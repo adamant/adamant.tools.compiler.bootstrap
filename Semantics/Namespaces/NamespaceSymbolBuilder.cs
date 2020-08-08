@@ -41,6 +41,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Namespaces
                     WalkChildren(syn, sym);
                 }
                 break;
+                case INonMemberEntityDeclarationSyntax syn:
+                    syn.ContainingNamespaceSymbol = containingSymbol;
+                    break;
                 default:
                     // do nothing
                     return;

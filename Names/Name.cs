@@ -41,6 +41,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
             return text;
         }
 
+        public override SimpleName ToSimpleName()
+        {
+            return new SimpleName(Text);
+        }
+
         [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates",
             Justification = "Constructor is alternative")]
         public static implicit operator Name(string text)

@@ -156,11 +156,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
             return parameter switch
             {
                 INamedParameterSyntax namedParameter =>
-                    new Parameter(namedParameter.IsMutableBinding, namedParameter.Name, namedParameter.DataType.Known()),
+                    new Parameter(namedParameter.IsMutableBinding, namedParameter.FullName.UnqualifiedName, namedParameter.DataType.Known()),
                 ISelfParameterSyntax selfParameter =>
-                    new Parameter(selfParameter.IsMutableBinding, selfParameter.Name, selfParameter.DataType.Known()),
+                    new Parameter(selfParameter.IsMutableBinding, selfParameter.FullName.UnqualifiedName, selfParameter.DataType.Known()),
                 IFieldParameterSyntax fieldParameter =>
-                    new Parameter(fieldParameter.IsMutableBinding, fieldParameter.Name, fieldParameter.DataType.Known()),
+                    new Parameter(fieldParameter.IsMutableBinding, fieldParameter.FullName.UnqualifiedName, fieldParameter.DataType.Known()),
                 _ => throw ExhaustiveMatch.Failed(parameter)
             };
         }
@@ -175,7 +175,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
 
         private static FieldInitialization BuildFieldInitialization(IFieldParameterSyntax parameter)
         {
-            return new FieldInitialization(parameter.Name, parameter.FieldName);
+            return new FieldInitialization(parameter.FullName.UnqualifiedName, parameter.Name);
         }
     }
 }

@@ -40,5 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         }
 
         public abstract override string ToString();
+
+        public abstract SimpleName ToSimpleName();
     }
 }

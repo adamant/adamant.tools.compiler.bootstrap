@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public MaybeQualifiedName FullName { get; }
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public SimpleName Name => FullName.UnqualifiedName;
+        public Name? Name { get; }
         public bool Unused { get; }
         public DataTypePromise DataType { get; } = new DataTypePromise();
 
@@ -22,10 +22,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         DataType IBindingMetadata.DataType => DataType.Fulfilled();
 
-        protected ParameterSyntax(TextSpan span, MaybeQualifiedName fullName)
+        protected ParameterSyntax(TextSpan span, MaybeQualifiedName fullName, Name? name)
             : base(span)
         {
             FullName = fullName;
+            Name = name;
             Unused = fullName.UnqualifiedName.Text.StartsWith("_", StringComparison.Ordinal);
         }
     }

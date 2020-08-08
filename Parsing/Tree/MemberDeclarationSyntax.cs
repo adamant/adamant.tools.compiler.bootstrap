@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Metadata;
@@ -14,9 +13,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public MaybeQualifiedName FullName { get; }
 
-        [DebuggerHidden]
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        SimpleName IMemberDeclarationSyntax.Name => FullName.UnqualifiedName;
         public Name? Name { get; }
         public MetadataSet ChildMetadata { get; protected set; }
 

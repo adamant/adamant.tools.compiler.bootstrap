@@ -15,7 +15,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal class FunctionDeclarationSyntax : CallableDeclarationSyntax, IFunctionDeclarationSyntax
     {
         private LexicalScope<Promise<Symbol?>>? containingLexicalScope;
-
         public LexicalScope<Promise<Symbol?>>? ContainingLexicalScope
         {
             get => containingLexicalScope;
@@ -27,6 +26,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             }
         }
         public NamespaceName ContainingNamespaceName { get; }
+
+        private NamespaceOrPackageSymbol? containingNamespaceSymbol;
+        public NamespaceOrPackageSymbol ContainingNamespaceSymbol
+        {
+            get => containingNamespaceSymbol
+                   ?? throw new InvalidOperationException($"{ContainingNamespaceSymbol} not yet assigned");
+            set
+            {
+                if (containingNamespaceSymbol != null)
+                    throw new InvalidOperationException($"Can't set {nameof(ContainingNamespaceSymbol)} repeatedly");
+                containingNamespaceSymbol = value;
+            }
+        }
+
         public new Name Name { get; }
         public bool IsExternalFunction { [DebuggerStepThrough] get; [DebuggerStepThrough] set; }
         public ITypeSyntax? ReturnType { [DebuggerStepThrough] get; }

@@ -90,7 +90,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
                 case IFieldDeclarationSyntax field:
                     if (field.DataType.TryBeginFulfilling(() =>
-                        diagnostics.Add(TypeError.CircularDefinition(field.File, field.NameSpan, field.Name))))
+                        diagnostics.Add(TypeError.CircularDefinition(field.File, field.NameSpan, field.Name.ToSimpleName()))))
                     {
                         var resolver = new BasicTypeAnalyzer(field.File, diagnostics);
                         var type = resolver.Evaluate(field.TypeSyntax);
@@ -106,7 +106,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
                 case IClassDeclarationSyntax @class:
                     if (@class.DeclaresDataType.TryBeginFulfilling(() => diagnostics.Add(
-                        TypeError.CircularDefinition(@class.File, @class.NameSpan, @class.Name))))
+                        TypeError.CircularDefinition(@class.File, @class.NameSpan, @class.Name.ToSimpleName()))))
                     {
                         bool mutable = !(@class.MutableModifier is null);
                         var classType = new ObjectType(
@@ -142,7 +142,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         parameter.DataType.BeginFulfilling();
                         var field = (declaringClass ?? throw new InvalidOperationException("Field parameter outside of class declaration"))
                                     .Members.OfType<IFieldDeclarationSyntax>()
-                                    .SingleOrDefault(f => f.Name == fieldParameter.FieldName);
+                                    .SingleOrDefault(f => f.Name == fieldParameter.Name);
                         if (field is null)
                         {
                             fieldParameter.SetIsMutableBinding(false);
@@ -155,7 +155,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             fieldParameter.SetIsMutableBinding(field.IsMutableBinding);
                             if (field.DataType.TryBeginFulfilling(() =>
                                 diagnostics.Add(TypeError.CircularDefinition(field.File, field.NameSpan,
-                                    field.Name))))
+                                    field.Name.ToSimpleName()))))
                             {
                                 var resolver = new BasicBodyAnalyzer(field.File, stringSymbol, diagnostics);
                                 field.DataType.BeginFulfilling();

@@ -109,9 +109,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             return mapping.GetAscii(builder.ToString());
         }
 
+        public string Mangle(TypeName name)
+        {
+            var builder = new StringBuilder(EstimateSize(name));
+            Mangle(name, builder);
+            return mapping.GetAscii(builder.ToString());
+        }
+
         public string Mangle(string name)
         {
             return Mangle(new SimpleName(name));
+        }
+
+        private static int EstimateSize(TypeName typeName)
+        {
+            return typeName switch
+            {
+                SpecialTypeName specialName => 1 + specialName.Text.Length,
+                Name name => name.Text.Length,
+                _ => throw ExhaustiveMatch.Failed(typeName)
+            };
         }
 
         private static int EstimateSize(MaybeQualifiedName name)
@@ -123,6 +140,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 SimpleName simpleName => simpleName.Text.Length,
                 _ => throw ExhaustiveMatch.Failed(name)
             };
+        }
+
+        private static void Mangle(TypeName typeName, StringBuilder builder)
+        {
+            switch (typeName)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(typeName);
+                case Name name:
+                    ManglePart(name.Text, builder);
+                    break;
+                case SpecialTypeName specialName:
+                    builder.Append('_');
+                    ManglePart(specialName.Text, builder);
+                    break;
+            }
         }
 
         private static void Mangle(MaybeQualifiedName name, StringBuilder builder)

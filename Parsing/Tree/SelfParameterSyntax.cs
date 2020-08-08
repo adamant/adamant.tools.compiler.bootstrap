@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public bool MutableSelf { get; }
 
         public SelfParameterSyntax(TextSpan span, MaybeQualifiedName fullName, bool mutableSelf)
-            : base(span, fullName)
+            : base(span, fullName, null)
         {
             MutableSelf = mutableSelf;
         }

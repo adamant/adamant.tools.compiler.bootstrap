@@ -1,3 +1,5 @@
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
+
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
     /// <summary>
@@ -5,5 +7,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     /// </summary>
     public partial interface INonMemberEntityDeclarationSyntax
     {
+        NamespaceOrPackageSymbol ContainingNamespaceSymbol { get; set; }
     }
 }

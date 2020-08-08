@@ -92,7 +92,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
             if (selfType != null) graph.AddSelfParameter(selfType);
 
             foreach (var parameter in callable.Parameters.Where(p => !p.Unused))
-                graph.AddParameter(parameter.IsMutableBinding, parameter.DataType.Fulfilled(), CurrentScope, parameter.Name.UnqualifiedName);
+                graph.AddParameter(parameter.IsMutableBinding, parameter.DataType.Fulfilled(), CurrentScope, parameter.FullName.UnqualifiedName);
 
             currentBlock = graph.NewBlock();
             foreach (var statement in callable.Body.Statements)

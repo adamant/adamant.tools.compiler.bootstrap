@@ -2,7 +2,6 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.CST.Walkers;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
-using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Parsing.Tree;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.NotImplemented
@@ -42,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.NotImplemented
                         diagnostics.Add(ParseError.NotImplemented(file, syn.DefaultValue.Span, "Default values"));
                     break;
                 case IConstructorDeclarationSyntax syn:
-                    if (syn.Name != SpecialNames.New)
+                    if (!(syn.Name is null))
                         diagnostics.Add(ParseError.NotImplemented(file, syn.Span, "Named constructors"));
                     break;
                 case IFieldDeclarationSyntax syn:

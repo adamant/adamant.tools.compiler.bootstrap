@@ -11,6 +11,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Builders;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes;
@@ -21,6 +22,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Validation;
+using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 {
@@ -56,7 +58,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // Make a list of all the entity declarations (i.e. not namespaces)
             var entities = GetEntityDeclarations(packageSyntax);
 
-            CheckSemantics(entities, stringSymbol, diagnostics);
+            CheckSemantics(entities, stringSymbol, diagnostics, packageSyntax.SymbolTreeBuilder);
 
             // If there are errors from the semantics phase, don't continue on
             diagnostics.ThrowIfFatalErrors();
@@ -112,8 +114,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         private static void CheckSemantics(
             FixedList<IEntityDeclarationSyntax> entities,
             ITypeMetadata? stringSymbol,
-            Diagnostics diagnostics)
+            Diagnostics diagnostics,
+            SymbolTree symbolTree)
         {
+            // Resolve symbols for the entities
+            new EntitySymbolResolver(diagnostics, symbolTree).Resolve(entities);
+
             // Basic Analysis includes: Name Binding, Type Checking, Constant Folding
             new BasicAnalyzer(stringSymbol, diagnostics).Check(entities);
 

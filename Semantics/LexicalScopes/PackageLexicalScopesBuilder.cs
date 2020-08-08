@@ -35,23 +35,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             }
         }
 
-        private static FixedList<DeclarationSymbol> GetAllDeclarationSymbols(PackageSyntax package)
+        private static FixedList<NonMemberEntitySymbol> GetAllDeclarationSymbols(PackageSyntax package)
         {
             var packageSymbols = package.CompilationUnits
                                         .SelectMany(cu => cu.AllEntityDeclarations)
                                         .OfType<INonMemberEntityDeclarationSyntax>()
-                                        .Select(d => new DeclarationSymbol(d));
+                                        .Select(d => new NonMemberEntitySymbol(d));
 
             // TODO it might be better to go to the declarations and get their symbols (once that is implemented)
             var referencedSymbols = package.References.Values
                                            .SelectMany(p => p.SymbolTree.Symbols)
                                            .Where(s => s.ContainingSymbol is NamespaceOrPackageSymbol)
-                                           .Select(s => new DeclarationSymbol(s));
+                                           .Select(s => new NonMemberEntitySymbol(s));
             return packageSymbols.Concat(referencedSymbols).ToFixedList();
         }
 
         private static FixedDictionary<NamespaceName, Namespace> BuildNamespaces(
-            FixedList<DeclarationSymbol> declarationSymbols)
+            FixedList<NonMemberEntitySymbol> declarationSymbols)
         {
             var namespaces = declarationSymbols.SelectMany(s => s.ContainingNamespace.NamespaceNames()).Distinct();
             var nsSymbols = new List<Namespace>();
@@ -80,7 +80,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         }
 
         private static FixedDictionary<TypeName, FixedSet<Promise<Symbol?>>> ToDictionary(
-            IEnumerable<DeclarationSymbol> symbols)
+            IEnumerable<NonMemberEntitySymbol> symbols)
         {
             return symbols.GroupBy(s => s.Name, s => s.Symbol)
                           .ToFixedDictionary(e => e.Key, e => e.ToFixedSet());

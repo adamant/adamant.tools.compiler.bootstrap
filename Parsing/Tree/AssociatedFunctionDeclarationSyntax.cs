@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -12,11 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal class AssociatedFunctionDeclarationSyntax : CallableDeclarationSyntax, IAssociatedFunctionDeclarationSyntax
     {
         public IClassDeclarationSyntax DeclaringClass { get; }
-
-        [DebuggerHidden]
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        SimpleName IMemberDeclarationSyntax.Name => FullName.UnqualifiedName;
-
+        public new Name Name { get; }
         public new FixedList<INamedParameterSyntax> Parameters { get; }
         public ITypeSyntax? ReturnType { get; }
         DataType IFunctionMetadata.ReturnDataType => ReturnDataType.Fulfilled();
@@ -38,6 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
                 reachabilityAnnotations, GetChildMetadata(null, parameters, body))
         {
             DeclaringClass = declaringClass;
+            Name = name;
             Parameters = parameters;
             ReturnType = returnTypeSyntax;
             Body = body;

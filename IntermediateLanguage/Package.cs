@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
     public class Package
     {
         public PackageSymbol Symbol { get; }
-        public PackageSymbolTree SymbolTree { get; }
+        public FixedSymbolTree SymbolTree { get; }
         public FixedList<Diagnostic> Diagnostics { get; internal set; }
         /// <summary>
         /// Referenced packages
@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         public FunctionDeclaration EntryPoint { get; internal set; }
 
         public Package(
-            PackageSymbolTree symbolTree,
+            FixedSymbolTree symbolTree,
             FixedList<Diagnostic> diagnostics,
             FixedList<Package> references,
             IEnumerable<Declaration> declarations,

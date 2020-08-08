@@ -131,7 +131,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IClassDeclarationSyntax : INonMemberEntityDeclarationSyntax
     {
         IMutableKeywordToken? MutableModifier { get; }
-        new SimpleName Name { get; }
+        new Name Name { get; }
         FixedList<IMemberDeclarationSyntax> Members { get; }
     }
 
@@ -237,13 +237,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface IFieldDeclarationSyntax : IMemberDeclarationSyntax
     {
+        new Name Name { get; }
         ITypeSyntax TypeSyntax { get; }
         DataTypePromise DataType { get; }
     }
 
     public partial interface IFieldParameterSyntax : IParameterSyntax, IConstructorParameterSyntax
     {
-        SimpleName FieldName { get; }
+        new Name Name { get; }
         IExpressionSyntax? DefaultValue { get; }
     }
 
@@ -338,7 +339,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IMemberDeclarationSyntax : IEntityDeclarationSyntax
     {
         IClassDeclarationSyntax DeclaringClass { get; }
-        new SimpleName Name { get; }
     }
 
     [Closed(
@@ -362,6 +362,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface INamedParameterSyntax : IParameterSyntax, IConstructorParameterSyntax
     {
+        new Name Name { get; }
         ITypeSyntax TypeSyntax { get; }
         IExpressionSyntax? DefaultValue { get; }
     }
@@ -423,7 +424,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(ISelfParameterSyntax))]
     public partial interface IParameterSyntax : ISyntax, IBindingMetadata
     {
-        SimpleName Name { get; }
+        Name? Name { get; }
         bool Unused { get; }
         DataTypePromise DataType { get; }
     }

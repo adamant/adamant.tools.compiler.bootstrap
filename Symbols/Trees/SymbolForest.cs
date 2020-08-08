@@ -5,17 +5,17 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Symbols.Trees
 {
-    public class MultiPackageSymbolTree : SymbolTree
+    public class SymbolForest
     {
-        private readonly FixedDictionary<PackageSymbol, PackageSymbolTree> packageTrees;
-        public override IEnumerable<Symbol> Symbols => packageTrees.Values.SelectMany(t => t.Symbols);
+        private readonly FixedDictionary<PackageSymbol, FixedSymbolTree> packageTrees;
+        public IEnumerable<Symbol> Symbols => packageTrees.Values.SelectMany(t => t.Symbols);
 
-        public MultiPackageSymbolTree(IEnumerable<PackageSymbolTree> packageTrees)
+        public SymbolForest(IEnumerable<FixedSymbolTree> packageTrees)
         {
             this.packageTrees = packageTrees.ToFixedDictionary(t => t.Package);
         }
 
-        public override IEnumerable<Symbol> Children(Symbol symbol)
+        public IEnumerable<Symbol> Children(Symbol symbol)
         {
             if (!packageTrees.TryGetValue(symbol.Package, out var tree))
                 throw new ArgumentException("Symbol must be for one of the packages in this tree", nameof(symbol));

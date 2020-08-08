@@ -16,7 +16,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal class ClassDeclarationSyntax : DeclarationSyntax, IClassDeclarationSyntax
     {
         private LexicalScope<Promise<Symbol?>>? containingLexicalScope;
-
         public LexicalScope<Promise<Symbol?>>? ContainingLexicalScope
         {
             get => containingLexicalScope;
@@ -27,15 +26,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
                 containingLexicalScope = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
+
         public NamespaceName ContainingNamespaceName { get; }
+
+        private NamespaceOrPackageSymbol? containingNamespaceSymbol;
+        public NamespaceOrPackageSymbol ContainingNamespaceSymbol
+        {
+            get => containingNamespaceSymbol
+                   ?? throw new InvalidOperationException($"{ContainingNamespaceSymbol} not yet assigned");
+            set
+            {
+                if (containingNamespaceSymbol != null)
+                    throw new InvalidOperationException($"Can't set {nameof(ContainingNamespaceSymbol)} repeatedly");
+                containingNamespaceSymbol = value;
+            }
+        }
+
         public IAccessModifierToken? AccessModifier { get; }
         public IMutableKeywordToken? MutableModifier { get; }
         public MaybeQualifiedName FullName { get; }
         public Name Name { get; }
-        [DebuggerHidden]
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        SimpleName IClassDeclarationSyntax.Name => FullName.UnqualifiedName;
-
         public FixedList<IMemberDeclarationSyntax> Members { get; }
         public DataTypePromise DeclaresDataType { get; } = new DataTypePromise();
         public MetadataSet ChildMetadata { get; protected set; }

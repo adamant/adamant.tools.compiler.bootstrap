@@ -10,6 +10,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         private bool? isMutableBinding;
         public override bool IsMutableBinding => isMutableBinding ?? throw new Exception($"Tried to access {nameof(IsMutableBinding)} of field parameter before it had been assigned.");
 
+        public new Name Name { get; }
+
         public SimpleName FieldName { get; }
 
         public IExpressionSyntax? DefaultValue { get; }
@@ -17,11 +19,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public FieldParameterSyntax(
             TextSpan span,
             MaybeQualifiedName fullName,
-            SimpleName fieldName,
+            Name name,
             IExpressionSyntax? defaultValue)
-            : base(span, fullName)
+            : base(span, fullName, name)
         {
-            FieldName = fieldName;
+            FieldName = fullName.UnqualifiedName;
+            Name = name;
             DefaultValue = defaultValue;
         }
 
