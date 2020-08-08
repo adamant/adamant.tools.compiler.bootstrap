@@ -36,6 +36,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         }
 
         [DebuggerStepThrough]
+        public static FixedSet<T> ToFixedSet<T>(this IEnumerable<T> values)
+        {
+            return new FixedSet<T>(values);
+        }
+
+        [DebuggerStepThrough]
         public static IEnumerable<TResult> CrossJoin<TFirst, TSecond, TResult>(
             this IEnumerable<TFirst> first,
             IEnumerable<TSecond> second,

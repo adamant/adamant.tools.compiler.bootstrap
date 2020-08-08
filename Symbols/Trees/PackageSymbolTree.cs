@@ -10,10 +10,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols.Trees
     public class PackageSymbolTree : SymbolTree
     {
         public PackageSymbol Package { get; }
-        private readonly FixedDictionary<Symbol, FixedList<Symbol>> symbolChildren;
+        private readonly FixedDictionary<Symbol, FixedSet<Symbol>> symbolChildren;
         public override IEnumerable<Symbol> Symbols => symbolChildren.Keys;
 
-        public PackageSymbolTree(PackageSymbol package, FixedDictionary<Symbol, FixedList<Symbol>> symbolChildren)
+        public PackageSymbolTree(PackageSymbol package, FixedDictionary<Symbol, FixedSet<Symbol>> symbolChildren)
         {
             if (!symbolChildren.ContainsKey(package))
                 throw new ArgumentException("Children must be for this package", nameof(symbolChildren));
@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols.Trees
                 throw new ArgumentException("Symbol must be for the package of this tree", nameof(symbol));
 
             return symbolChildren.TryGetValue(symbol, out var children)
-                ? children : FixedList<Symbol>.Empty;
+                ? children : FixedSet<Symbol>.Empty;
         }
     }
 }

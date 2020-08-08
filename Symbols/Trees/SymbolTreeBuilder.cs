@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols.Trees
 
         public PackageSymbolTree Build()
         {
-            return new PackageSymbolTree(Package, symbolChildren.ToFixedDictionary(e => e.Key, e => e.Value.ToFixedList()));
+            return new PackageSymbolTree(Package, symbolChildren.ToFixedDictionary(e => e.Key, e => e.Value.ToFixedSet()));
         }
     }
 }

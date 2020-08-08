@@ -12,13 +12,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.LexicalScopes
     public abstract class LexicalScope<TSymbol>
     {
         internal PackagesScope PackagesScope { get; }
-        private readonly FixedDictionary<TypeName, FixedList<TSymbol>> symbolsInScope;
-        private readonly FixedDictionary<TypeName, FixedList<TSymbol>> symbolsInNestedScopes;
+        private readonly FixedDictionary<TypeName, FixedSet<TSymbol>> symbolsInScope;
+        private readonly FixedDictionary<TypeName, FixedSet<TSymbol>> symbolsInNestedScopes;
 
         protected LexicalScope(
             PackagesScope packagesScope,
-            FixedDictionary<TypeName, FixedList<TSymbol>> symbolsInScope,
-            FixedDictionary<TypeName, FixedList<TSymbol>> symbolsInNestedScopes)
+            FixedDictionary<TypeName, FixedSet<TSymbol>> symbolsInScope,
+            FixedDictionary<TypeName, FixedSet<TSymbol>> symbolsInNestedScopes)
         {
             this.PackagesScope = packagesScope;
             this.symbolsInScope = symbolsInScope;

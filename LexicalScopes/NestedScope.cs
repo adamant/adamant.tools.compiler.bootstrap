@@ -10,8 +10,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.LexicalScopes
 
         public NestedScope(
             LexicalScope<TSymbol> containingScope,
-            FixedDictionary<TypeName, FixedList<TSymbol>> symbolsInScope,
-            FixedDictionary<TypeName, FixedList<TSymbol>> symbolsInNestedScopes)
+            FixedDictionary<TypeName, FixedSet<TSymbol>> symbolsInScope,
+            FixedDictionary<TypeName, FixedSet<TSymbol>> symbolsInNestedScopes)
             : base(containingScope.PackagesScope, symbolsInScope, symbolsInNestedScopes)
         {
             this.containingScope = containingScope;
@@ -19,8 +19,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.LexicalScopes
 
         public NestedScope(
             LexicalScope<TSymbol> containingScope,
-            FixedDictionary<TypeName, FixedList<TSymbol>> symbolsInScope)
-            : this(containingScope, symbolsInScope, FixedDictionary<TypeName, FixedList<TSymbol>>.Empty)
+            FixedDictionary<TypeName, FixedSet<TSymbol>> symbolsInScope)
+            : this(containingScope, symbolsInScope, FixedDictionary<TypeName, FixedSet<TSymbol>>.Empty)
         {
         }
 

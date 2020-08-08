@@ -79,11 +79,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             return new GlobalScope<Promise<Symbol?>>(packagesScope, globalNamespace.Symbols, globalNamespace.NestedSymbols);
         }
 
-        private static FixedDictionary<TypeName, FixedList<Promise<Symbol?>>> ToDictionary(
+        private static FixedDictionary<TypeName, FixedSet<Promise<Symbol?>>> ToDictionary(
             IEnumerable<DeclarationSymbol> symbols)
         {
             return symbols.GroupBy(s => s.Name, s => s.Symbol)
-                          .ToFixedDictionary(e => e.Key, e => e.ToFixedList());
+                          .ToFixedDictionary(e => e.Key, e => e.ToFixedSet());
         }
     }
 }

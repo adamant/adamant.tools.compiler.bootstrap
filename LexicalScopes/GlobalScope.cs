@@ -8,8 +8,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.LexicalScopes
     {
         public GlobalScope(
             PackagesScope packagesScope,
-            FixedDictionary<TypeName, FixedList<TSymbol>> symbolsInScope,
-            FixedDictionary<TypeName, FixedList<TSymbol>> symbolsInNestedScopes)
+            FixedDictionary<TypeName, FixedSet<TSymbol>> symbolsInScope,
+            FixedDictionary<TypeName, FixedSet<TSymbol>> symbolsInNestedScopes)
             : base(packagesScope, symbolsInScope, symbolsInNestedScopes) { }
 
         public override IEnumerable<TSymbol> LookupInGlobalScope(TypeName name)

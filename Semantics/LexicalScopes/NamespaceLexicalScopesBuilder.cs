@@ -84,7 +84,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                 }
             }
 
-            var symbolsInScope = importedSymbols.ToFixedDictionary(e => e.Key, e => e.Value.ToFixedList());
+            var symbolsInScope = importedSymbols.ToFixedDictionary(e => e.Key, e => e.Value.ToFixedSet());
             return new NestedScope<Promise<Symbol?>>(containingScope, symbolsInScope);
         }
     }
