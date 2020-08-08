@@ -10,6 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols.Trees
     /// </summary>
     public abstract class SymbolTree
     {
+        public abstract IEnumerable<Symbol> Symbols { get; }
         public abstract IEnumerable<Symbol> Children(Symbol symbol);
     }
 }

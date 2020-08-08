@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Symbols.Trees
@@ -7,6 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols.Trees
     public class MultiPackageSymbolTree : SymbolTree
     {
         private readonly FixedDictionary<PackageSymbol, PackageSymbolTree> packageTrees;
+        public override IEnumerable<Symbol> Symbols => packageTrees.Values.SelectMany(t => t.Symbols);
 
         public MultiPackageSymbolTree(IEnumerable<PackageSymbolTree> packageTrees)
         {

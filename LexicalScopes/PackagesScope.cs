@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.LexicalScopes
 
         public PackagesScope(PackageSymbol currentPackage, FixedDictionary<Name, PackageSymbol> packageAliases)
         {
-            this.CurrentPackage = currentPackage;
+            CurrentPackage = currentPackage;
             this.packageAliases = packageAliases;
         }
 
