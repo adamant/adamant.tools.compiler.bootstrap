@@ -86,6 +86,6 @@ TypeName: Type, IHasContainingScope;
 Type;
 UnaryOperatorExpression: Expression = Fixity:UnaryOperatorFixity Operator:UnaryOperator;
 UnsafeExpression: Expression;
-UsingDirective = Name:MaybeQualifiedName;
+UsingDirective = Name:NamespaceName;
 VariableDeclarationStatement: BodyStatement, IBindingMetadata = NameSpan:TextSpan Name:SimpleName TypeSyntax:Type? InferMutableType:bool;
 WhileExpression: Expression = Block:BlockExpression;

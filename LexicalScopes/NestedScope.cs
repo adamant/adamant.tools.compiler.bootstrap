@@ -17,6 +17,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.LexicalScopes
             this.containingScope = containingScope;
         }
 
+        public NestedScope(
+            LexicalScope<TSymbol> containingScope,
+            FixedDictionary<TypeName, FixedList<TSymbol>> symbolsInScope)
+            : this(containingScope, symbolsInScope, FixedDictionary<TypeName, FixedList<TSymbol>>.Empty)
+        {
+        }
+
         public override IEnumerable<TSymbol> LookupInGlobalScope(TypeName name)
         {
             throw new System.NotImplementedException();

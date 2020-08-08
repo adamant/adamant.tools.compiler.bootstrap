@@ -21,13 +21,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 return null;
             var identifiers = ParseManySeparated<(IIdentifierToken?, TextSpan), IDotToken>(
                 () => Tokens.ExpectToken<IIdentifierToken>());
-            RootName name = GlobalNamespaceName.Instance;
+            NamespaceName name = NamespaceName.Global;
             foreach (var (identifier, _) in identifiers)
                 if (!(identifier is null))
                     name = name.Qualify(identifier.Value);
             var semicolon = Tokens.Expect<ISemicolonToken>();
             var span = TextSpan.Covering(accept.Span, semicolon);
-            return new UsingDirectiveSyntax(span, (MaybeQualifiedName)name);
+            return new UsingDirectiveSyntax(span, name);
         }
     }
 }

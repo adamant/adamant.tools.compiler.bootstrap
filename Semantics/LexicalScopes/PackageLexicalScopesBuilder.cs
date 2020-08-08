@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 
             foreach (var compilationUnit in package.CompilationUnits)
             {
-                var builder = new NamespaceLexicalScopesBuilder(diagnostics, namespaces);
+                var builder = new NamespaceLexicalScopesBuilder(diagnostics, compilationUnit.CodeFile, namespaces);
                 //new SyntaxScopesBuilder(compilationUnit.CodeFile, GlobalScope, namespaces, diagnostics);
                 builder.Walk(compilationUnit, globalScope);
             }

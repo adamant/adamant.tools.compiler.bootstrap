@@ -499,7 +499,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface IUsingDirectiveSyntax : ISyntax
     {
-        MaybeQualifiedName Name { get; }
+        NamespaceName Name { get; }
     }
 
     public partial interface IVariableDeclarationStatementSyntax : IBodyStatementSyntax, IBindingMetadata

@@ -73,5 +73,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
             return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Analysis, 5010,
                 $"Using directive refers to namespace `{ns}` which does not exist");
         }
+
+        public static Diagnostic UsingNonExistentNamespace(CodeFile file, TextSpan span, NamespaceName ns)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Analysis, 5010,
+                $"Using directive refers to namespace `{ns}` which does not exist");
+        }
     }
 }

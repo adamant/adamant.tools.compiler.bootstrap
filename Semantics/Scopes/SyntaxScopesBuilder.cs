@@ -128,10 +128,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
             var importedSymbols = Enumerable.Empty<IMetadata>();
             foreach (var usingDirective in usingDirectives)
             {
-                var @namespace = namespaces.SingleOrDefault(ns => ns.FullName.Equals(usingDirective.Name));
+                var @namespace = namespaces.SingleOrDefault(ns => ns.FullName.Equals(usingDirective.Name.ToRootName()));
                 if (@namespace is null)
                 {
-                    diagnostics.Add(NameBindingError.UsingNonExistentNamespace(file, usingDirective.Span, usingDirective.Name));
+                    diagnostics.Add(NameBindingError.UsingNonExistentNamespace(file, usingDirective.Span, (MaybeQualifiedName)usingDirective.Name.ToRootName()));
                     continue;
                 }
 
