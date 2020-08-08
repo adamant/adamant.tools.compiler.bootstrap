@@ -6,26 +6,41 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Scopes;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     /// <summary>
-    /// The potentially qualified name of a type (i.e. `foo.bar.Baz`)
+    /// The unqualified name of a type
     /// </summary>
     internal class TypeNameSyntax : TypeSyntax, ITypeNameSyntax
     {
-        public MaybeQualifiedName Name { get; }
+        public TypeName Name { get; }
 
-        private IMetadata? referencedSymbol;
-        [DisallowNull]
-        public IMetadata? ReferencedType
+        private TypeSymbol? referencedSymbol;
+        public TypeSymbol ReferencedSymbol
         {
-            get => referencedSymbol;
+            get => referencedSymbol
+                   ?? throw new InvalidOperationException($"{nameof(ReferencedSymbol)} not yet assigned");
             set
             {
                 if (referencedSymbol != null)
+                    throw new InvalidOperationException($"Can't set {nameof(ReferencedSymbol)} repeatedly");
+
+                referencedSymbol = value;
+            }
+        }
+
+        private IMetadata? referencedMetadata;
+        [DisallowNull]
+        public IMetadata? ReferencedMetadata
+        {
+            get => referencedMetadata;
+            set
+            {
+                if (referencedMetadata != null)
                     throw new InvalidOperationException("Can't set referenced symbol repeatedly");
-                referencedSymbol = value ?? throw new ArgumentNullException(nameof(value));
+                referencedMetadata = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 
@@ -42,16 +57,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             }
         }
 
-        public TypeNameSyntax(TextSpan span, MaybeQualifiedName name)
+        public TypeNameSyntax(TextSpan span, TypeName name)
             : base(span)
         {
             Name = name;
         }
 
-        public FixedList<IMetadata> LookupInContainingScope()
+        public FixedList<IMetadata> LookupMetadataInContainingScope()
         {
             if (ContainingScope != null)
-                return ContainingScope.LookupMetadata(Name);
+                return ContainingScope.LookupMetadata(Name.ToSimpleName());
 
             throw new InvalidOperationException("Can't lookup type name without containing scope");
         }

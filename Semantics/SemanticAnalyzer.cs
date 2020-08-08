@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             NamespaceSymbolBuilder.BuildNamespaceSymbols(packageSyntax);
 
-            BuildNamespaceScopes(packageSyntax, diagnostics);
+            BuildNamespaceScopes(packageSyntax);
 
             var stringSymbol = BuildScopes(packageSyntax, diagnostics);
 
@@ -80,13 +80,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         /// <summary>
         /// Build up lexical scopes down to the declaration level
         /// </summary>
-        private static void BuildNamespaceScopes(PackageSyntax packageSyntax, Diagnostics diagnostics)
+        private static void BuildNamespaceScopes(PackageSyntax packageSyntax)
         {
-            var builder = new PackageLexicalScopesBuilder(diagnostics);
-            // TODO can the references be part of the package syntax?
+            var builder = new PackageLexicalScopesBuilder();
             builder.BuildNamespaceScopesFor(packageSyntax);
-
-            // TODO finish building declaration scopes
         }
 
         private static ITypeMetadata? BuildScopes(

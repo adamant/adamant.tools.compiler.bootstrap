@@ -82,7 +82,7 @@ SelfParameter: Parameter = MutableSelf:bool;
 ShareExpression: Expression = SharedSymbol:IBindingMetadata;
 Statement;
 StringLiteralExpression: LiteralExpression = Value:string;
-TypeName: Type, IHasContainingScope;
+TypeName: Type, IHasContainingScope = Name:'TypeName';
 Type;
 UnaryOperatorExpression: Expression = Fixity:UnaryOperatorFixity Operator:UnaryOperator;
 UnsafeExpression: Expression;

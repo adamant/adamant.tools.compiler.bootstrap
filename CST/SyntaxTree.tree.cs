@@ -478,6 +478,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface ITypeNameSyntax : ITypeSyntax, IHasContainingScope
     {
+        TypeName Name { get; }
     }
 
     [Closed(

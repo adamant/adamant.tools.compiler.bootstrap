@@ -9,17 +9,17 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
 {
     /// <summary>
     /// Analyzes an <see cref="ITypeSyntax" /> to evaluate which type it refers to.
     /// </summary>
-    public class BasicTypeAnalyzer
+    public class TypeResolver
     {
         private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
 
-        public BasicTypeAnalyzer(CodeFile file, Diagnostics diagnostics)
+        public TypeResolver(CodeFile file, Diagnostics diagnostics)
         {
             this.file = file;
             this.diagnostics = diagnostics;

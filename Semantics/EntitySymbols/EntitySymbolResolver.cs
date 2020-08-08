@@ -2,7 +2,6 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
@@ -27,6 +26,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
             // Process all classes first because they may be referenced by functions etc.
             foreach (var @class in entities.OfType<IClassDeclarationSyntax>())
                 ResolveClass(@class);
+
+            // Now resolve all other symbols (class declarations will already have symbols and won't be processed again)
+            foreach (var entity in entities)
+                ResolveEntity(entity);
         }
 
         /// <summary>
@@ -64,25 +67,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
                     break;
                 }
                 case IFieldDeclarationSyntax field:
-                    if (field.DataType.TryBeginFulfilling(() =>
-                        diagnostics.Add(TypeError.CircularDefinition(field.File, field.NameSpan, field.Name.ToSimpleName()))))
-                    {
-                        var resolver = new BasicTypeAnalyzer(field.File, diagnostics);
-                        var type = resolver.Evaluate(field.TypeSyntax);
-                        field.DataType.Fulfill(type);
-                    }
+                    //if (field.DataType.TryBeginFulfilling(() =>
+                    //    diagnostics.Add(TypeError.CircularDefinition(field.File, field.NameSpan, field.Name.ToSimpleName()))))
+                    //{
+                    //    var resolver = new TypeResolver(field.File, diagnostics);
+                    //    var type = resolver.Evaluate(field.TypeSyntax);
+                    //    field.DataType.Fulfill(type);
+                    //}
                     break;
-                case IFunctionDeclarationSyntax function:
-                {
-                    //var analyzer = new BasicTypeAnalyzer(function.File, diagnostics);
-                    //ResolveTypesInParameters(analyzer, function.Parameters, null);
-                    //ResolveReturnType(function.ReturnDataType, function.ReturnType, analyzer);
+                case IFunctionDeclarationSyntax syn:
+                    ResolveFunction(syn);
                     break;
-                }
                 case IClassDeclarationSyntax syn:
                     ResolveClass(syn);
                     break;
             }
+        }
+
+        private void ResolveFunction(IFunctionDeclarationSyntax function)
+        {
+            var analyzer = new TypeResolver(function.File, diagnostics);
+            //ResolveTypesInParameters(analyzer, function.Parameters, null);
+            //ResolveReturnType(function.ReturnDataType, function.ReturnType, analyzer);
         }
 
         private void ResolveClass(IClassDeclarationSyntax @class)

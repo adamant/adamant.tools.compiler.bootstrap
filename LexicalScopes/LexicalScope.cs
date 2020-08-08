@@ -38,6 +38,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.LexicalScopes
             if (includeNested && symbolsInNestedScopes.TryGetValue(name, out symbols)) return symbols;
             return Enumerable.Empty<TSymbol>();
         }
-
     }
 }

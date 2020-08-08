@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Names
@@ -42,5 +43,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         public abstract override string ToString();
 
         public abstract SimpleName ToSimpleName();
+
+        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates",
+            Justification = "Name() constructor is alternative")]
+        public static implicit operator TypeName(string text)
+        {
+            return new Name(text);
+        }
     }
 }

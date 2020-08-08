@@ -9,7 +9,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
     /// </summary>
     public sealed class SpecialTypeName : TypeName
     {
-        public SpecialTypeName(string text)
+        public static readonly SpecialTypeName Void = new SpecialTypeName("void");
+        public static readonly SpecialTypeName Never = new SpecialTypeName("never");
+        public static readonly SpecialTypeName Bool = new SpecialTypeName("bool");
+        public static readonly SpecialTypeName Any = new SpecialTypeName("Any");
+        public static readonly SpecialTypeName Byte = new SpecialTypeName("byte");
+#pragma warning disable CA1720
+        public static readonly SpecialTypeName Int = new SpecialTypeName("int");
+        public static readonly SpecialTypeName UInt = new SpecialTypeName("uint");
+#pragma warning restore CA1720
+        public static readonly SpecialTypeName Size = new SpecialTypeName("size");
+        public static readonly SpecialTypeName Offset = new SpecialTypeName("offset");
+
+        private SpecialTypeName(string text)
             : base(text) { }
 
         public override bool Equals(TypeName? other)

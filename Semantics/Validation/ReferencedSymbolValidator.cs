@@ -43,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                     return;
                 case ITypeNameSyntax typeName:
                     WalkChildren(typeName);
-                    AssertHasReferencedSymbol(typeName, typeName.ReferencedType);
+                    AssertHasReferencedSymbol(typeName, typeName.ReferencedMetadata);
                     return;
                 case IMoveExpressionSyntax move:
                     WalkChildren(move);

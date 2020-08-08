@@ -12,17 +12,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 {
     internal class NamespaceLexicalScopesBuilder : SyntaxWalker<LexicalScope<Promise<Symbol?>>>
     {
-        private readonly Diagnostics diagnostics;
-        private readonly CodeFile file;
         private readonly FixedDictionary<NamespaceName, Namespace> namespaces;
 
-        public NamespaceLexicalScopesBuilder(
-            Diagnostics diagnostics,
-            CodeFile file,
-            FixedDictionary<NamespaceName, Namespace> namespaces)
+        public NamespaceLexicalScopesBuilder(FixedDictionary<NamespaceName, Namespace> namespaces)
         {
-            this.diagnostics = diagnostics;
-            this.file = file;
             this.namespaces = namespaces;
         }
 

@@ -88,44 +88,44 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         private ITypeNameSyntax ParseTypeName()
         {
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
-            var name = new SimpleName(identifier.Value);
+            var name = identifier.Value;
             return new TypeNameSyntax(identifier.Span, name);
         }
 
         private ITypeNameSyntax ParsePrimitiveType()
         {
             var keyword = Tokens.RequiredToken<IPrimitiveTypeToken>();
-            SimpleName name;
+            SpecialTypeName name;
             switch (keyword)
             {
                 default:
                     throw ExhaustiveMatch.Failed(keyword);
                 case IVoidKeywordToken _:
-                    name = SpecialNames.Void;
+                    name = SpecialTypeName.Void;
                     break;
                 case INeverKeywordToken _:
-                    name = SpecialNames.Never;
+                    name = SpecialTypeName.Never;
                     break;
                 case IBoolKeywordToken _:
-                    name = SpecialNames.Bool;
+                    name = SpecialTypeName.Bool;
                     break;
                 case IAnyKeywordToken _:
-                    name = SpecialNames.Any;
+                    name = SpecialTypeName.Any;
                     break;
                 case IByteKeywordToken _:
-                    name = SpecialNames.Byte;
+                    name = SpecialTypeName.Byte;
                     break;
                 case IIntKeywordToken _:
-                    name = SpecialNames.Int;
+                    name = SpecialTypeName.Int;
                     break;
                 case IUIntKeywordToken _:
-                    name = SpecialNames.UInt;
+                    name = SpecialTypeName.UInt;
                     break;
                 case ISizeKeywordToken _:
-                    name = SpecialNames.Size;
+                    name = SpecialTypeName.Size;
                     break;
                 case IOffsetKeywordToken _:
-                    name = SpecialNames.Offset;
+                    name = SpecialTypeName.Offset;
                     break;
             }
 

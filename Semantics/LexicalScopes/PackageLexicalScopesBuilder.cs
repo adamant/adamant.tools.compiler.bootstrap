@@ -12,12 +12,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 {
     public class PackageLexicalScopesBuilder
     {
-        private readonly Diagnostics diagnostics;
-        public PackageLexicalScopesBuilder(Diagnostics diagnostics)
-        {
-            this.diagnostics = diagnostics;
-        }
-
         [SuppressMessage("Performance", "CA1822:Mark members as static",
             Justification = "OO")]
         public void BuildNamespaceScopesFor(PackageSyntax package)
@@ -29,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 
             foreach (var compilationUnit in package.CompilationUnits)
             {
-                var builder = new NamespaceLexicalScopesBuilder(diagnostics, compilationUnit.CodeFile, namespaces);
+                var builder = new NamespaceLexicalScopesBuilder(namespaces);
                 //new SyntaxScopesBuilder(compilationUnit.CodeFile, GlobalScope, namespaces, diagnostics);
                 builder.Walk(compilationUnit, globalScope);
             }
