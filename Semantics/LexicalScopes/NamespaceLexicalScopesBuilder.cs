@@ -36,13 +36,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     WalkChildren(syn, containingScope);
                     break;
                 case INamespaceDeclarationSyntax syn:
+                    syn.ContainingLexicalScope = containingScope;
                     // TODO BuildNamespaceScopes
                     containingScope = BuildUsingDirectivesScope(syn.UsingDirectives, containingScope);
                     WalkChildren(syn, containingScope);
                     break;
-                default:
-                    // Ignore
-                    return;
+                case INonMemberDeclarationSyntax syn:
+                    syn.ContainingLexicalScope = containingScope;
+                    break;
             }
         }
 

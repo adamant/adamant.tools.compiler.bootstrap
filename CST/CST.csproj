@@ -28,6 +28,7 @@
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Framework\Framework.csproj" />
     <ProjectReference Include="..\IntermediateLanguage\IntermediateLanguage.csproj" />
+    <ProjectReference Include="..\LexicalScopes\LexicalScopes.csproj" />
     <ProjectReference Include="..\Metadata\Metadata.csproj" />
     <ProjectReference Include="..\Names\Names.csproj" />
     <ProjectReference Include="..\Scopes\Scopes.csproj" />

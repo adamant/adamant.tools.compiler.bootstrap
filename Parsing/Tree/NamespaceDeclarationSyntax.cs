@@ -1,12 +1,27 @@
+using System;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.LexicalScopes;
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class NamespaceDeclarationSyntax : DeclarationSyntax, INamespaceDeclarationSyntax
     {
+        private LexicalScope<Promise<Symbol?>>? containingLexicalScope;
+        public LexicalScope<Promise<Symbol?>>? ContainingLexicalScope
+        {
+            get => containingLexicalScope;
+            set
+            {
+                if (containingLexicalScope != null)
+                    throw new InvalidOperationException($"Can't set {nameof(ContainingLexicalScope)} repeatedly");
+                containingLexicalScope = value ?? throw new ArgumentNullException(nameof(value));
+            }
+        }
+
         public NamespaceName ContainingNamespaceName { get; }
 
         /// <summary>

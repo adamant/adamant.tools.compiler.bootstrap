@@ -30,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             set
             {
                 if (constructorSymbol != null)
-                    throw new InvalidOperationException("Can't set constructor symbol repeatedly");
+                    throw new InvalidOperationException($"Can't set {nameof(ReferencedConstructor)} repeatedly");
                 constructorSymbol = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
