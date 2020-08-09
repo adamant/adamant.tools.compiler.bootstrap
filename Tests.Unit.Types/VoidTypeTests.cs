@@ -44,7 +44,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Types
         {
             var type = VoidType.Instance;
 
-            Assert.Equal(SpecialNames.Void, type.Name);
+            Assert.Equal(SpecialTypeName.Void, type.Name);
         }
 
         [Fact]

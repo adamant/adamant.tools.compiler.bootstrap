@@ -32,8 +32,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         private SpecialTypeName(string text)
             : base(text) { }
 
-
-
         public override bool Equals(TypeName? other)
         {
             if (other is null) return false;

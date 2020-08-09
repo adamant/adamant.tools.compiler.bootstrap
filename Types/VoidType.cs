@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         internal static readonly VoidType Instance = new VoidType();
 
         private VoidType()
-            : base(SpecialNames.Void)
+            : base(SpecialTypeName.Void)
         { }
         #endregion
 

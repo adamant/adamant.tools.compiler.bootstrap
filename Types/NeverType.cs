@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         internal static readonly NeverType Instance = new NeverType();
 
         private NeverType()
-            : base(SpecialNames.Never)
+            : base(SpecialTypeName.Never)
         { }
         #endregion
 

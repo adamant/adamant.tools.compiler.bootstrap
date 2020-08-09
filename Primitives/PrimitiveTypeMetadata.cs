@@ -40,7 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 
         public static PrimitiveTypeMetadata NewEmptyType(EmptyType type)
         {
-            return new PrimitiveTypeMetadata(type.Name, type);
+            return new PrimitiveTypeMetadata(type.Name.ToSimpleName(), type);
         }
 
         public static PrimitiveTypeMetadata New(MaybeQualifiedName fullName, DataType? type = null)

@@ -44,7 +44,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Types
         {
             var type = NeverType.Instance;
 
-            Assert.Equal(SpecialNames.Never, type.Name);
+            Assert.Equal(SpecialTypeName.Never, type.Name);
         }
 
         [Fact]
