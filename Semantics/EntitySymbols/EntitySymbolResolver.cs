@@ -181,7 +181,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
                 return;
 
             bool mutable = !(@class.MutableModifier is null);
-            var classType = new ObjectType(@class.FullName, mutable, ReferenceCapability.Shared);
+            var classType = new ObjectType(@class.ContainingNamespaceName, @class.Name, mutable, ReferenceCapability.Shared);
 
             var symbol = new TypeSymbol(@class.ContainingNamespaceSymbol!, @class.Name, classType);
             @class.Symbol.Fulfill(symbol);

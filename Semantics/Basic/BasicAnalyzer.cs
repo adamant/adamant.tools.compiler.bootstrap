@@ -110,7 +110,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     {
                         bool mutable = !(@class.MutableModifier is null);
                         var classType = new ObjectType(
-                            @class.FullName,
+                            @class.ContainingNamespaceName,
+                            @class.Name,
                             mutable,
                             ReferenceCapability.Shared);
                         @class.DeclaresDataType.Fulfill(classType);

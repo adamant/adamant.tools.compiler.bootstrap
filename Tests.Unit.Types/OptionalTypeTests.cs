@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using Xunit;
@@ -66,10 +67,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Types
         [Fact]
         public void With_equal_referent_are_equal()
         {
-            var type1 = new OptionalType(new ObjectType(MaybeQualifiedName.From("foo", "bar", "baz"), true, ReferenceCapability.Borrowed));
-            var type2 = new OptionalType(new ObjectType(MaybeQualifiedName.From("foo", "bar", "baz"), true, ReferenceCapability.Borrowed));
+            var type1 = new OptionalType(new ObjectType(Namespace("foo", "bar"), "Baz", true, ReferenceCapability.Borrowed));
+            var type2 = new OptionalType(new ObjectType(Namespace("foo", "bar"), "Baz", true, ReferenceCapability.Borrowed));
 
             Assert.Equal(type1, type2);
+        }
+
+        private static NamespaceName Namespace(params string[] segments)
+        {
+            return new NamespaceName(segments.Select(s => new Name(s)));
         }
     }
 }

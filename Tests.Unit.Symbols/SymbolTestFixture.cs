@@ -99,7 +99,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
         protected ObjectType DataType(string? name = null)
         {
             var finalName = Name(name) ?? DefaultName("DataType");
-            return new ObjectType(new SimpleName(finalName.Text), false, ReferenceCapability.Isolated);
+            return new ObjectType(NamespaceName.Global, finalName.Text, false, ReferenceCapability.Isolated);
         }
 
         protected TypeSymbol Type(

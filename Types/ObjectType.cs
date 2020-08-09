@@ -18,18 +18,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
     /// </remarks>
     public sealed class ObjectType : ReferenceType
     {
-        public MaybeQualifiedName FullName { get; }
+        public NamespaceName ContainingNamespace { get; }
+        public TypeName Name { get; }
+        public MaybeQualifiedName FullName => ContainingNamespace.ToRootName().Qualify(Name.ToSimpleName());
 
         public override bool IsKnown { [DebuggerStepThrough] get => true; }
 
         // TODO referenceCapability needs to match declared mutable?
         public ObjectType(
-            MaybeQualifiedName fullName,
+            NamespaceName containingNamespace,
+            TypeName name,
             bool declaredMutable,
             ReferenceCapability referenceCapability)
             : base(declaredMutable, referenceCapability)
         {
-            FullName = fullName;
+            ContainingNamespace = containingNamespace;
+            Name = name;
         }
 
         /// <summary>
@@ -38,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         public ObjectType ToMutable()
         {
             Requires.That("DeclaredMutable", DeclaredMutable, "must be declared as a mutable type to use mutably");
-            return new ObjectType(FullName, DeclaredMutable, ReferenceCapability.ToMutable());
+            return new ObjectType(ContainingNamespace, Name, DeclaredMutable, ReferenceCapability.ToMutable());
         }
 
         /// <summary>
@@ -47,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         /// </summary>
         public ObjectType ForConstructorSelf()
         {
-            return new ObjectType(FullName, DeclaredMutable, ReferenceCapability.Borrowed);
+            return new ObjectType(ContainingNamespace, Name, DeclaredMutable, ReferenceCapability.Borrowed);
         }
 
         public override string ToString()
@@ -76,7 +80,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
 
         protected internal override Self To_ReturnsSelf(ReferenceCapability referenceCapability)
         {
-            return new ObjectType(FullName, DeclaredMutable, referenceCapability);
+            return new ObjectType(ContainingNamespace, Name, DeclaredMutable, referenceCapability);
         }
     }
 }
