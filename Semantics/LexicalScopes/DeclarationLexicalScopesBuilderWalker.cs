@@ -30,7 +30,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                 case ICompilationUnitSyntax syn:
                     containingScope = BuildNamespaceScopes(syn.ImplicitNamespaceName, containingScope);
                     containingScope = BuildUsingDirectivesScope(syn.UsingDirectives, containingScope);
-                    WalkChildren(syn, containingScope);
                     break;
                 case INamespaceDeclarationSyntax syn:
                     syn.ContainingLexicalScope = containingScope;
