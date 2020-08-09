@@ -44,7 +44,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Types
         {
             var type = BoolConstantType.True;
 
-            Assert.Equal(SimpleName.Special("const[true]"), type.Name);
+            Assert.Equal(SpecialTypeName.True, type.Name);
             Assert.Equal("const[true]", type.ToString());
         }
 
@@ -53,7 +53,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Types
         {
             var type = BoolConstantType.False;
 
-            Assert.Equal(SimpleName.Special("const[false]"), type.Name);
+            Assert.Equal(SpecialTypeName.False, type.Name);
             Assert.Equal("const[false]", type.ToString());
         }
 

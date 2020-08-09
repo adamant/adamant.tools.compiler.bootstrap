@@ -1,5 +1,6 @@
 using System;
 using System.Numerics;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Types
 {
@@ -14,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         public override bool IsKnown => true;
 
         public IntegerConstantType(BigInteger value)
-            : base($"const[{value}]")
+            : base(SpecialTypeName.ConstInt)
         {
             Value = value;
         }
@@ -35,6 +36,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         public override int GetHashCode()
         {
             return HashCode.Combine(Value);
+        }
+
+        public override string ToString()
+        {
+            return $"const[{Value}]";
         }
     }
 }

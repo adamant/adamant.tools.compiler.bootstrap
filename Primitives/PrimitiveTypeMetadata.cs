@@ -35,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             SimpleType type,
             IEnumerable<IMetadata>? childSymbols = null)
         {
-            return new PrimitiveTypeMetadata(type.Name, type, childSymbols);
+            return new PrimitiveTypeMetadata(type.Name.ToSimpleName(), type, childSymbols);
         }
 
         public static PrimitiveTypeMetadata NewEmptyType(EmptyType type)

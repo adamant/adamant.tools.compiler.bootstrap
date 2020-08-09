@@ -9,13 +9,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         typeof(NumericType))]
     public abstract class SimpleType : ValueType
     {
-        public MaybeQualifiedName Name { get; }
+        public SpecialTypeName Name { get; }
 
         public override TypeSemantics Semantics => TypeSemantics.Copy;
 
-        private protected SimpleType(string name)
+        private protected SimpleType(SpecialTypeName name)
         {
-            Name = SimpleName.Special(name);
+            Name = name;
         }
 
         public override string ToString()

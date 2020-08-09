@@ -1,3 +1,5 @@
+using Adamant.Tools.Compiler.Bootstrap.Names;
+
 namespace Adamant.Tools.Compiler.Bootstrap.Types
 {
     public class BoolType : SimpleType
@@ -6,11 +8,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         internal static readonly BoolType Instance = new BoolType();
 
         private BoolType()
-            : base("bool")
+            : base(SpecialTypeName.Bool)
         { }
         #endregion
 
-        private protected BoolType(string name)
+        private protected BoolType(SpecialTypeName name)
             : base(name) { }
 
         public override bool IsKnown => true;

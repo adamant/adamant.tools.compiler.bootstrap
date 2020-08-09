@@ -9,6 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
     /// </summary>
     public sealed class SpecialTypeName : TypeName
     {
+        #region Empty and Simple Types
         public static readonly SpecialTypeName Void = new SpecialTypeName("void");
         public static readonly SpecialTypeName Never = new SpecialTypeName("never");
         public static readonly SpecialTypeName Bool = new SpecialTypeName("bool");
@@ -20,9 +21,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
 #pragma warning restore CA1720
         public static readonly SpecialTypeName Size = new SpecialTypeName("size");
         public static readonly SpecialTypeName Offset = new SpecialTypeName("offset");
+        #endregion
+
+        #region Constant Types
+        public static readonly SpecialTypeName True = new SpecialTypeName("True");
+        public static readonly SpecialTypeName False = new SpecialTypeName("False");
+        public static readonly SpecialTypeName ConstInt = new SpecialTypeName("ConstInt");
+        #endregion
 
         private SpecialTypeName(string text)
             : base(text) { }
+
+
 
         public override bool Equals(TypeName? other)
         {

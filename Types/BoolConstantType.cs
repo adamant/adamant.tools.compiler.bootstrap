@@ -1,3 +1,5 @@
+using Adamant.Tools.Compiler.Bootstrap.Names;
+
 namespace Adamant.Tools.Compiler.Bootstrap.Types
 {
     public sealed class BoolConstantType : BoolType
@@ -10,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         public bool Value { get; }
 
         private BoolConstantType(bool value)
-            : base($"const[{(value ? "true" : "false")}]")
+            : base(value ? SpecialTypeName.True : SpecialTypeName.False)
         {
             Value = value;
         }
@@ -18,6 +20,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         public override DataType ToNonConstantType()
         {
             return Bool;
+        }
+
+        public override string ToString()
+        {
+            return $"const[{(Value ? "true" : "false")}]";
         }
     }
 }

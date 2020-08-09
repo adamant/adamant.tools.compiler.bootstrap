@@ -24,13 +24,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         public static readonly BoolType Bool = BoolType.Instance;
         public static readonly BoolConstantType True = BoolConstantType.True;
         public static readonly BoolConstantType False = BoolConstantType.False;
-        public static readonly SizedIntegerType Byte = SizedIntegerType.Byte;
+        public static readonly FixedSizeIntegerType Byte = FixedSizeIntegerType.Byte;
 #pragma warning disable CA1720
-        public static readonly SizedIntegerType Int = SizedIntegerType.Int;
-        public static readonly SizedIntegerType UInt = SizedIntegerType.UInt;
+        public static readonly FixedSizeIntegerType Int = FixedSizeIntegerType.Int;
+        public static readonly FixedSizeIntegerType UInt = FixedSizeIntegerType.UInt;
 #pragma warning restore CA1720
-        public static readonly UnsizedIntegerType Size = UnsizedIntegerType.Size;
-        public static readonly UnsizedIntegerType Offset = UnsizedIntegerType.Offset;
+        public static readonly PointerSizedIntegerType Size = PointerSizedIntegerType.Size;
+        public static readonly PointerSizedIntegerType Offset = PointerSizedIntegerType.Offset;
 
         /// <summary>
         /// The value `none` has this type, which is `never?`

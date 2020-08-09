@@ -1,14 +1,15 @@
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Types
 {
     [Closed(
         typeof(IntegerConstantType),
-        typeof(SizedIntegerType),
-        typeof(UnsizedIntegerType))]
+        typeof(FixedSizeIntegerType),
+        typeof(PointerSizedIntegerType))]
     public abstract class IntegerType : NumericType
     {
-        private protected IntegerType(string name)
+        private protected IntegerType(SpecialTypeName name)
             : base(name)
         {
         }

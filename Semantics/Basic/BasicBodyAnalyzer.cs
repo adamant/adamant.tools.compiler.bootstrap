@@ -176,11 +176,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     if (targetType.Referent.IsAssignableFrom(type))
                         expression = new ImplicitOptionalConversionExpression(expression, targetType);
                     break;
-                case (SizedIntegerType targetType, SizedIntegerType expressionType):
+                case (FixedSizeIntegerType targetType, FixedSizeIntegerType expressionType):
                     if (targetType.Bits > expressionType.Bits && (!expressionType.IsSigned || targetType.IsSigned))
                         expression = new ImplicitNumericConversionExpression(expression, targetType);
                     break;
-                case (SizedIntegerType targetType, IntegerConstantType expressionType):
+                case (FixedSizeIntegerType targetType, IntegerConstantType expressionType):
                 {
                     var requireSigned = expressionType.Value < 0;
                     var bits = expressionType.Value.GetByteCount() * 8;
@@ -188,7 +188,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         expression = new ImplicitNumericConversionExpression(expression, targetType);
                 }
                 break;
-                case (UnsizedIntegerType targetType, IntegerConstantType expressionType):
+                case (PointerSizedIntegerType targetType, IntegerConstantType expressionType):
                 {
                     var requireSigned = expressionType.Value < 0;
                     if (!requireSigned || targetType.IsSigned)
@@ -407,7 +407,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                                 case IntegerConstantType integerType:
                                     exp.Type = integerType;
                                     break;
-                                case SizedIntegerType sizedIntegerType:
+                                case FixedSizeIntegerType sizedIntegerType:
                                     exp.Type = sizedIntegerType;
                                     break;
                                 case UnknownType _:
@@ -1062,14 +1062,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     // TODO may need to promote based on size
                     throw new NotImplementedException();
                 //return !IsIntegerType(rightType);
-                case UnsizedIntegerType integerType:
+                case PointerSizedIntegerType integerType:
                     // TODO this isn't right we might need to convert either of them
                     InsertImplicitConversionIfNeeded(ref rightOperand, integerType);
-                    return rightOperand.Type is UnsizedIntegerType;
-                case SizedIntegerType integerType:
+                    return rightOperand.Type is PointerSizedIntegerType;
+                case FixedSizeIntegerType integerType:
                     // TODO this isn't right we might need to convert either of them
                     InsertImplicitConversionIfNeeded(ref rightOperand, integerType);
-                    return rightOperand.Type is SizedIntegerType;
+                    return rightOperand.Type is FixedSizeIntegerType;
                 case OptionalType _:
                     throw new NotImplementedException("Trying to do math on optional type");
                 case NeverType _:

@@ -18,14 +18,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         .LookupMetadataInGlobalScope(objectType.FullName)
                         .OfType<ITypeMetadata>()
                         .Single(),
-                SizedIntegerType integerType =>
+                FixedSizeIntegerType integerType =>
                         containingScope
-                        .LookupMetadataInGlobalScope(integerType.Name)
+                        .LookupMetadataInGlobalScope(integerType.Name.ToSimpleName())
                         .OfType<ITypeMetadata>()
                         .Single(),
-                UnsizedIntegerType integerType =>
+                PointerSizedIntegerType integerType =>
                         containingScope
-                        .LookupMetadataInGlobalScope(integerType.Name)
+                        .LookupMetadataInGlobalScope(integerType.Name.ToSimpleName())
                         .OfType<ITypeMetadata>()
                         .Single(),
                 _ => throw new NotImplementedException(

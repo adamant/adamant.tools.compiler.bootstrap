@@ -62,10 +62,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 
         private static IMetadata BuildIntegerTypeMetadata(IntegerType integerType, DataType stringType)
         {
-            var typeName = integerType.Name;
+            var typeName = integerType.Name.ToSimpleName();
             var symbols = new List<IMetadata>
             {
-                PrimitiveMethodMetadata.New( typeName.Qualify("remainder"), integerType, integerType, ("divisor", integerType)),
+                PrimitiveMethodMetadata.New(typeName.Qualify("remainder"), integerType, integerType, ("divisor", integerType)),
                 PrimitiveMethodMetadata.New(typeName.Qualify("to_display_string"), stringType, integerType),
             };
             return PrimitiveTypeMetadata.NewSimpleType(integerType, symbols);
