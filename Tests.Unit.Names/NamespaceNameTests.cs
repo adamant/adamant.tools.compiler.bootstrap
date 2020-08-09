@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Xunit;
@@ -30,11 +29,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Names
         }
 
         [Fact]
-        public void Cannot_qualify_global_namespace()
+        public void Can_qualify_empty_namespace()
         {
             var ns = Namespace("foo", "bar", "baz");
 
-            Assert.Throws<ArgumentException>(() => ns.Qualify(NamespaceName.Global));
+            var qualifiedEmpty = ns.Qualify(Namespace());
+
+            Assert.Equal(ns, qualifiedEmpty);
         }
 
         [Fact]

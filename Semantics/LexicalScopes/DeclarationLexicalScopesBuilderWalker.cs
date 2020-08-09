@@ -28,14 +28,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             switch (syntax)
             {
                 case ICompilationUnitSyntax syn:
-                    containingScope = BuildNamespaceScopes(syn.ImplicitNamespaceName, containingScope);
+                    containingScope = BuildNamespaceScopes(NamespaceName.Global, syn.ImplicitNamespaceName, containingScope);
                     containingScope = BuildUsingDirectivesScope(syn.UsingDirectives, containingScope);
                     break;
                 case INamespaceDeclarationSyntax syn:
                     syn.ContainingLexicalScope = containingScope;
-                    if (syn.IsGlobalQualified) containingScope = globalScope;
-                    // TODO BuildNamespaceScopes
-                    containingScope = BuildNamespaceScopes(syn.DeclaredNames, containingScope);
+                    if (syn.IsGlobalQualified)
+                    {
+                        containingScope = globalScope;
+                        containingScope = BuildNamespaceScopes(NamespaceName.Global, syn.FullName, containingScope);
+                    }
+                    else
+                        containingScope = BuildNamespaceScopes(syn.ContainingNamespaceName, syn.DeclaredNames, containingScope);
+
                     containingScope = BuildUsingDirectivesScope(syn.UsingDirectives, containingScope);
                     break;
 
@@ -52,10 +57,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             WalkChildren(syntax, containingScope);
         }
 
-        private LexicalScope<IPromise<Symbol>> BuildNamespaceScopes(NamespaceName nsName, LexicalScope<IPromise<Symbol>> containingScope)
+        private LexicalScope<IPromise<Symbol>> BuildNamespaceScopes(
+            NamespaceName containingNamespaceName,
+            NamespaceName declaredNamespaceNames,
+            LexicalScope<IPromise<Symbol>> containingScope)
         {
-            foreach (var name in nsName.NamespaceNames())
-                containingScope = BuildNamespaceScope(name, containingScope);
+            foreach (var name in declaredNamespaceNames.NamespaceNames())
+            {
+                var fullNamespaceName = containingNamespaceName.Qualify(name);
+                // Skip the global namespace because we already have the global lexical scopes
+                if (fullNamespaceName == NamespaceName.Global) continue;
+                containingScope = BuildNamespaceScope(fullNamespaceName, containingScope);
+            }
 
             return containingScope;
         }
@@ -63,7 +76,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         private LexicalScope<IPromise<Symbol>> BuildNamespaceScope(NamespaceName nsName, LexicalScope<IPromise<Symbol>> containingScope)
         {
             var ns = namespaces[nsName];
-            return NestedScope.Create(containingScope, ns.Symbols, ns.NestedSymbols);
+            return NestedScope.Create(containingScope, ns.SymbolsInPackage, ns.NestedSymbolsInPackage);
         }
 
         private LexicalScope<IPromise<Symbol>> BuildUsingDirectivesScope(

@@ -24,8 +24,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
 
         public NamespaceName Qualify(NamespaceName name)
         {
-            if (name == Global) throw new ArgumentException("Can't qualify the global namespace", nameof(name));
-
             return new NamespaceName(Segments.Concat(name.Segments));
         }
 
