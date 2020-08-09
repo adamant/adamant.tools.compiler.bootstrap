@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
@@ -67,13 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
                     break;
                 }
                 case IFieldDeclarationSyntax field:
-                    //if (field.DataType.TryBeginFulfilling(() =>
-                    //    diagnostics.Add(TypeError.CircularDefinition(field.File, field.NameSpan, field.Name.ToSimpleName()))))
-                    //{
-                    //    var resolver = new TypeResolver(field.File, diagnostics);
-                    //    var type = resolver.Evaluate(field.TypeSyntax);
-                    //    field.DataType.Fulfill(type);
-                    //}
+                    ResolveField(field);
                     break;
                 case IFunctionDeclarationSyntax syn:
                     ResolveFunction(syn);
@@ -84,11 +80,99 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
             }
         }
 
+        private void ResolveField(IFieldDeclarationSyntax field)
+        {
+            if (!field.Symbol.TryBeginFulfilling(AddCircularDefinitionError)) return;
+
+            var resolver = new TypeResolver(field.File, diagnostics);
+            //var type = resolver.Evaluate(field.TypeSyntax);
+            //var symbol = new FieldSymbol(field.DeclaringClass.Symbol.Result, field.Name, field.IsMutableBinding, type);
+            //field.Symbol.Fulfill(symbol);
+
+            void AddCircularDefinitionError()
+            {
+                diagnostics.Add(TypeError.CircularDefinition(field.File, field.NameSpan, field.Name.ToSimpleName()));
+            }
+        }
+
         private void ResolveFunction(IFunctionDeclarationSyntax function)
         {
-            var analyzer = new TypeResolver(function.File, diagnostics);
-            //ResolveTypesInParameters(analyzer, function.Parameters, null);
-            //ResolveReturnType(function.ReturnDataType, function.ReturnType, analyzer);
+            var resolver = new TypeResolver(function.File, diagnostics);
+            //ResolveTypesInParameters(resolver, function.Parameters, null);
+            //ResolveReturnType(function.ReturnDataType, function.ReturnType, resolver);
+        }
+
+        private void ResolveTypesInParameters(
+            TypeResolver resolver,
+            IEnumerable<IConstructorParameterSyntax> parameters,
+            IClassDeclarationSyntax? declaringClass)
+        {
+            foreach (var parameter in parameters)
+                switch (parameter)
+                {
+                    default:
+                        throw ExhaustiveMatch.Failed(parameter);
+                    case INamedParameterSyntax namedParameter:
+                    {
+                        parameter.DataType.BeginFulfilling();
+                        var type = resolver.Evaluate(namedParameter.TypeSyntax);
+                        parameter.DataType.Fulfill(type);
+                    }
+                    break;
+                    case IFieldParameterSyntax fieldParameter:
+                    {
+                        parameter.DataType.BeginFulfilling();
+                        var field = (declaringClass ?? throw new InvalidOperationException("Field parameter outside of class declaration"))
+                                    .Members.OfType<IFieldDeclarationSyntax>()
+                                    .SingleOrDefault(f => f.Name == fieldParameter.Name);
+                        if (field is null)
+                        {
+                            fieldParameter.SetIsMutableBinding(false);
+                            fieldParameter.DataType.Fulfill(DataType.Unknown);
+                            // TODO report an error
+                            throw new NotImplementedException();
+                        }
+                        else
+                        {
+                            fieldParameter.SetIsMutableBinding(field.IsMutableBinding);
+                            if (field.DataType.TryBeginFulfilling(() =>
+                                diagnostics.Add(TypeError.CircularDefinition(field.File, field.NameSpan,
+                                    field.Name.ToSimpleName()))))
+                            {
+                                //var resolver = new BasicBodyAnalyzer(field.File, stringSymbol, diagnostics);
+                                field.DataType.BeginFulfilling();
+                                //var type = resolver.EvaluateType(field.TypeSyntax);
+                                //field.DataType.Fulfill(type);
+                            }
+
+                            parameter.DataType.Fulfill(field.DataType.Fulfilled());
+                        }
+                    }
+                    break;
+                }
+        }
+
+        private static ObjectType ResolveTypesInParameter(
+            ISelfParameterSyntax selfParameter,
+            IClassDeclarationSyntax declaringClass)
+        {
+            var declaringType = declaringClass.DeclaresDataType.Fulfilled();
+            selfParameter.DataType.BeginFulfilling();
+            var selfType = (ObjectType)declaringType;
+            if (selfParameter.MutableSelf) selfType = selfType.ForConstructorSelf();
+            selfParameter.DataType.Fulfill(selfType);
+            return selfType;
+        }
+
+        private static void ResolveReturnType(
+            DataTypePromise returnTypePromise,
+            ITypeSyntax? returnTypeSyntax,
+            TypeResolver resolver)
+        {
+            returnTypePromise.BeginFulfilling();
+            var returnType = returnTypeSyntax != null ? resolver.Evaluate(returnTypeSyntax) : DataType.Void;
+
+            returnTypePromise.Fulfill(returnType);
         }
 
         private void ResolveClass(IClassDeclarationSyntax @class)

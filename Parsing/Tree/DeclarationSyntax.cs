@@ -13,8 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public LexicalScope<IPromise<Symbol>> ContainingLexicalScope
         {
             [DebuggerStepThrough]
-            get =>
-                containingLexicalScope
+            get => containingLexicalScope
                 ?? throw new InvalidOperationException($"{nameof(ContainingLexicalScope)} not yet assigned");
             [DebuggerStepThrough]
             set

@@ -207,6 +207,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IFieldDeclarationSyntax : IMemberDeclarationSyntax
     {
         new Name Name { get; }
+        new Promise<FieldSymbol> Symbol { get; }
         ITypeSyntax TypeSyntax { get; }
         DataTypePromise DataType { get; }
     }
@@ -273,7 +274,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     {
     }
 
-    public partial interface ITypeNameSyntax : ITypeSyntax, IHasContainingScope
+    public partial interface ITypeNameSyntax : ITypeSyntax, IHasContainingScope, IHasContainingLexicalScope
     {
         TypeName Name { get; }
     }

@@ -4,8 +4,8 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
 
@@ -36,23 +36,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
                     return null;
                 case ITypeNameSyntax typeName:
                 {
-                    var metadatas = typeName.LookupMetadataInContainingScope().OfType<ITypeMetadata>().ToFixedList();
-                    switch (metadatas.Count)
+                    var symbolPromises = typeName.LookupInContainingScope().OfType<Promise<TypeSymbol>>().ToFixedList();
+                    switch (symbolPromises.Count)
                     {
                         case 0:
                             diagnostics.Add(NameBindingError.CouldNotBindName(file, typeName.Span));
-                            typeName.ReferencedMetadata = UnknownMetadata.Instance;
-                            typeSyntax.NamedType = DataType.Unknown;
+                            typeName.ReferencedSymbol = Promise.ForValue(default(TypeSymbol));
                             break;
                         case 1:
-                            var metadata = metadatas.Single();
-                            typeName.ReferencedMetadata = metadata;
-                            typeName.NamedType = metadata.DeclaresDataType;
+                            var symbolPromise = symbolPromises.Single();
+                            typeName.ReferencedSymbol = symbolPromise;
                             break;
                         default:
                             diagnostics.Add(NameBindingError.AmbiguousName(file, typeName.Span));
-                            typeName.ReferencedMetadata = UnknownMetadata.Instance;
-                            typeName.NamedType = DataType.Unknown;
+                            typeName.ReferencedSymbol = Promise.ForValue(default(TypeSymbol));
                             break;
                     }
                     break;

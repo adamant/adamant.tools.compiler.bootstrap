@@ -49,7 +49,7 @@ MethodDeclaration: MemberDeclaration, CallableDeclaration = Name Symbol:Promise<
 AbstractMethodDeclaration: MethodDeclaration;
 ConcreteMethodDeclaration: MethodDeclaration, ConcreteCallableDeclaration;
 ConstructorDeclaration: MemberDeclaration, ConcreteCallableDeclaration = ImplicitSelfParameter:SelfParameter;
-FieldDeclaration: MemberDeclaration = Name TypeSyntax:Type DataType:DataTypePromise;
+FieldDeclaration: MemberDeclaration = Name Symbol:Promise<FieldSymbol> TypeSyntax:Type DataType:DataTypePromise;
 
 // Parameters
 Parameter: 'ISyntax', IBindingMetadata = Name? Unused:bool DataType:DataTypePromise;
@@ -65,7 +65,7 @@ CanReachAnnotation: ReachabilityAnnotation = CanReach:NameExpression*;
 
 // Types
 Type;
-TypeName: Type, IHasContainingScope = Name:'TypeName';
+TypeName: Type, IHasContainingScope, IHasContainingLexicalScope = Name:'TypeName';
 OptionalType: Type = Referent:Type;
 CapabilityType: Type = ReferentType:Type Capability:ReferenceCapability;
 
