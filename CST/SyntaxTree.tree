@@ -14,40 +14,79 @@
 ◊using Adamant.Tools.Compiler.Bootstrap.Types;
 
 'ISyntax' = Span:TextSpan;
-AbstractMethodDeclaration: MethodDeclaration;
+CompilationUnit = CodeFile ImplicitNamespaceName:NamespaceName UsingDirectives:UsingDirective* Declarations:NonMemberDeclaration* AllEntityDeclarations:EntityDeclaration* Diagnostics:Diagnostic*;
+UsingDirective = Name:NamespaceName;
+
+// Function Parts
+CallableName = Name:MaybeQualifiedName;
 Argument;
+Body: BodyOrBlock = Statements:BodyStatement*;
+
+// Special Parts
+BodyOrBlock = Statements:Statement*;
+ElseClause;
+BlockOrResult: ElseClause;
+
+// Declarations
+Declaration = File:CodeFile NameSpan:TextSpan;
+EntityDeclaration: Declaration = AccessModifier:IAccessModifierToken? Name? Symbol:IPromise<Symbol>;
+CallableDeclaration: EntityDeclaration, IFunctionMetadata = ReachabilityAnnotations:ReachabilityAnnotation*;
+ConcreteCallableDeclaration: CallableDeclaration = Body;
+
+// Non-Member Declarations
+NonMemberDeclaration: Declaration = ContainingNamespaceName:NamespaceName;
+NamespaceDeclaration: NonMemberDeclaration, Declaration = IsGlobalQualified:bool DeclaredNames:NamespaceName FullName:NamespaceName Symbol:Promise<NamespaceOrPackageSymbol> UsingDirectives:UsingDirective* Declarations:NonMemberDeclaration*;
+
+// Non-Member Entity Declarations
+NonMemberEntityDeclaration: EntityDeclaration, NonMemberDeclaration = Name;
+ClassDeclaration: NonMemberEntityDeclaration = MutableModifier:IMutableKeywordToken? Name Symbol:Promise<TypeSymbol> Members:MemberDeclaration*;
+FunctionDeclaration: NonMemberEntityDeclaration, ConcreteCallableDeclaration = IsExternalFunction:bool Symbol:Promise<FunctionSymbol> ReturnType:Type? ReturnDataType:DataTypePromise;
+AssociatedFunctionDeclaration: MemberDeclaration, ConcreteCallableDeclaration = ReturnType:Type? ReturnDataType:DataTypePromise;
+
+// Member Declarations
+MemberDeclaration: EntityDeclaration = DeclaringClass:ClassDeclaration;
+MethodDeclaration: MemberDeclaration, CallableDeclaration = Symbol:Promise<MethodSymbol> SelfParameter ReturnType:Type? ReturnDataType:DataTypePromise;
+AbstractMethodDeclaration: MethodDeclaration;
+ConcreteMethodDeclaration: MethodDeclaration, ConcreteCallableDeclaration;
+ConstructorDeclaration: MemberDeclaration, ConcreteCallableDeclaration = ImplicitSelfParameter:SelfParameter;
+FieldDeclaration: MemberDeclaration = Name TypeSyntax:Type DataType:DataTypePromise;
+
+// Parameters
+Parameter: 'ISyntax', IBindingMetadata = Name? Unused:bool DataType:DataTypePromise;
+NamedParameter: Parameter, ConstructorParameter = Name TypeSyntax:Type DefaultValue:Expression?;
+ConstructorParameter: Parameter;
+SelfParameter: Parameter = MutableSelf:bool;
+FieldParameter: Parameter, ConstructorParameter = Name DefaultValue:Expression?;
+
+// Annotations
+ReachabilityAnnotation;
+ReachableFromAnnotation: ReachabilityAnnotation = ReachableFrom:NameExpression*;
+CanReachAnnotation: ReachabilityAnnotation = CanReach:NameExpression*;
+
+// Types
+Type;
+TypeName: Type, IHasContainingScope = Name:'TypeName';
+OptionalType: Type = Referent:Type;
+CapabilityType: Type = ReferentType:Type Capability:ReferenceCapability;
+
+// Statements
+Statement;
+ResultStatement: Statement, BlockOrResult;
+BodyStatement: Statement;
+VariableDeclarationStatement: BodyStatement, IBindingMetadata = NameSpan:TextSpan Name:SimpleName TypeSyntax:Type? InferMutableType:bool;
+ExpressionStatement: BodyStatement;
+
+// Expressions
+Expression;
 AssignableExpression: Expression;
 AssignmentExpression: Expression = Operator:AssignmentOperator;
-AssociatedFunctionDeclaration: MemberDeclaration, ConcreteCallableDeclaration = ReturnType:Type? ReturnDataType:DataTypePromise;
 BinaryOperatorExpression: Expression = Operator:BinaryOperator;
 BlockExpression: Expression, BlockOrResult, BodyOrBlock;
-BlockOrResult: ElseClause;
-BodyOrBlock = Statements:Statement*;
-BodyStatement: Statement;
-Body: BodyOrBlock = Statements:BodyStatement*;
 BoolLiteralExpression: LiteralExpression = Value:bool;
 BorrowExpression: Expression;
 BreakExpression: Expression;
-CallableDeclaration: EntityDeclaration, IFunctionMetadata = ReachabilityAnnotations:ReachabilityAnnotation*;
-CallableName = Name:MaybeQualifiedName;
-CanReachAnnotation: ReachabilityAnnotation = CanReach:NameExpression*;
-CapabilityType: Type = ReferentType:Type Capability:ReferenceCapability;
-ClassDeclaration: NonMemberEntityDeclaration = MutableModifier:IMutableKeywordToken? Name Symbol:Promise<TypeSymbol> Members:MemberDeclaration*;
-CompilationUnit = CodeFile ImplicitNamespaceName:NamespaceName UsingDirectives:UsingDirective* Declarations:NonMemberDeclaration* AllEntityDeclarations:EntityDeclaration* Diagnostics:Diagnostic*;
-ConcreteCallableDeclaration: CallableDeclaration = Body;
-ConcreteMethodDeclaration: MethodDeclaration, ConcreteCallableDeclaration;
-ConstructorDeclaration: MemberDeclaration, ConcreteCallableDeclaration = ImplicitSelfParameter:SelfParameter;
-ConstructorParameter: Parameter;
-Declaration = File:CodeFile NameSpan:TextSpan;
-ElseClause;
-EntityDeclaration: Declaration = AccessModifier:IAccessModifierToken? Name? Symbol:IPromise<Symbol>;
-ExpressionStatement: BodyStatement;
-Expression;
 FieldAccessExpression: AssignableExpression = AccessOperator Field:NameExpression;
-FieldDeclaration: MemberDeclaration = Name TypeSyntax:Type DataType:DataTypePromise;
-FieldParameter: Parameter, ConstructorParameter = Name DefaultValue:Expression?;
 ForeachExpression: Expression = VariableName:SimpleName TypeSyntax:Type? Block:BlockExpression;
-FunctionDeclaration: NonMemberEntityDeclaration, ConcreteCallableDeclaration = IsExternalFunction:bool Symbol:Promise<FunctionSymbol> ReturnType:Type? ReturnDataType:DataTypePromise;
 FunctionInvocationExpression: InvocationExpression = FunctionNameSyntax:CallableName;
 IfExpression: Expression, ElseClause = ThenBlock:BlockOrResult ElseClause?;
 ImplicitConversionExpression: Expression = Expression DataType;
@@ -59,33 +98,16 @@ IntegerLiteralExpression: LiteralExpression = Value:BigInteger;
 InvocationExpression: Expression = FullName:MaybeQualifiedName Arguments:Argument*;
 LiteralExpression: Expression;
 LoopExpression: Expression = Block:BlockExpression;
-MemberDeclaration: EntityDeclaration = DeclaringClass:ClassDeclaration;
-MethodDeclaration: MemberDeclaration, CallableDeclaration = Symbol:Promise<MethodSymbol> SelfParameter ReturnType:Type? ReturnDataType:DataTypePromise;
 MethodInvocationExpression: InvocationExpression = MethodNameSyntax:CallableName;
 MoveExpression: Expression;
-NamedParameter: Parameter, ConstructorParameter = Name TypeSyntax:Type DefaultValue:Expression?;
 NameExpression: AssignableExpression, IHasContainingScope = Name:SimpleName;
-NamespaceDeclaration: NonMemberDeclaration, Declaration = IsGlobalQualified:bool DeclaredNames:NamespaceName FullName:NamespaceName Symbol:Promise<NamespaceOrPackageSymbol> UsingDirectives:UsingDirective* Declarations:NonMemberDeclaration*;
 NewObjectExpression: Expression = TypeSyntax:TypeName ConstructorName:CallableName? Arguments:Argument*;
 NextExpression: Expression;
 NoneLiteralExpression: LiteralExpression;
-NonMemberDeclaration: Declaration = ContainingNamespaceName:NamespaceName;
-NonMemberEntityDeclaration: EntityDeclaration, NonMemberDeclaration = Name;
-OptionalType: Type = Referent:Type;
-Parameter: 'ISyntax', IBindingMetadata = Name? Unused:bool DataType:DataTypePromise;
-ReachabilityAnnotation;
-ReachableFromAnnotation: ReachabilityAnnotation = ReachableFrom:NameExpression*;
-ResultStatement: Statement, BlockOrResult;
 ReturnExpression: Expression;
 SelfExpression: Expression, IHasContainingScope = IsImplicit:bool;
-SelfParameter: Parameter = MutableSelf:bool;
 ShareExpression: Expression = SharedSymbol:IBindingMetadata;
-Statement;
 StringLiteralExpression: LiteralExpression = Value:string;
-TypeName: Type, IHasContainingScope = Name:'TypeName';
-Type;
 UnaryOperatorExpression: Expression = Fixity:UnaryOperatorFixity Operator:UnaryOperator;
 UnsafeExpression: Expression;
-UsingDirective = Name:NamespaceName;
-VariableDeclarationStatement: BodyStatement, IBindingMetadata = NameSpan:TextSpan Name:SimpleName TypeSyntax:Type? InferMutableType:bool;
 WhileExpression: Expression = Block:BlockExpression;

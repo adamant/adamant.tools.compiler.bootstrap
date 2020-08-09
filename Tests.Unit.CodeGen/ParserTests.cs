@@ -243,6 +243,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
         }
         #endregion
 
+        #region Comments
+        [Fact]
+        public void Ignores_line_comments()
+        {
+            const string grammar = "// A comment";
+            var config = Parser.ReadGrammarConfig(grammar);
+
+            Assert.Empty(config.Rules);
+        }
+        #endregion
+
         #region Properties
         [Fact]
         public void ParsesSimpleProperty()

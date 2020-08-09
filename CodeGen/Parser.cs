@@ -58,7 +58,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
 
         private static IEnumerable<Rule> GetRules(List<string> lines)
         {
-            var ruleLines = lines.Where(l => !l.StartsWith(Program.DirectiveMarker, StringComparison.InvariantCulture) && !string.IsNullOrWhiteSpace(l))
+            var ruleLines = lines.Select(l => l.Trim())
+                                 .Where(l => !l.StartsWith(Program.DirectiveMarker, StringComparison.InvariantCulture)
+                                            && !l.StartsWith("//", StringComparison.InvariantCulture)
+                                            && !string.IsNullOrWhiteSpace(l))
                                  .Select(l => l.TrimEnd(';')) // TODO error if no semicolon
                                  .ToList()!;
             foreach (var ruleLine in ruleLines)
