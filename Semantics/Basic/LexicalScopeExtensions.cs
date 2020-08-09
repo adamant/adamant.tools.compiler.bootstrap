@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 UnknownType _ => UnknownMetadata.Instance,
                 ObjectType objectType =>
                         containingScope
-                        .LookupMetadataInGlobalScope(objectType.FullName)
+                        .LookupMetadataInGlobalScope(objectType.ContainingNamespace.ToRootName().Qualify(objectType.Name.ToSimpleName()))
                         .OfType<ITypeMetadata>()
                         .Single(),
                 FixedSizeIntegerType integerType =>

@@ -35,7 +35,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
                     return false;
                 case (ObjectType targetReference, ObjectType sourceReference):
                     return targetReference.ReferenceCapability.IsAssignableFrom(sourceReference.ReferenceCapability)
-                           && targetReference.FullName.Equals(sourceReference.FullName);
+                           && targetReference.Name == sourceReference.Name
+                           && targetReference.ContainingNamespace == sourceReference.ContainingNamespace;
                 case (OptionalType targetOptional, OptionalType sourceOptional):
                     return IsAssignableFrom(targetOptional.Referent, sourceOptional.Referent);
                 default:

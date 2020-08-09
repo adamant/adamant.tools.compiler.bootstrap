@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata
         public DefaultConstructor(ObjectType constructedType)
         {
             ConstructedType = constructedType;
-            FullName = constructedType.FullName.Qualify(SpecialNames.New);
+            FullName = constructedType.ContainingNamespace.ToRootName().Qualify(constructedType.Name.ToSimpleName()).Qualify(SpecialNames.New);
         }
     }
 }

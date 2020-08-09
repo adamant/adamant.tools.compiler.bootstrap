@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
@@ -56,9 +57,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
 
         public override string ToString()
         {
-            var capability = ReferenceCapability.ToSourceString();
-            if (capability.Length == 0) return FullName.ToString();
-            return $"{capability} {FullName}";
+            var builder = new StringBuilder();
+            builder.Append(ReferenceCapability.ToSourceString());
+            if (builder.Length > 0) builder.Append(' ');
+            builder.Append(ContainingNamespace);
+            if (ContainingNamespace != NamespaceName.Global) builder.Append('.');
+            builder.Append(Name);
+            return builder.ToString();
         }
 
         #region Equality
@@ -67,14 +72,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
             return other is ObjectType otherType
-                && FullName == otherType.FullName
+                && ContainingNamespace == otherType.ContainingNamespace
+                && Name == otherType.Name
                 && DeclaredMutable == otherType.DeclaredMutable
                 && ReferenceCapability == otherType.ReferenceCapability;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(FullName, DeclaredMutable, ReferenceCapability);
+            return HashCode.Combine(ContainingNamespace, Name, DeclaredMutable, ReferenceCapability);
         }
         #endregion
 

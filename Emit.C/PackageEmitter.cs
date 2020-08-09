@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using Adamant.Tools.Compiler.Bootstrap.Semantics;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
@@ -59,17 +58,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.Definitions.AppendLine("int32_t main(const int argc, char const * const * const argv)");
             code.Definitions.BeginBlock();
             var arguments = new List<string>();
-            foreach (var parameterTypeName in entryPoint.Parameters.Select(p => p.DataType).Cast<ObjectType>().Select(t => t.FullName))
+            foreach (var parameterType in entryPoint.Parameters.Select(p => p.DataType).Cast<ObjectType>())
             {
-                if (parameterTypeName.Equals(MaybeQualifiedName.From("system", "console", "Console")))
+                if (parameterType.ContainingNamespace == SystemConsole
+                    && parameterType.Name == "Console")
                 {
-                    code.Definitions.AppendLine("system__console__Console console = { &system__console__Console___vtable, malloc(sizeof(system__console__Console___Self)) };");
+                    code.Definitions.AppendLine(
+                        "system__console__Console console = { &system__console__Console___vtable, malloc(sizeof(system__console__Console___Self)) };");
                     arguments.Add("system__console__Console___new__1(console)");
                 }
-                else if (parameterTypeName.Equals(MaybeQualifiedName.From("system", "console", "Arguments")))
+                else if (parameterType.ContainingNamespace == SystemConsole
+                         && parameterType.Name == "Arguments")
                     throw new NotImplementedException();
                 else
-                    throw new Exception($"Unexpected type for parameter to main: {parameterTypeName}");
+                    throw new Exception($"Unexpected type for parameter to main: {parameterType}");
             }
             var joinedArguments = string.Join(", ", arguments);
             if (entryPoint.ReturnDataType == DataType.Void)
@@ -90,5 +92,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.TypeIdDeclaration.EndBlockWithSemicolon();
             code.TypeIdDeclaration.AppendLine("typedef enum _Type_ID _Type_ID;");
         }
+
+        private static readonly NamespaceName SystemConsole = new NamespaceName("system", "console");
     }
 }

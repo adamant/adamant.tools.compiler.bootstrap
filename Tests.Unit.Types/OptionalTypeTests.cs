@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using Xunit;
@@ -75,7 +74,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Types
 
         private static NamespaceName Namespace(params string[] segments)
         {
-            return new NamespaceName(segments.Select(s => new Name(s)));
+            return new NamespaceName(segments);
         }
     }
 }

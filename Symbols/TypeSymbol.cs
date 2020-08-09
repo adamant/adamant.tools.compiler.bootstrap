@@ -20,8 +20,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
             ObjectType declaresDataType)
             : base(containingSymbol, name)
         {
-            // TODO check the name correctly
-            if (name.Text != declaresDataType.FullName.UnqualifiedName.Text)
+            // TODO check the name correctly (i.e. containing namespace too)
+            if (name != declaresDataType.Name)
                 throw new ArgumentException("Declared type must have the same name as symbol", nameof(declaresDataType));
 
             Package = containingSymbol.Package;

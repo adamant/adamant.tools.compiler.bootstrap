@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
@@ -97,8 +98,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         public string Mangle(ObjectType type)
         {
             // builder with room for the characters we are likely to add
-            var builder = new StringBuilder(EstimateSize(type.FullName) + 5);
-            Mangle(type.FullName, builder);
+            var builder = new StringBuilder(EstimateSize(type.ContainingNamespace) + EstimateSize(type.Name) + 5);
+            Mangle(type.ContainingNamespace, builder);
+            Mangle(type.Name, builder);
             return mapping.GetAscii(builder.ToString());
         }
 
@@ -121,6 +123,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             return Mangle(new SimpleName(name));
         }
 
+        private static int EstimateSize(NamespaceName namespaceName)
+        {
+            return namespaceName.Segments.Sum(s => s.Text.Length + 2);
+        }
+
         private static int EstimateSize(TypeName typeName)
         {
             return typeName switch
@@ -140,6 +147,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 SimpleName simpleName => simpleName.Text.Length,
                 _ => throw ExhaustiveMatch.Failed(name)
             };
+        }
+
+        private static void Mangle(NamespaceName namespaceName, StringBuilder builder)
+        {
+            foreach (var name in namespaceName.Segments)
+            {
+                builder.Append(name.Text);
+                builder.Append("__");
+            }
         }
 
         private static void Mangle(TypeName typeName, StringBuilder builder)

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -8,14 +9,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
 {
     public sealed class NamespaceName : IEquatable<NamespaceName>
     {
-        public static readonly NamespaceName Global = new NamespaceName(Enumerable.Empty<Name>());
+        public static readonly NamespaceName Global = new NamespaceName(FixedList<Name>.Empty);
 
         public FixedList<Name> Segments { get; }
 
-        public NamespaceName(IEnumerable<Name> segments)
+        public NamespaceName(FixedList<Name> segments)
         {
-            Segments = segments.ToFixedList();
+            Segments = segments;
         }
+
+        public NamespaceName(IEnumerable<Name> segments)
+            : this(segments.ToFixedList()) { }
+
+        public NamespaceName(params string[] segments)
+            : this(segments.Select(s => new Name(s)).ToFixedList()) { }
 
         public NamespaceName(Name segment)
         {
