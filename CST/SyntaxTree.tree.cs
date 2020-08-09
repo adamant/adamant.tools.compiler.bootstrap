@@ -132,6 +132,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     {
         IMutableKeywordToken? MutableModifier { get; }
         new Name Name { get; }
+        new Promise<TypeSymbol> Symbol { get; }
         FixedList<IMemberDeclarationSyntax> Members { get; }
     }
 
@@ -179,7 +180,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     {
         CodeFile File { get; }
         TextSpan NameSpan { get; }
-        Promise<Symbol?> Symbol { get; }
     }
 
     [Closed(
@@ -197,6 +197,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     {
         IAccessModifierToken? AccessModifier { get; }
         Name? Name { get; }
+        IPromise<Symbol> Symbol { get; }
     }
 
     public partial interface IExpressionStatementSyntax : IBodyStatementSyntax
@@ -258,6 +259,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IFunctionDeclarationSyntax : INonMemberEntityDeclarationSyntax, IConcreteCallableDeclarationSyntax
     {
         bool IsExternalFunction { get; }
+        new Promise<FunctionSymbol> Symbol { get; }
         ITypeSyntax? ReturnType { get; }
         DataTypePromise ReturnDataType { get; }
     }
@@ -346,6 +348,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(IConcreteMethodDeclarationSyntax))]
     public partial interface IMethodDeclarationSyntax : IMemberDeclarationSyntax, ICallableDeclarationSyntax
     {
+        new Promise<MethodSymbol> Symbol { get; }
         ISelfParameterSyntax SelfParameter { get; }
         ITypeSyntax? ReturnType { get; }
         DataTypePromise ReturnDataType { get; }
@@ -376,7 +379,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     {
         bool IsGlobalQualified { get; }
         NamespaceName DeclaredNames { get; }
-        NamespaceName Name { get; }
+        NamespaceName FullName { get; }
+        Promise<NamespaceOrPackageSymbol> Symbol { get; }
         FixedList<IUsingDirectiveSyntax> UsingDirectives { get; }
         FixedList<INonMemberDeclarationSyntax> Declarations { get; }
     }

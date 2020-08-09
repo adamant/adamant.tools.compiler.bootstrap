@@ -7,6 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 
@@ -16,7 +17,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     {
         public IAccessModifierToken? AccessModifier { get; }
         public Name? Name { get; }
+        IPromise<Symbol> IEntityDeclarationSyntax.Symbol => SymbolPromise;
+        protected abstract IPromise<Symbol> SymbolPromise { get; }
         public MaybeQualifiedName FullName { get; }
+
         private DataType? selfParameterType;
         [DisallowNull]
         public DataType? SelfParameterType

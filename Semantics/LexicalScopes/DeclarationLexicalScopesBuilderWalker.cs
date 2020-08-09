@@ -10,16 +10,16 @@ using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 {
-    internal class NamespaceLexicalScopesBuilder : SyntaxWalker<LexicalScope<Promise<Symbol?>>>
+    internal class DeclarationLexicalScopesBuilderWalker : SyntaxWalker<LexicalScope<IPromise<Symbol>>>
     {
         private readonly FixedDictionary<NamespaceName, Namespace> namespaces;
 
-        public NamespaceLexicalScopesBuilder(FixedDictionary<NamespaceName, Namespace> namespaces)
+        public DeclarationLexicalScopesBuilderWalker(FixedDictionary<NamespaceName, Namespace> namespaces)
         {
             this.namespaces = namespaces;
         }
 
-        protected override void WalkNonNull(ISyntax syntax, LexicalScope<Promise<Symbol?>> containingScope)
+        protected override void WalkNonNull(ISyntax syntax, LexicalScope<IPromise<Symbol>> containingScope)
         {
             switch (syntax)
             {
@@ -40,7 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             }
         }
 
-        private LexicalScope<Promise<Symbol?>> BuildNamespaceScopes(NamespaceName nsName, LexicalScope<Promise<Symbol?>> containingScope)
+        private LexicalScope<IPromise<Symbol>> BuildNamespaceScopes(NamespaceName nsName, LexicalScope<IPromise<Symbol>> containingScope)
         {
             foreach (var name in nsName.NamespaceNames())
                 containingScope = BuildNamespaceScope(name, containingScope);
@@ -48,19 +48,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             return containingScope;
         }
 
-        private LexicalScope<Promise<Symbol?>> BuildNamespaceScope(NamespaceName nsName, LexicalScope<Promise<Symbol?>> containingScope)
+        private LexicalScope<IPromise<Symbol>> BuildNamespaceScope(NamespaceName nsName, LexicalScope<IPromise<Symbol>> containingScope)
         {
             var ns = namespaces[nsName];
-            return new NestedScope<Promise<Symbol?>>(containingScope, ns.Symbols, ns.NestedSymbols);
+            return new NestedScope<IPromise<Symbol>>(containingScope, ns.Symbols, ns.NestedSymbols);
         }
 
-        private LexicalScope<Promise<Symbol?>> BuildUsingDirectivesScope(
+        private LexicalScope<IPromise<Symbol>> BuildUsingDirectivesScope(
             FixedList<IUsingDirectiveSyntax> usingDirectives,
-            LexicalScope<Promise<Symbol?>> containingScope)
+            LexicalScope<IPromise<Symbol>> containingScope)
         {
             if (!usingDirectives.Any()) return containingScope;
 
-            var importedSymbols = new Dictionary<TypeName, HashSet<Promise<Symbol?>>>();
+            var importedSymbols = new Dictionary<TypeName, HashSet<IPromise<Symbol>>>();
             foreach (var usingDirective in usingDirectives)
             {
                 if (!namespaces.TryGetValue(usingDirective.Name, out var ns))
@@ -79,7 +79,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             }
 
             var symbolsInScope = importedSymbols.ToFixedDictionary(e => e.Key, e => e.Value.ToFixedSet());
-            return new NestedScope<Promise<Symbol?>>(containingScope, symbolsInScope);
+            return new NestedScope<IPromise<Symbol>>(containingScope, symbolsInScope);
         }
     }
 }

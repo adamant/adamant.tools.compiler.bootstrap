@@ -8,13 +8,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
     internal class Namespace
     {
         public NamespaceName Name { get; }
-        public FixedDictionary<TypeName, FixedSet<Promise<Symbol?>>> Symbols { get; }
-        public FixedDictionary<TypeName, FixedSet<Promise<Symbol?>>> NestedSymbols { get; }
+        public FixedDictionary<TypeName, FixedSet<IPromise<Symbol>>> Symbols { get; }
+        public FixedDictionary<TypeName, FixedSet<IPromise<Symbol>>> NestedSymbols { get; }
 
         public Namespace(
             NamespaceName name,
-            FixedDictionary<TypeName, FixedSet<Promise<Symbol?>>> symbols,
-            FixedDictionary<TypeName, FixedSet<Promise<Symbol?>>> nestedSymbols)
+            FixedDictionary<TypeName, FixedSet<IPromise<Symbol>>> symbols,
+            FixedDictionary<TypeName, FixedSet<IPromise<Symbol>>> nestedSymbols)
         {
             Name = name;
             Symbols = symbols;

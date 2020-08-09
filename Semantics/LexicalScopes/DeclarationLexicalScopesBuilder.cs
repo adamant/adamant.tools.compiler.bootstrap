@@ -10,11 +10,11 @@ using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 {
-    public class PackageLexicalScopesBuilder
+    public class DeclarationLexicalScopesBuilder
     {
         [SuppressMessage("Performance", "CA1822:Mark members as static",
             Justification = "OO")]
-        public void BuildNamespaceScopesFor(PackageSyntax package)
+        public void BuildFor(PackageSyntax package)
         {
             var declarationSymbols = GetAllDeclarationSymbols(package);
             var namespaces = BuildNamespaces(declarationSymbols);
@@ -23,8 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 
             foreach (var compilationUnit in package.CompilationUnits)
             {
-                var builder = new NamespaceLexicalScopesBuilder(namespaces);
-                //new SyntaxScopesBuilder(compilationUnit.CodeFile, GlobalScope, namespaces, diagnostics);
+                var builder = new DeclarationLexicalScopesBuilderWalker(namespaces);
                 builder.Walk(compilationUnit, globalScope);
             }
         }
@@ -66,14 +65,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             return new PackagesScope(package.Symbol, packageAliases);
         }
 
-        private static GlobalScope<Promise<Symbol?>> BuildGlobalScope(
+        private static GlobalScope<IPromise<Symbol>> BuildGlobalScope(
             PackagesScope packagesScope,
             Namespace globalNamespace)
         {
-            return new GlobalScope<Promise<Symbol?>>(packagesScope, globalNamespace.Symbols, globalNamespace.NestedSymbols);
+            return new GlobalScope<IPromise<Symbol>>(packagesScope, globalNamespace.Symbols, globalNamespace.NestedSymbols);
         }
 
-        private static FixedDictionary<TypeName, FixedSet<Promise<Symbol?>>> ToDictionary(
+        private static FixedDictionary<TypeName, FixedSet<IPromise<Symbol>>> ToDictionary(
             IEnumerable<NonMemberEntitySymbol> symbols)
         {
             return symbols.GroupBy(s => s.Name, s => s.Symbol)

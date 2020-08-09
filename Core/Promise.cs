@@ -6,7 +6,7 @@ using ExhaustiveMatching;
 namespace Adamant.Tools.Compiler.Bootstrap.Core
 {
     [DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
-    public class Promise<T>
+    public class Promise<T> : IPromise<T>
     {
         private PromiseState State { get; set; }
         private T value = default!;

@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
     {
         public NamespaceName ContainingNamespace { get; }
         public TypeName Name { get; }
-        public Promise<Symbol?> Symbol { get; }
+        public IPromise<Symbol> Symbol { get; }
 
         public NonMemberEntitySymbol(INonMemberEntityDeclarationSyntax declaration)
         {
@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                 throw new ArgumentException("Symbol must be for a non-member entity", nameof(symbol));
             ContainingNamespace = containingSymbol.NamespaceName;
             Name = symbol.Name ?? throw new ArgumentException("Symbol must have a name", nameof(symbol));
-            Symbol = Promise.ForValue((Symbol?)symbol);
+            Symbol = Promise.ForValue(symbol);
         }
     }
 }

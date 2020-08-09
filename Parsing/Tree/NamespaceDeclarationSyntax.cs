@@ -10,15 +10,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class NamespaceDeclarationSyntax : DeclarationSyntax, INamespaceDeclarationSyntax
     {
-        private LexicalScope<Promise<Symbol?>>? containingLexicalScope;
-        public LexicalScope<Promise<Symbol?>>? ContainingLexicalScope
+        private LexicalScope<IPromise<Symbol>>? containingLexicalScope;
+        public LexicalScope<IPromise<Symbol>> ContainingLexicalScope
         {
-            get => containingLexicalScope;
+            get =>
+                containingLexicalScope
+                ?? throw new InvalidOperationException($"{nameof(ContainingLexicalScope)} not yet assigned");
             set
             {
                 if (containingLexicalScope != null)
                     throw new InvalidOperationException($"Can't set {nameof(ContainingLexicalScope)} repeatedly");
-                containingLexicalScope = value ?? throw new ArgumentNullException(nameof(value));
+                containingLexicalScope = value;
             }
         }
 
@@ -30,11 +32,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         /// declared using the package qualifier `namespace ::example { }`.
         /// </summary>
         public bool IsGlobalQualified { get; }
-
         public NamespaceName DeclaredNames { get; }
-
-        public NamespaceName Name { get; }
-
+        public NamespaceName FullName { get; }
+        public Promise<NamespaceOrPackageSymbol> Symbol { get; } = new Promise<NamespaceOrPackageSymbol>();
         public FixedList<IUsingDirectiveSyntax> UsingDirectives { get; }
         public FixedList<INonMemberDeclarationSyntax> Declarations { get; }
 
@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         {
             ContainingNamespaceName = containingNamespaceName;
             DeclaredNames = declaredNames;
-            Name = containingNamespaceName.Qualify(declaredNames);
+            FullName = containingNamespaceName.Qualify(declaredNames);
             UsingDirectives = usingDirectives;
             Declarations = declarations;
             IsGlobalQualified = isGlobalQualified;
@@ -59,7 +59,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public override string ToString()
         {
-            return $"namespace ::{Name} {{ … }}";
+            return $"namespace ::{FullName} {{ … }}";
         }
     }
 }

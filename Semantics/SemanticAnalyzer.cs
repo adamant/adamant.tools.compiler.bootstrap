@@ -41,24 +41,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         public bool SaveReachabilityGraphs { get; set; } = false;
 
         [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "OO")]
-        public Package Check(PackageSyntax packageSyntax)
+        public Package Check(PackageSyntax package)
         {
             // First pull over all the lexer and parser warnings
-            var diagnostics = new Diagnostics(packageSyntax.Diagnostics);
+            var diagnostics = new Diagnostics(package.Diagnostics);
 
             // If there are errors from the lex and parse phase, don't continue on
             diagnostics.ThrowIfFatalErrors();
 
-            NamespaceSymbolBuilder.BuildNamespaceSymbols(packageSyntax);
+            NamespaceSymbolBuilder.BuildNamespaceSymbols(package);
 
-            BuildNamespaceScopes(packageSyntax);
+            BuildDeclarationScopes(package);
 
-            var stringSymbol = BuildScopes(packageSyntax, diagnostics);
+            var stringSymbol = BuildScopes(package, diagnostics);
 
             // Make a list of all the entity declarations (i.e. not namespaces)
-            var entities = GetEntityDeclarations(packageSyntax);
+            var entities = GetEntityDeclarations(package);
 
-            CheckSemantics(entities, stringSymbol, diagnostics, packageSyntax.SymbolTreeBuilder);
+            CheckSemantics(entities, stringSymbol, diagnostics, package.SymbolTreeBuilder);
 
             // If there are errors from the semantics phase, don't continue on
             diagnostics.ThrowIfFatalErrors();
@@ -73,30 +73,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             var entryPoint = DetermineEntryPoint(declarations, diagnostics);
 
-            var references = packageSyntax.References.Values.ToFixedList();
-            return new Package(packageSyntax.SymbolTreeBuilder.Build(), diagnostics.Build(), references, declarations, entryPoint);
+            var references = package.References.Values.ToFixedList();
+            return new Package(package.SymbolTreeBuilder.Build(), diagnostics.Build(), references, declarations, entryPoint);
         }
 
         /// <summary>
         /// Build up lexical scopes down to the declaration level
         /// </summary>
-        private static void BuildNamespaceScopes(PackageSyntax packageSyntax)
+        private static void BuildDeclarationScopes(PackageSyntax package)
         {
-            var builder = new PackageLexicalScopesBuilder();
-            builder.BuildNamespaceScopesFor(packageSyntax);
+            var builder = new DeclarationLexicalScopesBuilder();
+            builder.BuildFor(package);
         }
 
         private static ITypeMetadata? BuildScopes(
-            PackageSyntax packageSyntax,
+            PackageSyntax package,
             Diagnostics diagnostics)
         {
-            var scopesBuilder = new PackageScopesBuilder(packageSyntax, diagnostics);
-            scopesBuilder.BuildScopesFor(packageSyntax);
+            var scopesBuilder = new PackageScopesBuilder(package, diagnostics);
+            scopesBuilder.BuildScopesFor(package);
             var stringSymbol = scopesBuilder.GlobalScope.LookupMetadataInGlobalScope(new SimpleName("String"))
                                             .OfType<ITypeMetadata>().FirstOrDefault();
             if (stringSymbol is null)
                 // TODO we are assuming there is a compilation unit. This should be generated against the package itself
-                diagnostics.Add(SemanticError.NoStringTypeDefined(packageSyntax.CompilationUnits[0].CodeFile));
+                diagnostics.Add(SemanticError.NoStringTypeDefined(package.CompilationUnits[0].CodeFile));
             return stringSymbol;
         }
 

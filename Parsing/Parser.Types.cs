@@ -76,13 +76,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         private ITypeSyntax ParseBareType()
         {
-            switch (Tokens.Current)
+            return Tokens.Current switch
             {
-                case IPrimitiveTypeToken _:
-                    return ParsePrimitiveType();
-                default: // otherwise we want a type name
-                    return ParseTypeName();
-            }
+                IPrimitiveTypeToken _ => ParsePrimitiveType(),
+                // otherwise we want a type name
+                _ => ParseTypeName()
+            };
         }
 
         private ITypeNameSyntax ParseTypeName()
@@ -95,39 +94,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         private ITypeNameSyntax ParsePrimitiveType()
         {
             var keyword = Tokens.RequiredToken<IPrimitiveTypeToken>();
-            SpecialTypeName name;
-            switch (keyword)
+            SpecialTypeName name = keyword switch
             {
-                default:
-                    throw ExhaustiveMatch.Failed(keyword);
-                case IVoidKeywordToken _:
-                    name = SpecialTypeName.Void;
-                    break;
-                case INeverKeywordToken _:
-                    name = SpecialTypeName.Never;
-                    break;
-                case IBoolKeywordToken _:
-                    name = SpecialTypeName.Bool;
-                    break;
-                case IAnyKeywordToken _:
-                    name = SpecialTypeName.Any;
-                    break;
-                case IByteKeywordToken _:
-                    name = SpecialTypeName.Byte;
-                    break;
-                case IIntKeywordToken _:
-                    name = SpecialTypeName.Int;
-                    break;
-                case IUIntKeywordToken _:
-                    name = SpecialTypeName.UInt;
-                    break;
-                case ISizeKeywordToken _:
-                    name = SpecialTypeName.Size;
-                    break;
-                case IOffsetKeywordToken _:
-                    name = SpecialTypeName.Offset;
-                    break;
-            }
+                IVoidKeywordToken _ => SpecialTypeName.Void,
+                INeverKeywordToken _ => SpecialTypeName.Never,
+                IBoolKeywordToken _ => SpecialTypeName.Bool,
+                IAnyKeywordToken _ => SpecialTypeName.Any,
+                IByteKeywordToken _ => SpecialTypeName.Byte,
+                IIntKeywordToken _ => SpecialTypeName.Int,
+                IUIntKeywordToken _ => SpecialTypeName.UInt,
+                ISizeKeywordToken _ => SpecialTypeName.Size,
+                IOffsetKeywordToken _ => SpecialTypeName.Offset,
+                _ => throw ExhaustiveMatch.Failed(keyword)
+            };
 
             return new TypeNameSyntax(keyword.Span, name);
         }
