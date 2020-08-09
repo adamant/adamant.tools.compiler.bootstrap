@@ -26,6 +26,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public NamespaceName ContainingNamespaceName { get; }
 
+        private NamespaceOrPackageSymbol? containingNamespaceSymbol;
+        public NamespaceOrPackageSymbol ContainingNamespaceSymbol
+        {
+            get =>
+                containingNamespaceSymbol
+                ?? throw new InvalidOperationException($"{ContainingNamespaceSymbol} not yet assigned");
+            set
+            {
+                if (containingNamespaceSymbol != null)
+                    throw new InvalidOperationException($"Can't set {nameof(ContainingNamespaceSymbol)} repeatedly");
+                containingNamespaceSymbol = value;
+            }
+        }
+
         /// <summary>
         /// Whether this namespace declaration is in the global namespace, the
         /// implicit file namespace is in the global namespace. As are namespaces

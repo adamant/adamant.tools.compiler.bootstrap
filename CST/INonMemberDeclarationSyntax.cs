@@ -9,6 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     /// </summary>
     public partial interface INonMemberDeclarationSyntax
     {
+        NamespaceOrPackageSymbol ContainingNamespaceSymbol { get; set; }
         LexicalScope<IPromise<Symbol>> ContainingLexicalScope { get; set; }
     }
 }
