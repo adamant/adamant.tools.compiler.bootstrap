@@ -43,8 +43,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 
                     containingScope = BuildUsingDirectivesScope(syn.UsingDirectives, containingScope);
                     break;
-
-                // TODO build class declaration scope
+                case IClassDeclarationSyntax syn:
+                    syn.ContainingLexicalScope = containingScope;
+                    containingScope = BuildClassScope(syn, containingScope);
+                    break;
                 case IHasContainingLexicalScope syn:
                     syn.ContainingLexicalScope = containingScope;
                     break;
@@ -105,6 +107,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 
             var symbolsInScope = importedSymbols.ToFixedDictionary(e => e.Key, e => e.Value.ToFixedSet());
             return NestedScope.Create(containingScope, symbolsInScope);
+        }
+
+        private static LexicalScope<IPromise<Symbol>> BuildClassScope(
+            IClassDeclarationSyntax @class,
+            LexicalScope<IPromise<Symbol>> containingScope)
+        {
+            // Only "static" names are in scope. Other names must use `self.`
+            var symbols = @class.Members.OfType<IAssociatedFunctionDeclarationSyntax>()
+                                .GroupBy(m => m.Name, m => m.Symbol)
+                                .ToFixedDictionary(e => (TypeName)e.Key, e => e.ToFixedSet());
+
+            return NestedScope.Create(containingScope, symbols);
         }
     }
 }

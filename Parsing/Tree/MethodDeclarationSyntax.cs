@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -13,9 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal abstract class MethodDeclarationSyntax : CallableDeclarationSyntax, IMethodDeclarationSyntax
     {
         public IClassDeclarationSyntax DeclaringClass { get; }
-        [DebuggerHidden]
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public new SimpleName Name => FullName.UnqualifiedName;
+        public new Name Name { get; }
         public Promise<MethodSymbol> Symbol { get; } = new Promise<MethodSymbol>();
         protected override IPromise<Symbol> SymbolPromise => Symbol;
 
@@ -42,6 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
                 parameters, reachabilityAnnotations, childMetadata)
         {
             DeclaringClass = declaringClass;
+            Name = name;
             SelfParameter = selfParameter;
             Parameters = parameters;
             ReturnType = returnType;

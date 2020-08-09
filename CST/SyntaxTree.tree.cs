@@ -156,6 +156,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IFunctionDeclarationSyntax : INonMemberEntityDeclarationSyntax, IConcreteCallableDeclarationSyntax
     {
         bool IsExternalFunction { get; }
+        new Name Name { get; }
         new Promise<FunctionSymbol> Symbol { get; }
         ITypeSyntax? ReturnType { get; }
         DataTypePromise ReturnDataType { get; }
@@ -163,6 +164,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface IAssociatedFunctionDeclarationSyntax : IMemberDeclarationSyntax, IConcreteCallableDeclarationSyntax
     {
+        new Name Name { get; }
         ITypeSyntax? ReturnType { get; }
         DataTypePromise ReturnDataType { get; }
     }
@@ -182,6 +184,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(IConcreteMethodDeclarationSyntax))]
     public partial interface IMethodDeclarationSyntax : IMemberDeclarationSyntax, ICallableDeclarationSyntax
     {
+        new Name Name { get; }
         new Promise<MethodSymbol> Symbol { get; }
         ISelfParameterSyntax SelfParameter { get; }
         ITypeSyntax? ReturnType { get; }
