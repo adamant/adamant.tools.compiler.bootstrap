@@ -12,10 +12,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 {
     internal class DeclarationLexicalScopesBuilderWalker : SyntaxWalker<LexicalScope<IPromise<Symbol>>>
     {
+        private readonly NestedScope<IPromise<Symbol>> globalScope;
         private readonly FixedDictionary<NamespaceName, Namespace> namespaces;
 
-        public DeclarationLexicalScopesBuilderWalker(FixedDictionary<NamespaceName, Namespace> namespaces)
+        public DeclarationLexicalScopesBuilderWalker(
+            NestedScope<IPromise<Symbol>> globalScope,
+            FixedDictionary<NamespaceName, Namespace> namespaces)
         {
+            this.globalScope = globalScope;
             this.namespaces = namespaces;
         }
 
@@ -30,14 +34,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     break;
                 case INamespaceDeclarationSyntax syn:
                     syn.ContainingLexicalScope = containingScope;
+                    if (syn.IsGlobalQualified) containingScope = globalScope;
                     // TODO BuildNamespaceScopes
+                    containingScope = BuildNamespaceScopes(syn.DeclaredNames, containingScope);
                     containingScope = BuildUsingDirectivesScope(syn.UsingDirectives, containingScope);
-                    WalkChildren(syn, containingScope);
                     break;
-                case INonMemberDeclarationSyntax syn:
+
+                // TODO build class declaration scope
+                case IHasContainingLexicalScope syn:
                     syn.ContainingLexicalScope = containingScope;
                     break;
+                case IBodySyntax _:
+                case IExpressionSyntax _:
+                    // Skip and don't walk children
+                    return;
             }
+
+            WalkChildren(syntax, containingScope);
         }
 
         private LexicalScope<IPromise<Symbol>> BuildNamespaceScopes(NamespaceName nsName, LexicalScope<IPromise<Symbol>> containingScope)
@@ -51,7 +64,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         private LexicalScope<IPromise<Symbol>> BuildNamespaceScope(NamespaceName nsName, LexicalScope<IPromise<Symbol>> containingScope)
         {
             var ns = namespaces[nsName];
-            return new NestedScope<IPromise<Symbol>>(containingScope, ns.Symbols, ns.NestedSymbols);
+            return NestedScope.Create(containingScope, ns.Symbols, ns.NestedSymbols);
         }
 
         private LexicalScope<IPromise<Symbol>> BuildUsingDirectivesScope(
@@ -79,7 +92,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             }
 
             var symbolsInScope = importedSymbols.ToFixedDictionary(e => e.Key, e => e.Value.ToFixedSet());
-            return new NestedScope<IPromise<Symbol>>(containingScope, symbolsInScope);
+            return NestedScope.Create(containingScope, symbolsInScope);
         }
     }
 }

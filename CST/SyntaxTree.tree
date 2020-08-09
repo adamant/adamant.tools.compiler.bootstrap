@@ -28,7 +28,7 @@ ElseClause;
 BlockOrResult: ElseClause;
 
 // Declarations
-Declaration = File:CodeFile NameSpan:TextSpan;
+Declaration: 'ISyntax', IHasContainingLexicalScope = File:CodeFile NameSpan:TextSpan;
 EntityDeclaration: Declaration = AccessModifier:IAccessModifierToken? Name? Symbol:IPromise<Symbol>;
 CallableDeclaration: EntityDeclaration, IFunctionMetadata = ReachabilityAnnotations:ReachabilityAnnotation*;
 ConcreteCallableDeclaration: CallableDeclaration = Body;

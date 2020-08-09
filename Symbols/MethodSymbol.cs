@@ -9,6 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
     public sealed class MethodSymbol : FunctionOrMethodSymbol
     {
         public new TypeSymbol ContainingSymbol { get; }
+        public new Name Name { get; }
         public DataType SelfDataType { get; }
 
         public MethodSymbol(
@@ -20,6 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
             : base(containingSymbol, name, parameterDataTypes, returnDataType)
         {
             ContainingSymbol = containingSymbol;
+            Name = name;
             SelfDataType = selfDataType;
         }
 
@@ -38,6 +40,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
         public override int GetHashCode()
         {
             return HashCode.Combine(Name, SelfDataType, ParameterDataTypes, ReturnDataType);
+        }
+
+        public override string ToString()
+        {
+            return $"{ContainingSymbol}::{Name}({string.Join(", ", ParameterDataTypes)}) -> {ReturnDataType}";
         }
     }
 }

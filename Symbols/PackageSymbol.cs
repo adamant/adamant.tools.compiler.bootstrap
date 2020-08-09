@@ -28,5 +28,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
         {
             return HashCode.Combine(Name);
         }
+
+        public override string ToString()
+        {
+            return $"{Name}::";
+        }
     }
 }

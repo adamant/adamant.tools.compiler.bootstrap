@@ -23,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 
             foreach (var compilationUnit in package.CompilationUnits)
             {
-                var builder = new DeclarationLexicalScopesBuilderWalker(namespaces);
+                var builder = new DeclarationLexicalScopesBuilderWalker(globalScope, namespaces);
                 builder.Walk(compilationUnit, globalScope);
             }
         }
@@ -50,26 +50,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             var nsSymbols = new List<Namespace>();
             foreach (var ns in namespaces)
             {
-                var symbols = ToDictionary(declarationSymbols.Where(s => s.ContainingNamespace == ns));
-                var nestedSymbols = ToDictionary(declarationSymbols.Where(s => s.ContainingNamespace.IsNestedIn(ns)));
-                nsSymbols.Add(new Namespace(ns, symbols, nestedSymbols));
+                var symbols = declarationSymbols.Where(s => s.ContainingNamespace == ns).ToList();
+                var nestedSymbols = declarationSymbols.Where(s => s.ContainingNamespace.IsNestedIn(ns)).ToList();
+
+                nsSymbols.Add(new Namespace(
+                    ns,
+                    ToDictionary(symbols),
+                    ToDictionary(nestedSymbols),
+                    ToDictionary(symbols.Where(s => s.InCurrentPackage)),
+                    ToDictionary(nestedSymbols.Where(s => s.InCurrentPackage))));
             }
 
             return nsSymbols.ToFixedDictionary(ns => ns.Name);
         }
-        private static PackagesScope BuildPackagesScope(PackageSyntax package)
+        private static PackagesScope<IPromise<Symbol>> BuildPackagesScope(PackageSyntax package)
         {
             var packageAliases = package.References
                                   .ToDictionary(p => p.Key, p => p.Value.Symbol)
                                   .ToFixedDictionary();
-            return new PackagesScope(package.Symbol, packageAliases);
+            return new PackagesScope<IPromise<Symbol>>(package.Symbol, packageAliases);
         }
 
-        private static GlobalScope<IPromise<Symbol>> BuildGlobalScope(
-            PackagesScope packagesScope,
+        private static NestedScope<IPromise<Symbol>> BuildGlobalScope(
+            PackagesScope<IPromise<Symbol>> packagesScope,
             Namespace globalNamespace)
         {
-            return new GlobalScope<IPromise<Symbol>>(packagesScope, globalNamespace.Symbols, globalNamespace.NestedSymbols);
+            var allPackagesGlobalScope = NestedScope.CreateGlobal(packagesScope, globalNamespace.Symbols, globalNamespace.NestedSymbols);
+
+            return allPackagesGlobalScope;
         }
 
         private static FixedDictionary<TypeName, FixedSet<IPromise<Symbol>>> ToDictionary(

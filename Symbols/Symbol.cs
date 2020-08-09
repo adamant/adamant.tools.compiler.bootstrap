@@ -23,8 +23,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
             Name = name;
         }
 
-        // TODO lookup method
-
         #region Equality
         public abstract bool Equals(Symbol? other);
 
@@ -47,5 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
             return !(symbol1 == symbol2);
         }
         #endregion
+
+        public abstract override string ToString();
     }
 }

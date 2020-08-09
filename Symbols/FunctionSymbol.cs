@@ -12,6 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
     public sealed class FunctionSymbol : FunctionOrMethodSymbol
     {
         public new NamespaceOrPackageSymbol ContainingSymbol { get; }
+        public new Name Name { get; }
 
         public FunctionSymbol(
             NamespaceOrPackageSymbol containingSymbol,
@@ -21,6 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
             : base(containingSymbol, name, parameterDataTypes, returnDataType)
         {
             ContainingSymbol = containingSymbol;
+            Name = name;
         }
 
         public override bool Equals(Symbol? other)
@@ -37,6 +39,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
         public override int GetHashCode()
         {
             return HashCode.Combine(ContainingSymbol, Name, ParameterDataTypes, ReturnDataType);
+        }
+
+        public override string ToString()
+        {
+            return $"{ContainingSymbol}.{Name}({string.Join(", ", ParameterDataTypes)}) -> {ReturnDataType}";
         }
     }
 }

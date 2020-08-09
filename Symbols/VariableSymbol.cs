@@ -39,5 +39,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
         {
             return HashCode.Combine(Name, DeclarationNumber, IsMutableBinding, DataType);
         }
+
+        public override string ToString()
+        {
+            var mutable = IsMutableBinding ? "mut " : "";
+            return $"{ContainingSymbol} {{{mutable}{Name}: {DataType}}}";
+        }
     }
 }

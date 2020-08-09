@@ -1,5 +1,3 @@
-using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.LexicalScopes;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.CST
@@ -10,6 +8,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface INonMemberDeclarationSyntax
     {
         NamespaceOrPackageSymbol ContainingNamespaceSymbol { get; set; }
-        LexicalScope<IPromise<Symbol>> ContainingLexicalScope { get; set; }
     }
 }

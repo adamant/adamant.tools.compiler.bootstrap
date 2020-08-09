@@ -11,6 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
     public abstract class InvokableSymbol : Symbol
     {
         public override PackageSymbol Package { get; }
+        public new Name? Name { get; }
         public FixedList<DataType> ParameterDataTypes { get; }
         public int Arity => ParameterDataTypes.Count;
 
@@ -18,6 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
             : base(containingSymbol, name)
         {
             Package = containingSymbol.Package;
+            Name = name;
             ParameterDataTypes = parameterDataTypes;
         }
     }

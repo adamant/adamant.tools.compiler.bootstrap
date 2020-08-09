@@ -84,7 +84,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(IEntityDeclarationSyntax),
         typeof(INonMemberDeclarationSyntax),
         typeof(INamespaceDeclarationSyntax))]
-    public partial interface IDeclarationSyntax : ISyntax
+    public partial interface IDeclarationSyntax : ISyntax, IHasContainingLexicalScope
     {
         CodeFile File { get; }
         TextSpan NameSpan { get; }
