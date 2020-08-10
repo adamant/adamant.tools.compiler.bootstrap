@@ -10,12 +10,12 @@ using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes.Declarations
 {
-    internal class DeclarationLexicalScopesBuilderWalker : SyntaxWalker<LexicalScope<IPromise<Symbol>>>
+    internal class LexicalDeclarationScopesBuilderWalker : SyntaxWalker<LexicalScope<IPromise<Symbol>>>
     {
         private readonly NestedScope<IPromise<Symbol>> globalScope;
         private readonly FixedDictionary<NamespaceName, Namespace> namespaces;
 
-        public DeclarationLexicalScopesBuilderWalker(
+        public LexicalDeclarationScopesBuilderWalker(
             NestedScope<IPromise<Symbol>> globalScope,
             FixedDictionary<NamespaceName, Namespace> namespaces)
         {

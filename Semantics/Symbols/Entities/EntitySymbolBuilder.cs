@@ -12,60 +12,60 @@ using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
 {
-    public class EntitySymbolResolver
+    public class EntitySymbolBuilder
     {
         private readonly Diagnostics diagnostics;
         private readonly SymbolTreeBuilder symbolTree;
 
-        public EntitySymbolResolver(Diagnostics diagnostics, SymbolTreeBuilder symbolTree)
+        public EntitySymbolBuilder(Diagnostics diagnostics, SymbolTreeBuilder symbolTree)
         {
             this.diagnostics = diagnostics;
             this.symbolTree = symbolTree;
         }
 
-        public void Resolve(FixedList<IEntityDeclarationSyntax> entities)
+        public void Build(FixedList<IEntityDeclarationSyntax> entities)
         {
             // Process all classes first because they may be referenced by functions etc.
             foreach (var @class in entities.OfType<IClassDeclarationSyntax>())
-                ResolveClass(@class);
+                BuildClassSymbol(@class);
 
             // Now resolve all other symbols (class declarations will already have symbols and won't be processed again)
             foreach (var entity in entities)
-                ResolveEntity(entity);
+                BuildEntitySymbol(entity);
         }
 
         /// <summary>
         /// If the type has not been resolved, this resolves it. This function
         /// also watches for type cycles and reports an error.
         /// </summary>
-        private void ResolveEntity(IEntityDeclarationSyntax entity)
+        private void BuildEntitySymbol(IEntityDeclarationSyntax entity)
         {
             switch (entity)
             {
                 default:
                     throw ExhaustiveMatch.Failed(entity);
                 case IMethodDeclarationSyntax method:
-                    ResolveMethod(method);
+                    BuildMethodSymbol(method);
                     break;
                 case IConstructorDeclarationSyntax constructor:
-                    ResolveConstructor(constructor);
+                    BuildConstructorSymbol(constructor);
                     break;
                 case IAssociatedFunctionDeclarationSyntax associatedFunction:
-                    ResolveAssociatedFunction(associatedFunction);
+                    BuildAssociatedFunctionSymbol(associatedFunction);
                     break;
                 case IFieldDeclarationSyntax field:
-                    ResolveField(field);
+                    BuildFieldSymbol(field);
                     break;
                 case IFunctionDeclarationSyntax syn:
-                    ResolveFunction(syn);
+                    BuildFunctionSymbol(syn);
                     break;
                 case IClassDeclarationSyntax syn:
-                    ResolveClass(syn);
+                    BuildClassSymbol(syn);
                     break;
             }
         }
 
-        private void ResolveMethod(IMethodDeclarationSyntax method)
+        private void BuildMethodSymbol(IMethodDeclarationSyntax method)
         {
             method.Symbol.BeginFulfilling();
             var resolver = new TypeResolver(method.File, diagnostics);
@@ -79,7 +79,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
             symbolTree.Add(symbol);
         }
 
-        private void ResolveConstructor(IConstructorDeclarationSyntax constructor)
+        private void BuildConstructorSymbol(IConstructorDeclarationSyntax constructor)
         {
             constructor.Symbol.BeginFulfilling();
             constructor.SelfParameterType = ResolveTypesInParameter(constructor.ImplicitSelfParameter, constructor.DeclaringClass);
@@ -91,7 +91,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
             symbolTree.Add(symbol);
         }
 
-        private void ResolveAssociatedFunction(IAssociatedFunctionDeclarationSyntax associatedFunction)
+        private void BuildAssociatedFunctionSymbol(IAssociatedFunctionDeclarationSyntax associatedFunction)
         {
             associatedFunction.Symbol.BeginFulfilling();
             var resolver = new TypeResolver(associatedFunction.File, diagnostics);
@@ -103,7 +103,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
             symbolTree.Add(symbol);
         }
 
-        private void ResolveField(IFieldDeclarationSyntax field)
+        private void BuildFieldSymbol(IFieldDeclarationSyntax field)
         {
             if (field.Symbol.State == PromiseState.Fulfilled)
                 return;
@@ -116,7 +116,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
             symbolTree.Add(symbol);
         }
 
-        private void ResolveFunction(IFunctionDeclarationSyntax function)
+        private void BuildFunctionSymbol(IFunctionDeclarationSyntax function)
         {
             function.Symbol.BeginFulfilling();
             var resolver = new TypeResolver(function.File, diagnostics);
@@ -125,6 +125,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
             var symbol = new FunctionSymbol(function.ContainingNamespaceSymbol, function.Name, parameterTypes, returnType);
             function.Symbol.Fulfill(symbol);
             symbolTree.Add(symbol);
+        }
+
+        private void BuildClassSymbol(IClassDeclarationSyntax @class)
+        {
+            if (!@class.Symbol.TryBeginFulfilling(AddCircularDefinitionError)) return;
+
+            bool mutable = !(@class.MutableModifier is null);
+            var classType = new ObjectType(@class.ContainingNamespaceName, @class.Name, mutable,
+                ReferenceCapability.Shared);
+
+            var symbol = new ObjectTypeSymbol(@class.ContainingNamespaceSymbol!, classType);
+            @class.Symbol.Fulfill(symbol);
+            symbolTree.Add(symbol);
+            var defaultConstructorSymbol = @class.CreateDefaultConstructor();
+            if (!(defaultConstructorSymbol is null)) symbolTree.Add(defaultConstructorSymbol);
+
+            void AddCircularDefinitionError()
+            {
+                // TODO use something better than Name here which is an old name
+                diagnostics.Add(TypeError.CircularDefinition(@class.File, @class.NameSpan, @class));
+            }
         }
 
         private FixedList<DataType> ResolveTypesInParameters(
@@ -162,7 +183,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
                         else
                         {
                             fieldParameter.SetIsMutableBinding(field.IsMutableBinding);
-                            ResolveField(field);
+                            BuildFieldSymbol(field);
                             parameter.DataType.Fulfill(field.Symbol.Result.DataType);
                         }
                         types.Add(fieldParameter.DataType.Result);
@@ -194,28 +215,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
                 ? resolver.Evaluate(returnTypeSyntax) : DataType.Void;
             returnTypePromise.Fulfill(returnType);
             return returnType;
-        }
-
-        private void ResolveClass(IClassDeclarationSyntax @class)
-        {
-            if (!@class.Symbol.TryBeginFulfilling(AddCircularDefinitionError))
-                return;
-
-            bool mutable = !(@class.MutableModifier is null);
-            var classType = new ObjectType(@class.ContainingNamespaceName, @class.Name, mutable, ReferenceCapability.Shared);
-
-            var symbol = new ObjectTypeSymbol(@class.ContainingNamespaceSymbol!, classType);
-            @class.Symbol.Fulfill(symbol);
-            symbolTree.Add(symbol);
-            var defaultConstructorSymbol = @class.CreateDefaultConstructor();
-            if (!(defaultConstructorSymbol is null))
-                symbolTree.Add(defaultConstructorSymbol);
-
-            void AddCircularDefinitionError()
-            {
-                // TODO use something better than Name here which is an old name
-                diagnostics.Add(TypeError.CircularDefinition(@class.File, @class.NameSpan, @class));
-            }
         }
     }
 }

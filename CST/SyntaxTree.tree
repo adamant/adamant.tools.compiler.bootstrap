@@ -73,7 +73,7 @@ CapabilityType: Type = ReferentType:Type Capability:ReferenceCapability;
 Statement;
 ResultStatement: Statement, BlockOrResult;
 BodyStatement: Statement;
-VariableDeclarationStatement: BodyStatement, IBindingMetadata = NameSpan:TextSpan Name:SimpleName TypeSyntax:Type? InferMutableType:bool;
+VariableDeclarationStatement: BodyStatement, IBindingMetadata = NameSpan:TextSpan Name:SimpleName Symbol:Promise<VariableSymbol> TypeSyntax:Type? InferMutableType:bool;
 ExpressionStatement: BodyStatement;
 
 // Expressions
@@ -86,7 +86,7 @@ BoolLiteralExpression: LiteralExpression = Value:bool;
 BorrowExpression: Expression;
 BreakExpression: Expression;
 FieldAccessExpression: AssignableExpression = AccessOperator Field:NameExpression;
-ForeachExpression: Expression = VariableName:SimpleName TypeSyntax:Type? Block:BlockExpression;
+ForeachExpression: Expression = VariableName:SimpleName Symbol:Promise<VariableSymbol> TypeSyntax:Type? Block:BlockExpression;
 FunctionInvocationExpression: InvocationExpression = FunctionNameSyntax:CallableName;
 IfExpression: Expression, ElseClause = ThenBlock:BlockOrResult ElseClause?;
 ImplicitConversionExpression: Expression = Expression DataType;

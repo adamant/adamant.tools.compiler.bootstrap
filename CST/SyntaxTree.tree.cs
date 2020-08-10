@@ -313,6 +313,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     {
         TextSpan NameSpan { get; }
         SimpleName Name { get; }
+        Promise<VariableSymbol> Symbol { get; }
         ITypeSyntax? TypeSyntax { get; }
         bool InferMutableType { get; }
     }
@@ -390,6 +391,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IForeachExpressionSyntax : IExpressionSyntax
     {
         SimpleName VariableName { get; }
+        Promise<VariableSymbol> Symbol { get; }
         ITypeSyntax? TypeSyntax { get; }
         IBlockExpressionSyntax Block { get; }
     }

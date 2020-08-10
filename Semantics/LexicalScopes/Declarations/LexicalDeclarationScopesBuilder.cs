@@ -11,7 +11,7 @@ using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes.Declarations
 {
-    public class DeclarationLexicalScopesBuilder
+    public class LexicalDeclarationScopesBuilder
     {
         [SuppressMessage("Performance", "CA1822:Mark members as static",
             Justification = "OO")]
@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes.Declarations
 
             foreach (var compilationUnit in package.CompilationUnits)
             {
-                var builder = new DeclarationLexicalScopesBuilderWalker(globalScope, namespaces);
+                var builder = new LexicalDeclarationScopesBuilderWalker(globalScope, namespaces);
                 builder.Walk(compilationUnit, globalScope);
             }
         }
