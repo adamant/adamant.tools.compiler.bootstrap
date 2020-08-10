@@ -62,12 +62,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
                     break;
                 }
                 case IAssociatedFunctionDeclarationSyntax associatedFunction:
-                {
-                    //var analyzer = new BasicTypeAnalyzer(associatedFunction.File, diagnostics);
-                    //ResolveTypesInParameters(analyzer, associatedFunction.Parameters, null);
-                    //ResolveReturnType(associatedFunction.ReturnDataType, associatedFunction.ReturnType, analyzer);
+                    ResolveAssociatedFunction(associatedFunction);
                     break;
-                }
                 case IFieldDeclarationSyntax field:
                     ResolveField(field);
                     break;
@@ -78,6 +74,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
                     ResolveClass(syn);
                     break;
             }
+        }
+
+        private void ResolveAssociatedFunction(IAssociatedFunctionDeclarationSyntax associatedFunction)
+        {
+            var resolver = new TypeResolver(associatedFunction.File, diagnostics);
+            ResolveTypesInParameters(resolver, associatedFunction.Parameters, null);
+            ResolveReturnType(associatedFunction.ReturnDataType, associatedFunction.ReturnType, resolver);
         }
 
         private void ResolveField(IFieldDeclarationSyntax field)
