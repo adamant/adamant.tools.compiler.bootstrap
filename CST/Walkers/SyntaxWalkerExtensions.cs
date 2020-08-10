@@ -94,7 +94,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Walkers
                         walker.Walk(statement, arg);
                     break;
                 case IVariableDeclarationStatementSyntax variableDeclaration:
-                    walker.Walk(variableDeclaration.TypeSyntax, arg);
+                    walker.Walk(variableDeclaration.Type, arg);
                     walker.Walk(variableDeclaration.Initializer, arg);
                     break;
                 case IExpressionStatementSyntax expressionStatement:

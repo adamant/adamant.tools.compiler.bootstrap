@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public Name Name { get; }
         public Promise<VariableSymbol> Symbol { get; } = new Promise<VariableSymbol>();
         public TextSpan NameSpan { [DebuggerStepThrough] get; }
-        public ITypeSyntax? TypeSyntax { [DebuggerStepThrough] get; }
+        public ITypeSyntax? Type { [DebuggerStepThrough] get; }
         public bool InferMutableType { [DebuggerStepThrough] get; }
 
         DataType IBindingMetadata.DataType => DataType ?? throw new InvalidOperationException();
@@ -63,7 +63,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name = name;
             FullName = fullName;
             NameSpan = nameSpan;
-            TypeSyntax = typeSyntax;
+            Type = typeSyntax;
             InferMutableType = inferMutableType;
             this.initializer = initializer;
         }
@@ -71,7 +71,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public override string ToString()
         {
             var binding = IsMutableBinding ? "var" : "let";
-            var type = TypeSyntax != null ? ": " + TypeSyntax : "";
+            var type = Type != null ? ": " + Type : "";
             var initializer = Initializer != null ? " = " + Initializer : "";
             return $"{binding} {Name}{type}{initializer};";
         }

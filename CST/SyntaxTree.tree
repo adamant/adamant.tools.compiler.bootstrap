@@ -73,7 +73,7 @@ CapabilityType: Type = ReferentType:Type Capability:ReferenceCapability;
 Statement;
 ResultStatement: Statement, BlockOrResult;
 BodyStatement: Statement;
-VariableDeclarationStatement: BodyStatement, IBindingMetadata = NameSpan:TextSpan Name Symbol:Promise<VariableSymbol> TypeSyntax:Type? InferMutableType:bool;
+VariableDeclarationStatement: BodyStatement, IBindingMetadata = NameSpan:TextSpan Name Symbol:Promise<VariableSymbol> Type? InferMutableType:bool;
 ExpressionStatement: BodyStatement;
 
 // Expressions

@@ -315,7 +315,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         TextSpan NameSpan { get; }
         Name Name { get; }
         Promise<VariableSymbol> Symbol { get; }
-        ITypeSyntax? TypeSyntax { get; }
+        ITypeSyntax? Type { get; }
         bool InferMutableType { get; }
     }
 

@@ -83,9 +83,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         private void ResolveTypes(IVariableDeclarationStatementSyntax variableDeclaration)
         {
             DataType type;
-            if (variableDeclaration.TypeSyntax != null)
+            if (variableDeclaration.Type != null)
             {
-                type = typeAnalyzer.Evaluate(variableDeclaration.TypeSyntax);
+                type = typeAnalyzer.Evaluate(variableDeclaration.Type);
                 CheckType(ref variableDeclaration.Initializer, type);
             }
             else if (variableDeclaration.Initializer != null)
