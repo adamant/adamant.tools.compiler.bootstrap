@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 {
     internal class NonMemberEntitySymbol
     {
-        public bool InCurrentPackage;
+        public bool InCurrentPackage { get; }
         public NamespaceName ContainingNamespace { get; }
         public TypeName Name { get; }
         public IPromise<Symbol> Symbol { get; }

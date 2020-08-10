@@ -221,13 +221,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IParameterSyntax : ISyntax, IBindingMetadata
     {
         Name? Name { get; }
+        IPromise<BindingSymbol> Symbol { get; }
         bool Unused { get; }
-        Promise<DataType> DataType { get; }
     }
 
     public partial interface INamedParameterSyntax : IParameterSyntax, IConstructorParameterSyntax
     {
-        new Name Name { get; }
         ITypeSyntax TypeSyntax { get; }
         IExpressionSyntax? DefaultValue { get; }
     }
@@ -237,16 +236,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(IFieldParameterSyntax))]
     public partial interface IConstructorParameterSyntax : IParameterSyntax
     {
+        new Name Name { get; }
+        new Promise<VariableSymbol> Symbol { get; }
     }
 
     public partial interface ISelfParameterSyntax : IParameterSyntax
     {
         bool MutableSelf { get; }
+        new Promise<SelfParameterSymbol> Symbol { get; }
     }
 
     public partial interface IFieldParameterSyntax : IParameterSyntax, IConstructorParameterSyntax
     {
-        new Name Name { get; }
         IExpressionSyntax? DefaultValue { get; }
     }
 

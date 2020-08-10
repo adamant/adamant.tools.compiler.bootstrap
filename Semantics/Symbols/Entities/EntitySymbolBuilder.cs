@@ -68,39 +68,43 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
         private void BuildMethodSymbol(IMethodDeclarationSyntax method)
         {
             method.Symbol.BeginFulfilling();
-            var resolver = new TypeResolver(method.File, diagnostics);
-            var selfParameterType = ResolveTypesInParameter(method.SelfParameter, method.DeclaringClass);
-            method.SelfParameterType = selfParameterType;
-            var parameterTypes = ResolveTypesInParameters(resolver, method.Parameters, method.DeclaringClass);
-            var returnType = ResolveReturnType(method.ReturnDataType, method.ReturnType, resolver);
             var declaringClassSymbol = method.DeclaringClass.Symbol.Result;
+            var resolver = new TypeResolver(method.File, diagnostics);
+            var selfParameterType = ResolveSelfParameterType(method.SelfParameter, method.DeclaringClass);
+            var parameterTypes = ResolveParameterTypes(resolver, method.Parameters, method.DeclaringClass);
+            var returnType = ResolveReturnType(method.ReturnDataType, method.ReturnType, resolver);
             var symbol = new MethodSymbol(declaringClassSymbol, method.Name, selfParameterType, parameterTypes, returnType);
             method.Symbol.Fulfill(symbol);
             symbolTree.Add(symbol);
+            BuildSelParameterSymbol(symbol, method.SelfParameter, selfParameterType);
+            BuildParameterSymbols(symbol, method.Parameters, parameterTypes);
         }
 
         private void BuildConstructorSymbol(IConstructorDeclarationSyntax constructor)
         {
             constructor.Symbol.BeginFulfilling();
-            constructor.SelfParameterType = ResolveTypesInParameter(constructor.ImplicitSelfParameter, constructor.DeclaringClass);
+            var selfParameterType = ResolveSelfParameterType(constructor.ImplicitSelfParameter, constructor.DeclaringClass);
             var resolver = new TypeResolver(constructor.File, diagnostics);
-            var parameterTypes = ResolveTypesInParameters(resolver, constructor.Parameters, constructor.DeclaringClass);
+            var parameterTypes = ResolveParameterTypes(resolver, constructor.Parameters, constructor.DeclaringClass);
             var declaringClassSymbol = constructor.DeclaringClass.Symbol.Result;
             var symbol = new ConstructorSymbol(declaringClassSymbol, constructor.Name, parameterTypes);
             constructor.Symbol.Fulfill(symbol);
             symbolTree.Add(symbol);
+            BuildSelParameterSymbol(symbol, constructor.ImplicitSelfParameter, selfParameterType);
+            BuildParameterSymbols(symbol, constructor.Parameters, parameterTypes);
         }
 
         private void BuildAssociatedFunctionSymbol(IAssociatedFunctionDeclarationSyntax associatedFunction)
         {
             associatedFunction.Symbol.BeginFulfilling();
             var resolver = new TypeResolver(associatedFunction.File, diagnostics);
-            var parameterTypes = ResolveTypesInParameters(resolver, associatedFunction.Parameters, null);
+            var parameterTypes = ResolveParameterTypes(resolver, associatedFunction.Parameters, null);
             var returnType = ResolveReturnType(associatedFunction.ReturnDataType, associatedFunction.ReturnType, resolver);
             var declaringClassSymbol = associatedFunction.DeclaringClass.Symbol.Result;
             var symbol = new FunctionSymbol(declaringClassSymbol, associatedFunction.Name, parameterTypes, returnType);
             associatedFunction.Symbol.Fulfill(symbol);
             symbolTree.Add(symbol);
+            BuildParameterSymbols(symbol, associatedFunction.Parameters, parameterTypes);
         }
 
         private void BuildFieldSymbol(IFieldDeclarationSyntax field)
@@ -120,11 +124,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
         {
             function.Symbol.BeginFulfilling();
             var resolver = new TypeResolver(function.File, diagnostics);
-            var parameterTypes = ResolveTypesInParameters(resolver, function.Parameters, null);
+            var parameterTypes = ResolveParameterTypes(resolver, function.Parameters, null);
             var returnType = ResolveReturnType(function.ReturnDataType, function.ReturnType, resolver);
             var symbol = new FunctionSymbol(function.ContainingNamespaceSymbol, function.Name, parameterTypes, returnType);
             function.Symbol.Fulfill(symbol);
             symbolTree.Add(symbol);
+            BuildParameterSymbols(symbol, function.Parameters, parameterTypes);
         }
 
         private void BuildClassSymbol(IClassDeclarationSyntax @class)
@@ -148,7 +153,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
             }
         }
 
-        private FixedList<DataType> ResolveTypesInParameters(
+        private FixedList<DataType> ResolveParameterTypes(
             TypeResolver resolver,
             IEnumerable<IConstructorParameterSyntax> parameters,
             IClassDeclarationSyntax? declaringClass)
@@ -161,22 +166,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
                         throw ExhaustiveMatch.Failed(parameter);
                     case INamedParameterSyntax namedParameter:
                     {
-                        parameter.DataType.BeginFulfilling();
                         var type = resolver.Evaluate(namedParameter.TypeSyntax);
-                        parameter.DataType.Fulfill(type);
                         types.Add(type);
                     }
                     break;
                     case IFieldParameterSyntax fieldParameter:
                     {
-                        parameter.DataType.BeginFulfilling();
                         var field = (declaringClass ?? throw new InvalidOperationException("Field parameter outside of class declaration"))
                                     .Members.OfType<IFieldDeclarationSyntax>()
                                     .SingleOrDefault(f => f.Name == fieldParameter.Name);
                         if (field is null)
                         {
                             fieldParameter.SetIsMutableBinding(false);
-                            fieldParameter.DataType.Fulfill(DataType.Unknown);
+                            types.Add(DataType.Unknown);
                             // TODO report an error
                             throw new NotImplementedException();
                         }
@@ -184,9 +186,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
                         {
                             fieldParameter.SetIsMutableBinding(field.IsMutableBinding);
                             BuildFieldSymbol(field);
-                            parameter.DataType.Fulfill(field.Symbol.Result.DataType);
+                            types.Add(field.Symbol.Result.DataType);
                         }
-                        types.Add(fieldParameter.DataType.Result);
                     }
                     break;
                 }
@@ -194,15 +195,39 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
             return types.ToFixedList();
         }
 
-        private static ObjectType ResolveTypesInParameter(
+        private void BuildParameterSymbols(
+            InvokableSymbol containingSymbol,
+            IEnumerable<IConstructorParameterSyntax> parameters,
+            IEnumerable<DataType> types)
+        {
+            foreach (var (param, type) in parameters.Zip(types))
+            {
+                param.Symbol.BeginFulfilling();
+                var symbol = new VariableSymbol(containingSymbol, param.Name, 0, param.IsMutableBinding, type);
+                param.Symbol.Fulfill(symbol);
+                symbolTree.Add(symbol);
+            }
+        }
+
+        private static ObjectType ResolveSelfParameterType(
             ISelfParameterSyntax selfParameter,
             IClassDeclarationSyntax declaringClass)
         {
             var selfType = declaringClass.Symbol.Result.DeclaresDataType;
-            selfParameter.DataType.BeginFulfilling();
-            if (selfParameter.MutableSelf) selfType = selfType.ForConstructorSelf();
-            selfParameter.DataType.Fulfill(selfType);
+            if (selfParameter.MutableSelf)
+                selfType = selfType.ForConstructorSelf();
             return selfType;
+        }
+
+        private void BuildSelParameterSymbol(
+            InvokableSymbol containingSymbol,
+            ISelfParameterSyntax param,
+            DataType type)
+        {
+            param.Symbol.BeginFulfilling();
+            var symbol = new SelfParameterSymbol(containingSymbol, param.IsMutableBinding, type);
+            param.Symbol.Fulfill(symbol);
+            symbolTree.Add(symbol);
         }
 
         private static DataType ResolveReturnType(

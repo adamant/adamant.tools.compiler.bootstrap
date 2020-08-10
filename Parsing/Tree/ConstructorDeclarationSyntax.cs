@@ -11,7 +11,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal class ConstructorDeclarationSyntax : CallableDeclarationSyntax, IConstructorDeclarationSyntax
     {
         public IClassDeclarationSyntax DeclaringClass { get; }
-
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public new SimpleName Name => FullName.UnqualifiedName;
@@ -19,7 +18,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         protected override IPromise<Symbol> SymbolPromise => Symbol;
         public ISelfParameterSyntax ImplicitSelfParameter { get; }
         public new FixedList<IConstructorParameterSyntax> Parameters { get; }
-
         public virtual IBodySyntax Body { get; }
 
         public ConstructorDeclarationSyntax(

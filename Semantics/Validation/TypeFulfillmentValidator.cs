@@ -22,12 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
             switch (syntax)
             {
                 case IClassDeclarationSyntax classDeclaration:
-                    _ = classDeclaration.Symbol.Result.DeclaresDataType;
                     // Don't recur into body, we will see those as separate members
-                    return;
-                case IConstructorDeclarationSyntax constructorDeclaration:
-                    WalkChildren(constructorDeclaration);
-                    constructorDeclaration.SelfParameterType.Assigned();
                     return;
                 case IMethodDeclarationSyntax methodDeclaration:
                     WalkChildren(methodDeclaration);
@@ -40,14 +35,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                 case IAssociatedFunctionDeclarationSyntax associatedFunctionDeclaration:
                     WalkChildren(associatedFunctionDeclaration);
                     _ = associatedFunctionDeclaration.ReturnDataType.Result;
-                    return;
-                case IParameterSyntax parameter:
-                    WalkChildren(parameter);
-                    _ = parameter.DataType.Result;
-                    return;
-                case IFieldDeclarationSyntax fieldDeclaration:
-                    WalkChildren(fieldDeclaration);
-                    _ = fieldDeclaration.Symbol.Result.DataType;
                     return;
                 case ITypeSyntax type:
                     WalkChildren(type);

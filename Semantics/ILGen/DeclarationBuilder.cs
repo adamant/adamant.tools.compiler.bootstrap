@@ -79,7 +79,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     var parameters = BuildConstructorParameters(constructor);
                     var fieldInitializations = BuildFieldInitializations(constructor);
                     declaration = new ConstructorDeclaration(constructor.FullName,
-                       parameters, constructor.SelfParameterType.Known(), fieldInitializations, il);
+                       parameters, constructor.ImplicitSelfParameter.Symbol.Result.DataType.Known(), fieldInitializations, il);
                     break;
                 }
                 case IFieldDeclarationSyntax fieldDeclaration:
@@ -145,7 +145,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
 
         private static FixedList<Parameter> BuildConstructorParameters(IConstructorDeclarationSyntax constructorDeclaration)
         {
-            var selfType = constructorDeclaration.SelfParameterType.Known();
+            var selfType = constructorDeclaration.ImplicitSelfParameter.Symbol.Result.DataType.Known();
             var selfParameter = new Parameter(false, SpecialNames.Self, selfType);
             return selfParameter.Yield().Concat(constructorDeclaration.Parameters.Select(BuildParameter)).ToFixedList();
         }

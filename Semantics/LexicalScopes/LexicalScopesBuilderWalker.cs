@@ -25,6 +25,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 
         protected override void WalkNonNull(ISyntax syntax, LexicalScope containingScope)
         {
+            if (syntax is IHasContainingLexicalScope hasContainingLexicalScope)
+                hasContainingLexicalScope.ContainingLexicalScope = containingScope;
+
             switch (syntax)
             {
                 case ICompilationUnitSyntax syn:
@@ -32,7 +35,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     containingScope = BuildUsingDirectivesScope(syn.UsingDirectives, containingScope);
                     break;
                 case INamespaceDeclarationSyntax syn:
-                    syn.ContainingLexicalScope = containingScope;
                     if (syn.IsGlobalQualified)
                     {
                         containingScope = globalScope;
@@ -44,12 +46,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     containingScope = BuildUsingDirectivesScope(syn.UsingDirectives, containingScope);
                     break;
                 case IClassDeclarationSyntax syn:
-                    syn.ContainingLexicalScope = containingScope;
                     containingScope = BuildClassScope(syn, containingScope);
                     break;
-                case IHasContainingLexicalScope syn:
-                    syn.ContainingLexicalScope = containingScope;
-                    break;
+                case IFunctionDeclarationSyntax function:
+                    foreach (var parameter in function.Parameters)
+                        Walk(parameter, containingScope);
+                    Walk(function.ReturnType, containingScope);
+                    containingScope = BuildBodyScope(function.Parameters, containingScope);
+                    Walk(function.Body, containingScope);
+                    return;
                 case IBodySyntax _:
                 case IExpressionSyntax _:
                     // Skip and don't walk children
@@ -118,6 +123,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                                 .GroupBy(m => m.Name, m => m.Symbol)
                                 .ToFixedDictionary(e => (TypeName)e.Key, e => e.ToFixedSet<IPromise<Symbol>>());
 
+            return NestedScope.Create(containingScope, symbols);
+        }
+
+        private static LexicalScope BuildBodyScope(
+            IEnumerable<IConstructorParameterSyntax> parameters,
+            LexicalScope containingScope)
+        {
+            var symbols = parameters.GroupBy(p => p.Name, p => p.Symbol)
+                                    .ToFixedDictionary(e => (TypeName)e.Key, e => e.ToFixedSet<IPromise<Symbol>>());
             return NestedScope.Create(containingScope, symbols);
         }
     }

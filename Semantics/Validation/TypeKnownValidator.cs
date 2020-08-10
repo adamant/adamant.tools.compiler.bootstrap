@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                     return;
                 case IConstructorDeclarationSyntax constructorDeclaration:
                     WalkChildren(constructorDeclaration);
-                    constructorDeclaration.SelfParameterType.Known();
+                    constructorDeclaration.ImplicitSelfParameter.Symbol.Result.DataType.Known();
                     return;
                 case IMethodDeclarationSyntax methodDeclaration:
                     WalkChildren(methodDeclaration);

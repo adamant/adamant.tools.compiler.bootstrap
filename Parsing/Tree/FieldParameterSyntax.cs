@@ -2,6 +2,7 @@ using System;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
@@ -9,9 +10,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     {
         private bool? isMutableBinding;
         public override bool IsMutableBinding => isMutableBinding ?? throw new Exception($"Tried to access {nameof(IsMutableBinding)} of field parameter before it had been assigned.");
-
         public new Name Name { get; }
-
+        public Promise<VariableSymbol> Symbol { get; } = new Promise<VariableSymbol>();
+        protected override IPromise<BindingSymbol> SymbolPromise => Symbol;
         public SimpleName FieldName { get; }
 
         public IExpressionSyntax? DefaultValue { get; }

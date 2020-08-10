@@ -1,6 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
@@ -8,6 +9,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     {
         public override bool IsMutableBinding { get; }
         public new Name Name { get; }
+        public Promise<VariableSymbol> Symbol { get; } = new Promise<VariableSymbol>();
+        protected override IPromise<BindingSymbol> SymbolPromise => Symbol;
         public ITypeSyntax TypeSyntax { get; }
         public IExpressionSyntax? DefaultValue { get; }
 

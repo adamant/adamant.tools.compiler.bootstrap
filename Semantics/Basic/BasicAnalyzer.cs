@@ -154,7 +154,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     break;
                 case IConstructorDeclarationSyntax constructor:
                 {
-                    var resolver = new BasicBodyAnalyzer(constructor.File, stringSymbol, diagnostics, constructor.SelfParameterType);
+                    var resolver = new BasicBodyAnalyzer(constructor.File, stringSymbol, diagnostics, constructor.ImplicitSelfParameter.Symbol.Result.DataType);
                     resolver.ResolveTypes(constructor.Body);
                     break;
                 }
