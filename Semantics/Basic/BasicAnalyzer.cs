@@ -1,10 +1,8 @@
 using System.Collections.Generic;
-using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata;
-using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
@@ -38,11 +36,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         public void Check(FixedList<IEntityDeclarationSyntax> entities)
         {
-            // Process all classes first because they may be referenced by functions etc.
-            foreach (var @class in entities.OfType<IClassDeclarationSyntax>())
-                ResolveSignatureTypes(@class);
-
-            // Now resolve all other signature types (class declarations will already have types and won't be processed again)
+            // EntitySymbolResolver has already resolved entity symbols and types
+            // Still need to set referenced metadata
             foreach (var entity in entities)
                 ResolveSignatureTypes(entity);
 
@@ -66,7 +61,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 {
                     var analyzer = new BasicTypeAnalyzer(method.File, diagnostics);
                     ResolveTypesInParameters(analyzer, method.Parameters);
-                    ResolveReturnType(method.ReturnDataType, method.ReturnType, analyzer);
+                    analyzer.Evaluate(method.ReturnType);
                     break;
                 }
                 case IConstructorDeclarationSyntax constructor:
@@ -79,23 +74,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 {
                     var analyzer = new BasicTypeAnalyzer(associatedFunction.File, diagnostics);
                     ResolveTypesInParameters(analyzer, associatedFunction.Parameters);
-                    ResolveReturnType(associatedFunction.ReturnDataType, associatedFunction.ReturnType, analyzer);
+                    analyzer.Evaluate(associatedFunction.ReturnType);
                     break;
                 }
                 case IFieldDeclarationSyntax field:
-                    // Resolved by EntitySymbolResolver, just need to set metadata
+                {
                     var resolver = new BasicTypeAnalyzer(field.File, diagnostics);
                     resolver.Evaluate(field.TypeSyntax);
                     break;
+                }
                 case IFunctionDeclarationSyntax function:
                 {
                     var analyzer = new BasicTypeAnalyzer(function.File, diagnostics);
                     ResolveTypesInParameters(analyzer, function.Parameters);
-                    ResolveReturnType(function.ReturnDataType, function.ReturnType, analyzer);
+                    analyzer.Evaluate(function.ReturnType);
                     break;
                 }
                 case IClassDeclarationSyntax _:
-                    // Resolved by EntitySymbolResolver
+                    // Fully resolved by EntitySymbolResolver
                     break;
             }
         }
@@ -110,38 +106,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     default:
                         throw ExhaustiveMatch.Failed(parameter);
                     case INamedParameterSyntax namedParameter:
-                        // It could already be fulfilled by the type resolver
-                        if (parameter.DataType.TryBeginFulfilling())
-                        {
-                            var type = analyzer.Evaluate(namedParameter.TypeSyntax);
-                            parameter.DataType.Fulfill(type);
-                        }
-                        else
-                        {
-                            // Still need to analyze to assign referenced metadata
-                            analyzer.Evaluate(namedParameter.TypeSyntax);
-                        }
+                        // Resolved by EntitySymbolResolver
+                        // Still need to analyze to assign referenced metadata
+                        analyzer.Evaluate(namedParameter.TypeSyntax);
                         break;
                     case IFieldParameterSyntax _:
                         // Resolved by EntitySymbolResolver
                         break;
                 }
-        }
-
-        private static void ResolveReturnType(
-            Promise<DataType> returnTypePromise,
-            ITypeSyntax? returnTypeSyntax,
-            BasicTypeAnalyzer analyzer)
-        {
-            if (returnTypePromise.TryBeginFulfilling())
-            {
-                var returnType = returnTypeSyntax != null
-                    ? analyzer.Evaluate(returnTypeSyntax) : DataType.Void;
-
-                returnTypePromise.Fulfill(returnType);
-            }
-            else
-                analyzer.Evaluate(returnTypeSyntax);
         }
 
         private void ResolveBodyTypes(IEntityDeclarationSyntax declaration)
