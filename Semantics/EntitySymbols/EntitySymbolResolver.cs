@@ -99,7 +99,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
         {
             var resolver = new TypeResolver(function.File, diagnostics);
             ResolveTypesInParameters(resolver, function.Parameters, null);
-            //ResolveReturnType(function.ReturnDataType, function.ReturnType, resolver);
+            ResolveReturnType(function.ReturnDataType, function.ReturnType, resolver);
         }
 
         private void ResolveTypesInParameters(

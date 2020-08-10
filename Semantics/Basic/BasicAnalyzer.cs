@@ -194,12 +194,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             ITypeSyntax? returnTypeSyntax,
             BasicTypeAnalyzer analyzer)
         {
-            returnTypePromise.BeginFulfilling();
-            var returnType = returnTypeSyntax != null
-                ? analyzer.Evaluate(returnTypeSyntax)
-                : DataType.Void;
+            if (returnTypePromise.TryBeginFulfilling())
+            {
+                var returnType = returnTypeSyntax != null
+                    ? analyzer.Evaluate(returnTypeSyntax) : DataType.Void;
 
-            returnTypePromise.Fulfill(returnType);
+                returnTypePromise.Fulfill(returnType);
+            }
+            else
+                analyzer.Evaluate(returnTypeSyntax);
         }
 
         private void ResolveBodyTypes(IEntityDeclarationSyntax declaration)
