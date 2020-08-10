@@ -55,6 +55,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     containingScope = BuildBodyScope(function.Parameters, containingScope);
                     Walk(function.Body, containingScope);
                     return;
+                case IAssociatedFunctionDeclarationSyntax function:
+                    foreach (var parameter in function.Parameters)
+                        Walk(parameter, containingScope);
+                    Walk(function.ReturnType, containingScope);
+                    containingScope = BuildBodyScope(function.Parameters, containingScope);
+                    Walk(function.Body, containingScope);
+                    return;
+                case IConcreteMethodDeclarationSyntax concreteMethod:
+                    Walk(concreteMethod.SelfParameter, containingScope);
+                    foreach (var parameter in concreteMethod.Parameters)
+                        Walk(parameter, containingScope);
+                    Walk(concreteMethod.ReturnType, containingScope);
+                    containingScope = BuildBodyScope(concreteMethod.Parameters, containingScope);
+                    Walk(concreteMethod.Body, containingScope);
+                    return;
+                case IConstructorDeclarationSyntax constructor:
+                    Walk(constructor.ImplicitSelfParameter, containingScope);
+                    foreach (var parameter in constructor.Parameters)
+                        Walk(parameter, containingScope);
+                    containingScope = BuildBodyScope(constructor.Parameters, containingScope);
+                    Walk(constructor.Body, containingScope);
+                    return;
                 case IBodySyntax _:
                 case IExpressionSyntax _:
                     // Skip and don't walk children
