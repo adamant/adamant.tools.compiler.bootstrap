@@ -10,13 +10,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
     /// </summary>
     public sealed class NamespaceSymbol : NamespaceOrPackageSymbol
     {
-        public override PackageSymbol Package { get; }
         public new NamespaceOrPackageSymbol ContainingSymbol { get; }
 
         public NamespaceSymbol(NamespaceOrPackageSymbol containingSymbol, Name name)
             : base(containingSymbol, name)
         {
-            Package = containingSymbol.Package;
             ContainingSymbol = containingSymbol;
         }
 

@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
         typeof(FieldSymbol))]
     public abstract class BindingSymbol : Symbol
     {
-        public override PackageSymbol Package { get; }
+        public override PackageSymbol? Package { get; }
         public new Name Name { get; }
         public bool IsMutableBinding { get; }
         public DataType DataType { get; }

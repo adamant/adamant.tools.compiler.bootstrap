@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
         typeof(BindingSymbol))]
     public abstract class Symbol : IEquatable<Symbol>
     {
-        public abstract PackageSymbol Package { get; }
+        public virtual PackageSymbol? Package { get; }
         public Symbol? ContainingSymbol { get; }
         public TypeName? Name { get; }
         public bool IsGlobal => ContainingSymbol is null;
@@ -19,6 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
         protected Symbol(Symbol? containingSymbol, TypeName? name)
         {
             // Note: constructor can't be `private protected` so `Symbol` can be mocked in unit tests
+            Package = containingSymbol?.Package;
             ContainingSymbol = containingSymbol;
             Name = name;
         }

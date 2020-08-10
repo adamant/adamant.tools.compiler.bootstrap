@@ -8,10 +8,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
 {
     public sealed class ConstructorSymbol : InvokableSymbol
     {
-        public new TypeSymbol ContainingSymbol { get; }
+        public new ObjectTypeSymbol ContainingSymbol { get; }
 
         public ConstructorSymbol(
-            TypeSymbol containingSymbol,
+            ObjectTypeSymbol containingSymbol,
             Name? name,
             FixedList<DataType> parameterDataTypes)
             : base(containingSymbol, name, parameterDataTypes)
@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
             ContainingSymbol = containingSymbol;
         }
 
-        public static ConstructorSymbol CreateDefault(TypeSymbol containingSymbol)
+        public static ConstructorSymbol CreateDefault(ObjectTypeSymbol containingSymbol)
         {
             return new ConstructorSymbol(containingSymbol, null, FixedList<DataType>.Empty);
         }

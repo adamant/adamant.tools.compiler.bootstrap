@@ -56,7 +56,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
             var parameters = Params(DataType("T1"), DataType("T2"));
             var funcA = Func("A", ns, parameters, DataType("T3"));
             var selfDataType = DataType("Class");
-            var selfType = Type("Class", ns, selfDataType);
+            var selfType = Type(ns, selfDataType);
             var methodA = Method("A", selfType, selfDataType, parameters, DataType("T3"));
 
             // Note: assert false used to ensure which object Equals is called on

@@ -67,7 +67,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
 
         protected MethodSymbol Method(
             string? name = null,
-            TypeSymbol? containing = null,
+            ObjectTypeSymbol? containing = null,
             DataType? self = null,
             FixedList<DataType>? @params = null,
             DataType? @return = null)
@@ -84,7 +84,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
         protected static MethodSymbol Method(
             MethodSymbol mother,
             string? name = null,
-            TypeSymbol? containing = null,
+            ObjectTypeSymbol? containing = null,
             DataType? self = null,
             FixedList<DataType>? @params = null,
             DataType? @return = null)
@@ -102,16 +102,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
             return new ObjectType(NamespaceName.Global, finalName.Text, false, ReferenceCapability.Isolated);
         }
 
-        protected TypeSymbol Type(
-            string? name = null,
+        protected ObjectTypeSymbol Type(
             NamespaceOrPackageSymbol? ns = null,
             ObjectType? dataType = null)
         {
-            var simpleName = Name(name) ?? DefaultName("TypeSym");
-            return new TypeSymbol(
+            return new ObjectTypeSymbol(
                 ns ?? Package(),
-                simpleName,
-                dataType ?? DataType(simpleName.Text));
+                dataType ?? DataType());
         }
 
         protected VariableSymbol Variable(

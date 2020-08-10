@@ -53,7 +53,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
             var ns = Namespace();
             var parameters = Params(DataType("T1"), DataType("T2"));
             var selfDataType = DataType("Class");
-            var selfType = Type("Class", ns, selfDataType);
+            var selfType = Type(ns, selfDataType);
             var method = Method("A", selfType, selfDataType, parameters, DataType("T3"));
             var func = Func("A", ns, parameters, DataType("T3"));
 

@@ -10,12 +10,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols.Trees
     /// </summary>
     public class SymbolTreeBuilder : SymbolTree
     {
+        public PackageSymbol Package { get; }
         private readonly IDictionary<Symbol, ISet<Symbol>> symbolChildren = new Dictionary<Symbol, ISet<Symbol>>();
         public override IEnumerable<Symbol> Symbols => symbolChildren.Keys;
 
         public SymbolTreeBuilder(PackageSymbol package)
-            : base(package)
         {
+            Package = package;
             symbolChildren.Add(package, new HashSet<Symbol>());
         }
 
