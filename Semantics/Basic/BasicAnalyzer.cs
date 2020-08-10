@@ -65,7 +65,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IMethodDeclarationSyntax method:
                 {
                     var analyzer = new BasicTypeAnalyzer(method.File, diagnostics);
-                    method.SelfParameterType = ResolveTypesInParameter(method.SelfParameter, method.DeclaringClass);
                     ResolveTypesInParameters(analyzer, method.Parameters);
                     ResolveReturnType(method.ReturnDataType, method.ReturnType, analyzer);
                     break;
@@ -127,19 +126,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         // Resolved by EntitySymbolResolver
                         break;
                 }
-        }
-
-        private static ObjectType ResolveTypesInParameter(
-            ISelfParameterSyntax selfParameter,
-            IClassDeclarationSyntax declaringClass)
-        {
-            var selfType = declaringClass.Symbol.Result.DeclaresDataType;
-            if (selfParameter.DataType.TryBeginFulfilling())
-            {
-                if (selfParameter.MutableSelf) selfType = selfType.ForConstructorSelf();
-                selfParameter.DataType.Fulfill(selfType);
-            }
-            return selfType;
         }
 
         private static void ResolveReturnType(

@@ -45,13 +45,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
                 default:
                     throw ExhaustiveMatch.Failed(entity);
                 case IMethodDeclarationSyntax method:
-                {
-                    //var analyzer = new BasicTypeAnalyzer(method.File, diagnostics);
-                    //method.SelfParameterType = ResolveTypesInParameter(method.SelfParameter, method.DeclaringClass);
-                    //ResolveTypesInParameters(analyzer, method.Parameters, method.DeclaringClass);
-                    //ResolveReturnType(method.ReturnDataType, method.ReturnType, analyzer);
+                    ResolveMethod(method);
                     break;
-                }
                 case IConstructorDeclarationSyntax constructor:
                     ResolveConstructor(constructor);
                     break;
@@ -68,6 +63,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
                     ResolveClass(syn);
                     break;
             }
+        }
+
+        private void ResolveMethod(IMethodDeclarationSyntax method)
+        {
+            var resolver = new TypeResolver(method.File, diagnostics);
+            method.SelfParameterType = ResolveTypesInParameter(method.SelfParameter, method.DeclaringClass);
+            ResolveTypesInParameters(resolver, method.Parameters, method.DeclaringClass);
+            ResolveReturnType(method.ReturnDataType, method.ReturnType, resolver);
         }
 
         private void ResolveConstructor(IConstructorDeclarationSyntax constructor)
