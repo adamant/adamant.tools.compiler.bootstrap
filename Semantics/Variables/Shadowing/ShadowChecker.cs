@@ -48,7 +48,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Shadowing
                 case IVariableDeclarationStatementSyntax variableDeclaration:
                 {
                     WalkChildren(variableDeclaration, bindingScope);
-                    if (bindingScope.Lookup(variableDeclaration.Name, out var binding))
+                    if (bindingScope.Lookup(variableDeclaration.FullName.UnqualifiedName, out var binding))
                     {
                         if (binding.MutableBinding)
                             diagnostics.Add(SemanticError.CantRebindMutableBinding(callableDeclaration.File,

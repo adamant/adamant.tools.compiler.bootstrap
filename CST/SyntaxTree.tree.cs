@@ -313,7 +313,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IVariableDeclarationStatementSyntax : IBodyStatementSyntax, IBindingMetadata
     {
         TextSpan NameSpan { get; }
-        SimpleName Name { get; }
+        Name Name { get; }
         Promise<VariableSymbol> Symbol { get; }
         ITypeSyntax? TypeSyntax { get; }
         bool InferMutableType { get; }

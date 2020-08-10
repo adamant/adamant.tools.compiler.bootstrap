@@ -77,7 +77,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     containingScope = BuildBodyScope(constructor.Parameters, containingScope);
                     Walk(constructor.Body, containingScope);
                     return;
-                case IBodySyntax _:
+                case IBodyOrBlockSyntax bodyOrBlock:
+                    foreach (var statement in bodyOrBlock.Statements)
+                    {
+                        Walk(statement, containingScope);
+                        // Each variable declaration effectively starts a new scope after it, this
+                        // ensures a lookup returns the last declaration
+                        if (statement is IVariableDeclarationStatementSyntax variableDeclaration)
+                            containingScope = BuildVariableScope(containingScope, variableDeclaration);
+                    }
+                    return;
                 case IExpressionSyntax _:
                     // Skip and don't walk children
                     return;
@@ -154,6 +163,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         {
             var symbols = parameters.GroupBy(p => p.Name, p => p.Symbol)
                                     .ToFixedDictionary(e => (TypeName)e.Key, e => e.ToFixedSet<IPromise<Symbol>>());
+            return NestedScope.Create(containingScope, symbols);
+        }
+
+        private static LexicalScope BuildVariableScope(
+            LexicalScope containingScope,
+            IVariableDeclarationStatementSyntax variableDeclaration)
+        {
+            var symbols = variableDeclaration.Yield().ToFixedDictionary(v => (TypeName)v.Name,
+                v => v.Symbol.Yield().ToFixedSet<IPromise<Symbol>>());
             return NestedScope.Create(containingScope, symbols);
         }
     }

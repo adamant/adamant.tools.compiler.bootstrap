@@ -14,9 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     {
         public bool IsMutableBinding { [DebuggerStepThrough] get; }
         public MaybeQualifiedName FullName { [DebuggerStepThrough] get; }
-        [DebuggerHidden]
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public SimpleName Name => FullName.UnqualifiedName;
+        public Name Name { get; }
         public Promise<VariableSymbol> Symbol { get; } = new Promise<VariableSymbol>();
         public TextSpan NameSpan { [DebuggerStepThrough] get; }
         public ITypeSyntax? TypeSyntax { [DebuggerStepThrough] get; }
@@ -53,6 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public VariableDeclarationStatementSyntax(
             TextSpan span,
             bool isMutableBinding,
+            Name name,
             MaybeQualifiedName fullName,
             TextSpan nameSpan,
             ITypeSyntax? typeSyntax,
@@ -61,6 +60,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             : base(span)
         {
             IsMutableBinding = isMutableBinding;
+            Name = name;
             FullName = fullName;
             NameSpan = nameSpan;
             TypeSyntax = typeSyntax;

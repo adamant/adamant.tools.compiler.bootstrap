@@ -120,7 +120,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 {
                     var variable = graph.AddVariable(variableDeclaration.IsMutableBinding,
                         variableDeclaration.DataType.Assigned(),
-                        CurrentScope, variableDeclaration.Name.UnqualifiedName);
+                        CurrentScope, variableDeclaration.FullName.UnqualifiedName);
                     if (variableDeclaration.Initializer != null)
                     {
                         ConvertIntoPlace(variableDeclaration.Initializer,
