@@ -214,8 +214,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     }
 
     [Closed(
-        typeof(INamedParameterSyntax),
         typeof(IConstructorParameterSyntax),
+        typeof(INamedParameterSyntax),
         typeof(ISelfParameterSyntax),
         typeof(IFieldParameterSyntax))]
     public partial interface IParameterSyntax : ISyntax, IBindingMetadata
@@ -225,12 +225,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         bool Unused { get; }
     }
 
-    public partial interface INamedParameterSyntax : IParameterSyntax, IConstructorParameterSyntax
-    {
-        ITypeSyntax TypeSyntax { get; }
-        IExpressionSyntax? DefaultValue { get; }
-    }
-
     [Closed(
         typeof(INamedParameterSyntax),
         typeof(IFieldParameterSyntax))]
@@ -238,6 +232,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     {
         new Name Name { get; }
         new Promise<VariableSymbol> Symbol { get; }
+    }
+
+    public partial interface INamedParameterSyntax : IParameterSyntax, IConstructorParameterSyntax
+    {
+        ITypeSyntax Type { get; }
+        IExpressionSyntax? DefaultValue { get; }
     }
 
     public partial interface ISelfParameterSyntax : IParameterSyntax

@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public new Name Name { get; }
         public Promise<VariableSymbol> Symbol { get; } = new Promise<VariableSymbol>();
         protected override IPromise<BindingSymbol> SymbolPromise => Symbol;
-        public ITypeSyntax TypeSyntax { get; }
+        public ITypeSyntax Type { get; }
         public IExpressionSyntax? DefaultValue { get; }
 
         public NamedParameterSyntax(
@@ -24,14 +24,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         {
             IsMutableBinding = isMutableBinding;
             Name = fullName.UnqualifiedName.Text;
-            TypeSyntax = typeSyntax;
+            Type = typeSyntax;
             DefaultValue = defaultValue;
         }
 
         public override string ToString()
         {
             var defaultValue = DefaultValue != null ? " = " + DefaultValue : "";
-            return $"{Name}: {TypeSyntax}{defaultValue}";
+            return $"{Name}: {Type}{defaultValue}";
         }
     }
 }

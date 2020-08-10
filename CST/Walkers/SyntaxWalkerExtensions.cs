@@ -69,7 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Walkers
                     walker.Walk(implicitConversion.Expression, arg);
                     break;
                 case INamedParameterSyntax namedParameter:
-                    walker.Walk(namedParameter.TypeSyntax, arg);
+                    walker.Walk(namedParameter.Type, arg);
                     walker.Walk(namedParameter.DefaultValue, arg);
                     break;
                 case IFieldParameterSyntax fieldParameter:

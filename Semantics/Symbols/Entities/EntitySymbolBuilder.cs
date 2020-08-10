@@ -167,7 +167,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
                         throw ExhaustiveMatch.Failed(parameter);
                     case INamedParameterSyntax namedParameter:
                     {
-                        var type = resolver.Evaluate(namedParameter.TypeSyntax);
+                        var type = resolver.Evaluate(namedParameter.Type);
                         types.Add(type);
                     }
                     break;

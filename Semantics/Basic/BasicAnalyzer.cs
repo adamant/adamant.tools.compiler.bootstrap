@@ -108,7 +108,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     case INamedParameterSyntax namedParameter:
                         // Resolved by EntitySymbolResolver
                         // Still need to analyze to assign referenced metadata
-                        analyzer.Evaluate(namedParameter.TypeSyntax);
+                        analyzer.Evaluate(namedParameter.Type);
                         break;
                     case IFieldParameterSyntax _:
                         // Resolved by EntitySymbolResolver

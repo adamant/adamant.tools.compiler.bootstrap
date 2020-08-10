@@ -53,8 +53,8 @@ FieldDeclaration: MemberDeclaration = Name Symbol:Promise<FieldSymbol> Type;
 
 // Parameters
 Parameter: 'ISyntax', IBindingMetadata = Name? Symbol:IPromise<BindingSymbol> Unused:bool;
-NamedParameter: Parameter, ConstructorParameter = TypeSyntax:Type DefaultValue:Expression?;
 ConstructorParameter: Parameter = Name Symbol:Promise<VariableSymbol>;
+NamedParameter: Parameter, ConstructorParameter = Type DefaultValue:Expression?;
 SelfParameter: Parameter = MutableSelf:bool Symbol:Promise<SelfParameterSymbol>;
 FieldParameter: Parameter, ConstructorParameter = DefaultValue:Expression?;
 
