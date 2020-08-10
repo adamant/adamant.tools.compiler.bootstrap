@@ -17,17 +17,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         /// </summary>
         public bool Poisoned { [DebuggerStepThrough] get; private set; }
 
-        private DataType? type;
+        private DataType? dataType;
         [DisallowNull]
-        public DataType? Type
+        public DataType? DataType
         {
             [DebuggerStepThrough]
-            get => type;
+            get => dataType;
             set
             {
-                if (type != null)
+                if (dataType != null)
                     throw new InvalidOperationException("Can't set type repeatedly");
-                type = value ?? throw new ArgumentNullException(nameof(Type),
+                dataType = value ?? throw new ArgumentNullException(nameof(DataType),
                            "Can't set type to null");
             }
         }

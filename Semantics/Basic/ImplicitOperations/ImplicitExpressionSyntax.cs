@@ -13,12 +13,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
             Justification = "This IS instance data!")]
         public TextSpan Span { [DebuggerStepThrough] get; }
 
-        private readonly DataType type;
+        private readonly DataType dataType;
         [DisallowNull]
-        public DataType? Type
+        public DataType? DataType
         {
             [DebuggerStepThrough]
-            get => type;
+            get => dataType;
             // Type is always set by the constructor, so it can't be set again
             set => throw new InvalidOperationException("Can't set type repeatedly");
         }
@@ -37,10 +37,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
             }
         }
 
-        protected ImplicitExpressionSyntax(DataType type, TextSpan span, ExpressionSemantics? semantics = null)
+        protected ImplicitExpressionSyntax(DataType dataType, TextSpan span, ExpressionSemantics? semantics = null)
         {
             Span = span;
-            this.type = type ?? throw new ArgumentNullException(nameof(type));
+            this.dataType = dataType ?? throw new ArgumentNullException(nameof(dataType));
             this.semantics = semantics;
         }
     }

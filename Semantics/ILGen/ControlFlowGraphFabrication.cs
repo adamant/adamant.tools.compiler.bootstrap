@@ -131,7 +131,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IExpressionStatementSyntax expressionStatement:
                 {
                     var expression = expressionStatement.Expression;
-                    if (!expression.Type.Assigned().IsKnown)
+                    if (!expression.DataType.Assigned().IsKnown)
                         throw new ArgumentException("Expression must have a known type", nameof(statement));
 
                     Convert(expression);
@@ -140,7 +140,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IResultStatementSyntax resultStatement:
                 {
                     var expression = resultStatement.Expression;
-                    if (!expression.Type.Assigned().IsKnown)
+                    if (!expression.DataType.Assigned().IsKnown)
                         throw new ArgumentException("Expression must have a known type", nameof(statement));
 
                     Convert(expression);
@@ -397,7 +397,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     else
                     {
                         var rhs = ConvertToOperand(exp.RightOperand);
-                        currentBlock!.Add(new NumericInstruction(assignInto, op.Value, (NumericType)leftOperand.Type.Known(),
+                        currentBlock!.Add(new NumericInstruction(assignInto, op.Value, (NumericType)leftOperand.DataType.Known(),
                             assignInto.ToOperand(leftOperand.Span), rhs, CurrentScope));
                     }
                 }
@@ -515,8 +515,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     break;
                 case IBinaryOperatorExpressionSyntax exp:
                 {
-                    var resultType = exp.Type.Assigned().Known();
-                    var operandType = exp.LeftOperand.Type.Assigned().Known();
+                    var resultType = exp.DataType.Assigned().Known();
+                    var operandType = exp.LeftOperand.DataType.Assigned().Known();
                     var leftOperand = ConvertToOperand(exp.LeftOperand);
                     var rightOperand = ConvertToOperand(exp.RightOperand);
                     switch (exp.Operator)
@@ -587,7 +587,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 break;
                 case IUnaryOperatorExpressionSyntax exp:
                 {
-                    var type = exp.Type.Assigned().Known();
+                    var type = exp.DataType.Assigned().Known();
                     var operand = ConvertToOperand(exp.Operand);
                     switch (exp.Operator)
                     {
@@ -620,7 +620,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     var methodName = exp.MethodNameSyntax.ReferencedFunctionMetadata!.FullName;
                     var target = ConvertToOperand(exp.ContextExpression);
                     var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
-                    if (exp.ContextExpression.Type is ReferenceType)
+                    if (exp.ContextExpression.DataType is ReferenceType)
                         currentBlock!.Add(new CallVirtualInstruction(resultPlace, target, methodName, args, exp.Span, CurrentScope));
                     else
                         currentBlock!.Add(CallInstruction.ForMethod(resultPlace, target, methodName, args, exp.Span, CurrentScope));
@@ -642,13 +642,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     break;
                 case IImplicitNumericConversionExpressionSyntax exp:
                 {
-                    if (exp.Expression.Type.Assigned().Known() is IntegerConstantType constantType)
+                    if (exp.Expression.DataType.Assigned().Known() is IntegerConstantType constantType)
                         currentBlock!.Add(new LoadIntegerInstruction(resultPlace, constantType.Value,
                             (IntegerType)exp.DataType.Assigned().Known(),
                             exp.Span, CurrentScope));
                     else
                         currentBlock!.Add(new ConvertInstruction(resultPlace, ConvertToOperand(exp.Expression),
-                            (NumericType)exp.Expression.Type.Assigned().Known(), exp.ConvertToType,
+                            (NumericType)exp.Expression.DataType.Assigned().Known(), exp.ConvertToType,
                             exp.Span, CurrentScope));
                 }
                 break;
@@ -706,7 +706,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case ILoopExpressionSyntax _:
                 case IWhileExpressionSyntax _:
                 {
-                    var tempVar = graph.Let(expression.Type.Assigned().Known(), CurrentScope);
+                    var tempVar = graph.Let(expression.DataType.Assigned().Known(), CurrentScope);
                     ConvertIntoPlace(expression, tempVar.Place(expression.Span));
                     return tempVar.Reference(expression.Span);
                 }

@@ -46,12 +46,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                     return;
                 case IForeachExpressionSyntax foreachExpression:
                     WalkChildren(foreachExpression);
-                    foreachExpression.Type.Assigned();
+                    foreachExpression.DataType.Assigned();
                     foreachExpression.VariableType.Assigned();
                     return;
                 case IExpressionSyntax expression:
                     WalkChildren(expression);
-                    expression.Type.Assigned();
+                    expression.DataType.Assigned();
                     return;
             }
 

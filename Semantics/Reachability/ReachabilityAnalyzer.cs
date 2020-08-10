@@ -88,7 +88,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
         private TempValue? Analyze(IExpressionSyntax? expression, ReachabilityGraph graph, VariableScope scope)
         {
             if (expression is null) return null;
-            var referenceType = expression.Type.Known().UnderlyingReferenceType();
+            var referenceType = expression.DataType.Known().UnderlyingReferenceType();
             var isReferenceType = !(referenceType is null);
             switch (expression)
             {
@@ -384,7 +384,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             IEnumerable<TempValue?> arguments,
             ReachabilityGraph graph)
         {
-            var referenceType = exp.Type.Known().UnderlyingReferenceType();
+            var referenceType = exp.DataType.Known().UnderlyingReferenceType();
             if (referenceType is null)
                 throw new ArgumentException($"{nameof(CaptureArguments)} only supports reference returning functions");
 
@@ -441,7 +441,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
 
         private Variable? AnalyzeAssignmentPlace(IAssignableExpressionSyntax expression, ReachabilityGraph graph, VariableScope scope)
         {
-            var isReferenceType = !(expression.Type.Known().UnderlyingReferenceType() is null);
+            var isReferenceType = !(expression.DataType.Known().UnderlyingReferenceType() is null);
             switch (expression)
             {
                 default:

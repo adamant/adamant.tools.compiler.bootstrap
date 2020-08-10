@@ -24,9 +24,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public override string ToString()
         {
             if (Statements.Any())
-                return $"{{ {Statements.Count} Statements }} : {Type}";
+                return $"{{ {Statements.Count} Statements }} : {DataType}";
 
-            return $"{{ }} : {Type}";
+            return $"{{ }} : {DataType}";
         }
     }
 }

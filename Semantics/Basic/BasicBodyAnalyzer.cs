@@ -99,7 +99,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
             if (variableDeclaration.Initializer != null)
             {
-                var initializerType = variableDeclaration.Initializer.Type ?? throw new InvalidOperationException("Initializer type should be determined");
+                var initializerType = variableDeclaration.Initializer.DataType ?? throw new InvalidOperationException("Initializer type should be determined");
 
                 if (!type.IsAssignableFrom(initializerType))
                     diagnostics.Add(TypeError.CannotConvert(file, variableDeclaration.Initializer, initializerType, type));
@@ -164,7 +164,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             ref IExpressionSyntax expression,
             DataType expectedType)
         {
-            switch (expectedExpressionType: expectedType, expression.Type)
+            switch (expectedExpressionType: expectedType, Type: expression.DataType)
             {
                 case (OptionalType targetType, OptionalType expressionType)
                         when expressionType.Referent is NeverType:
@@ -202,7 +202,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     break;
             }
 
-            return expression.Type!;
+            return expression.DataType!;
         }
 
         /// <summary>
@@ -245,7 +245,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
                             exp.MovedSymbol = nameExpression.ReferencedBinding!;
                             exp.Semantics = ExpressionSemantics.Acquire;
-                            return exp.Type = type;
+                            return exp.DataType = type;
                         case IBorrowExpressionSyntax _:
                             throw new NotImplementedException("Raise error about `move mut` expression");
                         case IMoveExpressionSyntax _:
@@ -278,7 +278,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             }
 
                             exp.BorrowedFromBinding = nameExpression.ReferencedBinding!;
-                            return exp.Type = type;
+                            return exp.DataType = type;
                         }
                         case IBorrowExpressionSyntax _:
                             throw new NotImplementedException("Raise error about `mut mut` expression");
@@ -305,14 +305,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     else if (returnType != DataType.Void)
                         diagnostics.Add(TypeError.ReturnExpressionMustHaveValue(file, exp.Span, returnType ?? DataType.Unknown));
 
-                    return exp.Type = DataType.Never;
+                    return exp.DataType = DataType.Never;
                 }
                 case IIntegerLiteralExpressionSyntax exp:
-                    return exp.Type = new IntegerConstantType(exp.Value);
+                    return exp.DataType = new IntegerConstantType(exp.Value);
                 case IStringLiteralExpressionSyntax exp:
-                    return exp.Type = stringSymbol?.DeclaresDataType ?? DataType.Unknown;
+                    return exp.DataType = stringSymbol?.DeclaresDataType ?? DataType.Unknown;
                 case IBoolLiteralExpressionSyntax exp:
-                    return exp.Type = exp.Value ? DataType.True : DataType.False;
+                    return exp.DataType = exp.Value ? DataType.True : DataType.False;
                 case IBinaryOperatorExpressionSyntax binaryOperatorExpression:
                 {
                     var leftType = InferType(ref binaryOperatorExpression.LeftOperand);
@@ -322,7 +322,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     // If either is unknown, then we can't know whether there is a a problem.
                     // Note that the operator could be overloaded
                     if (leftType == DataType.Unknown || rightType == DataType.Unknown)
-                        return binaryOperatorExpression.Type = DataType.Unknown;
+                        return binaryOperatorExpression.DataType = DataType.Unknown;
 
                     bool compatible;
                     switch (@operator)
@@ -332,7 +332,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         case BinaryOperator.Asterisk:
                         case BinaryOperator.Slash:
                             compatible = NumericOperatorTypesAreCompatible(ref binaryOperatorExpression.LeftOperand, ref binaryOperatorExpression.RightOperand);
-                            binaryOperatorExpression.Type = compatible ? leftType : DataType.Unknown;
+                            binaryOperatorExpression.DataType = compatible ? leftType : DataType.Unknown;
                             binaryOperatorExpression.Semantics = ExpressionSemantics.Copy;
                             break;
                         case BinaryOperator.EqualsEquals:
@@ -344,13 +344,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             compatible = (leftType == DataType.Bool && rightType == DataType.Bool)
                                          || NumericOperatorTypesAreCompatible(ref binaryOperatorExpression.LeftOperand, ref binaryOperatorExpression.RightOperand)
                                          /*|| OperatorOverloadDefined(@operator, binaryOperatorExpression.LeftOperand, ref binaryOperatorExpression.RightOperand)*/;
-                            binaryOperatorExpression.Type = DataType.Bool;
+                            binaryOperatorExpression.DataType = DataType.Bool;
                             binaryOperatorExpression.Semantics = ExpressionSemantics.Copy;
                             break;
                         case BinaryOperator.And:
                         case BinaryOperator.Or:
                             compatible = leftType == DataType.Bool && rightType == DataType.Bool;
-                            binaryOperatorExpression.Type = DataType.Bool;
+                            binaryOperatorExpression.DataType = DataType.Bool;
                             binaryOperatorExpression.Semantics = ExpressionSemantics.Copy;
                             break;
                         case BinaryOperator.DotDot:
@@ -365,7 +365,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         diagnostics.Add(TypeError.OperatorCannotBeAppliedToOperandsOfType(file,
                             binaryOperatorExpression.Span, @operator, leftType, rightType));
 
-                    return binaryOperatorExpression.Type;
+                    return binaryOperatorExpression.DataType;
                 }
                 case INameExpressionSyntax exp:
                 {
@@ -397,7 +397,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             throw ExhaustiveMatch.Failed(@operator);
                         case UnaryOperator.Not:
                             CheckType(ref exp.Operand, DataType.Bool);
-                            exp.Type = DataType.Bool;
+                            exp.DataType = DataType.Bool;
                             break;
                         case UnaryOperator.Minus:
                         case UnaryOperator.Plus:
@@ -405,24 +405,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             switch (operandType)
                             {
                                 case IntegerConstantType integerType:
-                                    exp.Type = integerType;
+                                    exp.DataType = integerType;
                                     break;
                                 case FixedSizeIntegerType sizedIntegerType:
-                                    exp.Type = sizedIntegerType;
+                                    exp.DataType = sizedIntegerType;
                                     break;
                                 case UnknownType _:
-                                    exp.Type = DataType.Unknown;
+                                    exp.DataType = DataType.Unknown;
                                     break;
                                 default:
                                     diagnostics.Add(TypeError.OperatorCannotBeAppliedToOperandOfType(file,
                                         exp.Span, @operator, operandType));
-                                    exp.Type = DataType.Unknown;
+                                    exp.DataType = DataType.Unknown;
                                     break;
                             }
                             break;
                     }
 
-                    return exp.Type;
+                    return exp.DataType;
                 }
                 case INewObjectExpressionSyntax exp:
                 {
@@ -433,7 +433,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     {
                         diagnostics.Add(NameBindingError.CouldNotBindConstructor(file, exp.Span));
                         exp.ReferencedConstructor = UnknownMetadata.Instance;
-                        return exp.Type  = DataType.Unknown;
+                        return exp.DataType  = DataType.Unknown;
                     }
                     var constructedType = (ObjectType)constructingType;
                     var typeSymbol = exp.TypeSyntax.ContainingScope.Assigned().GetMetadataForType(constructedType);
@@ -463,7 +463,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     constructedType = constructedType.To(ReferenceCapability.Isolated);
                     if (constructedType.DeclaredMutable)
                         constructedType = constructedType.ToMutable();
-                    return exp.Type = constructedType;
+                    return exp.DataType = constructedType;
                 }
                 case IForeachExpressionSyntax exp:
                 {
@@ -474,7 +474,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     InferBlockType(exp.Block);
                     // TODO assign correct type to the expression
                     exp.Semantics = ExpressionSemantics.Void;
-                    return exp.Type = DataType.Void;
+                    return exp.DataType = DataType.Void;
                 }
                 case IWhileExpressionSyntax exp:
                 {
@@ -482,22 +482,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     InferBlockType(exp.Block);
                     // TODO assign correct type to the expression
                     exp.Semantics = ExpressionSemantics.Void;
-                    return exp.Type = DataType.Void;
+                    return exp.DataType = DataType.Void;
                 }
                 case ILoopExpressionSyntax exp:
                     InferBlockType(exp.Block);
                     // TODO assign correct type to the expression
                     exp.Semantics = ExpressionSemantics.Void;
-                    return exp.Type = DataType.Void;
+                    return exp.DataType = DataType.Void;
                 case IMethodInvocationExpressionSyntax exp:
                     return InferMethodInvocationType(exp, ref expression);
                 case IFunctionInvocationExpressionSyntax exp:
                     return InferFunctionInvocationType(exp);
                 case IUnsafeExpressionSyntax exp:
                 {
-                    exp.Type = InferType(ref exp.Expression);
+                    exp.DataType = InferType(ref exp.Expression);
                     exp.Semantics = exp.Expression.Semantics.Assigned();
-                    return exp.Type;
+                    return exp.DataType;
                 }
                 case IIfExpressionSyntax exp:
                     CheckType(ref exp.Condition, DataType.Bool);
@@ -520,7 +520,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     }
                     // TODO assign a type to the expression
                     exp.Semantics = ExpressionSemantics.Void;
-                    return exp.Type = DataType.Void;
+                    return exp.DataType = DataType.Void;
                 case IFieldAccessExpressionSyntax exp:
                 {
                     // Don't wrap the self expression in a share expression for field access
@@ -543,24 +543,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                                 exp.Semantics = ExpressionSemantics.Move;
                                 break;
                         }
-                    return exp.Type = type;
+                    return exp.DataType = type;
                 }
                 case IBreakExpressionSyntax exp:
                     InferType(ref exp.Value);
-                    return exp.Type = DataType.Never;
+                    return exp.DataType = DataType.Never;
                 case INextExpressionSyntax exp:
-                    return exp.Type = DataType.Never;
+                    return exp.DataType = DataType.Never;
                 case IAssignmentExpressionSyntax exp:
                 {
                     var left = InferAssignmentTargetType(ref exp.LeftOperand);
                     InferType(ref exp.RightOperand);
                     InsertImplicitConversionIfNeeded(ref exp.RightOperand, left);
-                    var right = exp.RightOperand.Type ?? throw new InvalidOperationException();
+                    var right = exp.RightOperand.DataType ?? throw new InvalidOperationException();
                     if (!left.IsAssignableFrom(right))
                         diagnostics.Add(TypeError.CannotConvert(file,
                             exp.RightOperand, right, left));
                     exp.Semantics = ExpressionSemantics.Void;
-                    return exp.Type = DataType.Void;
+                    return exp.DataType = DataType.Void;
                 }
                 case ISelfExpressionSyntax exp:
                 {
@@ -579,7 +579,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return type;
                 }
                 case INoneLiteralExpressionSyntax exp:
-                    return exp.Type = DataType.None;
+                    return exp.DataType = DataType.None;
                 case IImplicitConversionExpressionSyntax _:
                     throw new Exception("ImplicitConversionExpressions are inserted by BasicExpressionAnalyzer. They should not be present in the AST yet.");
                 case IBlockExpressionSyntax blockSyntax:
@@ -664,7 +664,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private static void InsertImplicitActionIfNeeded([NotNull] ref IExpressionSyntax expression, DataType toType, bool implicitBorrowAllowed)
         {
-            var fromType = expression.Type.Assigned();
+            var fromType = expression.DataType.Assigned();
             if (!(fromType is ReferenceType from) || !(toType is ReferenceType to)) return;
 
             if (@from.IsMovable && to.IsMovable)
@@ -691,7 +691,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     var type = AssignReferencedSymbolAndType(member, memberSymbols);
                     exp.Field.Semantics ??= ExpressionSemantics.CreateReference;
                     exp.Semantics = exp.Field.Semantics.Assigned();
-                    return exp.Type = type;
+                    return exp.DataType = type;
                 case INameExpressionSyntax exp:
                     exp.Semantics = ExpressionSemantics.CreateReference;
                     return InferNameType(exp);
@@ -736,7 +736,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             if (contextType == DataType.Unknown)
             {
                 methodInvocation.Semantics = ExpressionSemantics.Never;
-                return methodInvocation.Type = DataType.Unknown;
+                return methodInvocation.DataType = DataType.Unknown;
             };
 
             var contextTypeSymbol = methodInvocation.MethodNameSyntax.ContainingScope.Assigned().GetMetadataForType(contextType);
@@ -748,7 +748,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case 0:
                     diagnostics.Add(NameBindingError.CouldNotBindMethod(file, methodInvocation.Span));
                     methodInvocation.MethodNameSyntax.ReferencedFunctionMetadata = UnknownMetadata.Instance;
-                    methodInvocation.Type = DataType.Unknown;
+                    methodInvocation.DataType = DataType.Unknown;
                     break;
                 case 1:
                     var methodSymbol = methodSymbols.Single();
@@ -767,17 +767,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         CheckArgumentTypeCompatibility(type, arg.Expression);
                     }
 
-                    methodInvocation.Type = methodSymbol.ReturnDataType;
+                    methodInvocation.DataType = methodSymbol.ReturnDataType;
                     AssignInvocationSemantics(methodInvocation, methodSymbol.ReturnDataType);
                     break;
                 default:
                     diagnostics.Add(NameBindingError.AmbiguousMethodCall(file, methodInvocation.Span));
                     methodInvocation.MethodNameSyntax.ReferencedFunctionMetadata = UnknownMetadata.Instance;
-                    methodInvocation.Type = DataType.Unknown;
+                    methodInvocation.DataType = DataType.Unknown;
                     break;
             }
 
-            return methodInvocation.Type;
+            return methodInvocation.DataType;
         }
 
         /// <summary>
@@ -810,7 +810,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case 0:
                     diagnostics.Add(NameBindingError.CouldNotBindFunction(file, functionInvocationExpression.Span));
                     functionInvocationExpression.FunctionNameSyntax.ReferencedFunctionMetadata = UnknownMetadata.Instance;
-                    functionInvocationExpression.Type = DataType.Unknown;
+                    functionInvocationExpression.DataType = DataType.Unknown;
                     functionInvocationExpression.Semantics = ExpressionSemantics.Never;
                     break;
                 case 1:
@@ -823,17 +823,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         CheckArgumentTypeCompatibility(parameter.DataType, arg.Expression);
                     }
 
-                    functionInvocationExpression.Type = functionSymbol.ReturnDataType;
+                    functionInvocationExpression.DataType = functionSymbol.ReturnDataType;
                     AssignInvocationSemantics(functionInvocationExpression, functionSymbol.ReturnDataType);
                     break;
                 default:
                     diagnostics.Add(NameBindingError.AmbiguousFunctionCall(file, functionInvocationExpression.Span));
                     functionInvocationExpression.FunctionNameSyntax.ReferencedFunctionMetadata = UnknownMetadata.Instance;
-                    functionInvocationExpression.Type = DataType.Unknown;
+                    functionInvocationExpression.DataType = DataType.Unknown;
                     functionInvocationExpression.Semantics = ExpressionSemantics.Never;
                     break;
             }
-            return functionInvocationExpression.Type;
+            return functionInvocationExpression.DataType;
         }
 
         private static void AssignInvocationSemantics(
@@ -879,10 +879,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         ResolveTypes(statement);
 
                     block.Semantics = ExpressionSemantics.Void;
-                    return block.Type = DataType.Void; // TODO assign the correct type to the block
+                    return block.DataType = DataType.Void; // TODO assign the correct type to the block
                 case IResultStatementSyntax result:
                     InferType(ref result.Expression);
-                    return result.Expression.Type!;
+                    return result.Expression.DataType!;
             }
         }
 
@@ -923,7 +923,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     break;
             }
 
-            return nameExpression.Type = type;
+            return nameExpression.DataType = type;
         }
 
         private DataType InferSelfType(ISelfExpressionSyntax selfExpression)
@@ -966,7 +966,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     break;
             }
 
-            return selfExpression.Type = type;
+            return selfExpression.DataType = type;
         }
 
         /// <summary>
@@ -993,7 +993,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     }
 
                     inExpression.Semantics = ExpressionSemantics.Copy; // Treat ranges as structs
-                    return inExpression.Type = leftType;
+                    return inExpression.DataType = leftType;
                 default:
                     return InferType(ref inExpression);
             }
@@ -1001,7 +1001,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private void CheckArgumentTypeCompatibility(DataType type, IExpressionSyntax arg)
         {
-            var fromType = arg.Type ?? throw new ArgumentException("argument must have a type");
+            var fromType = arg.DataType ?? throw new ArgumentException("argument must have a type");
             if (!type.IsAssignableFrom(fromType))
                 diagnostics.Add(TypeError.CannotConvert(file, arg, fromType, type));
         }
@@ -1016,7 +1016,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     diagnostics.Add(NameBindingError.CouldNotBindMember(file, identifier.Span));
                     identifier.ReferencedBinding = UnknownMetadata.Instance;
                     identifier.Semantics = ExpressionSemantics.Never;
-                    return identifier.Type = DataType.Unknown;
+                    return identifier.DataType = DataType.Unknown;
                 case 1:
                     var memberSymbol = memberSymbols.Single();
                     identifier.ReferencedBinding = memberSymbol;
@@ -1038,12 +1038,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         case TypeSemantics.Void:
                             throw new InvalidOperationException("Can't assign semantics to void field");
                     }
-                    return identifier.Type = memberSymbol.DataType;
+                    return identifier.DataType = memberSymbol.DataType;
                 default:
                     diagnostics.Add(NameBindingError.AmbiguousName(file, identifier.Span));
                     identifier.ReferencedBinding = UnknownMetadata.Instance;
                     identifier.Semantics = ExpressionSemantics.Never;
-                    return identifier.Type = DataType.Unknown;
+                    return identifier.DataType = DataType.Unknown;
             }
         }
 
@@ -1051,7 +1051,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             ref IExpressionSyntax leftOperand,
             ref IExpressionSyntax rightOperand)
         {
-            var leftType = leftOperand.Type;
+            var leftType = leftOperand.DataType;
             switch (leftType)
             {
                 default:
@@ -1065,11 +1065,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case PointerSizedIntegerType integerType:
                     // TODO this isn't right we might need to convert either of them
                     InsertImplicitConversionIfNeeded(ref rightOperand, integerType);
-                    return rightOperand.Type is PointerSizedIntegerType;
+                    return rightOperand.DataType is PointerSizedIntegerType;
                 case FixedSizeIntegerType integerType:
                     // TODO this isn't right we might need to convert either of them
                     InsertImplicitConversionIfNeeded(ref rightOperand, integerType);
-                    return rightOperand.Type is FixedSizeIntegerType;
+                    return rightOperand.DataType is FixedSizeIntegerType;
                 case OptionalType _:
                     throw new NotImplementedException("Trying to do math on optional type");
                 case NeverType _:

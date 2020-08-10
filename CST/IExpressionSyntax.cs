@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface IExpressionSyntax
     {
-        [DisallowNull] DataType? Type { get; set; }
+        [DisallowNull] DataType? DataType { get; set; }
         [DisallowNull] ExpressionSemantics? Semantics { get; set; }
         string ToGroupedString(OperatorPrecedence surroundingPrecedence);
     }

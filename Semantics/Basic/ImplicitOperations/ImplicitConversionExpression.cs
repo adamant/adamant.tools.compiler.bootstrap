@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
     internal abstract class ImplicitConversionExpression : ImplicitExpressionSyntax, IImplicitConversionExpressionSyntax
     {
         public IExpressionSyntax Expression { [DebuggerHidden] get; }
-        DataType IImplicitConversionExpressionSyntax.DataType { [DebuggerHidden] get => Type!; }
+        DataType IImplicitConversionExpressionSyntax.DataType { [DebuggerHidden] get => DataType!; }
 
         protected ImplicitConversionExpression(
             TextSpan span,

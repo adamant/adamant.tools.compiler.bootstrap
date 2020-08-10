@@ -37,7 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Reachability.Gra
         {
             var graph = new ReachabilityGraph();
             var mockExpression = new Mock<INewObjectExpressionSyntax>();
-            mockExpression.Setup(e => e.Type).Returns(DataType.Int);
+            mockExpression.Setup(e => e.DataType).Returns(DataType.Int);
 
             var temp = graph.AddObject(mockExpression.Object);
 
@@ -53,7 +53,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Reachability.Gra
             var mockExpression = new Mock<INewObjectExpressionSyntax>();
             // TODO this type should be Isolated or Owned
             var fakeReferenceType = new ObjectType(NamespaceName.Global, "Fake", false, ReferenceCapability.Shared);
-            mockExpression.Setup(e => e.Type).Returns(fakeReferenceType);
+            mockExpression.Setup(e => e.DataType).Returns(fakeReferenceType);
 
             var temp = graph.AddObject(mockExpression.Object);
 
@@ -74,7 +74,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Reachability.Gra
             var mockExpression = new Mock<INewObjectExpressionSyntax>();
             // TODO this type should be Isolated or Owned
             var fakeReferenceType = new ObjectType(NamespaceName.Global, "Fake", false, ReferenceCapability.Shared);
-            mockExpression.Setup(e => e.Type).Returns(fakeReferenceType);
+            mockExpression.Setup(e => e.DataType).Returns(fakeReferenceType);
             var temp = graph.AddObject(mockExpression.Object);
             var mockVariableBinding = new Mock<IBindingMetadata>();
             mockVariableBinding.Setup(v => v.DataType).Returns(fakeReferenceType);

@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         // TODO encapsulate this in the graph class
         public static TempValue? ForNewContextObject(ReachabilityGraph graph, IExpressionSyntax expression)
         {
-            var referenceType = expression.Type.Known().UnderlyingReferenceType();
+            var referenceType = expression.DataType.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
 
             var reference = Reference.ToNewContextObject(graph, expression);
@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         internal static TempValue? ForNewObject(ReachabilityGraph graph, INewObjectExpressionSyntax expression)
         {
-            var referenceType = expression.Type.Known().UnderlyingReferenceType();
+            var referenceType = expression.DataType.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
 
             var reference = Reference.ToNewObject(graph, expression);
@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         // TODO encapsulate this in the graph class
         internal static TempValue? ForNewInvocationReturnedObject(ReachabilityGraph graph, IInvocationExpressionSyntax expression)
         {
-            var referenceType = expression.Type.Known().UnderlyingReferenceType();
+            var referenceType = expression.DataType.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
 
             var reference = Reference.ToNewInvocationReturnedObject(graph, expression);
@@ -54,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             ReachabilityGraph graph,
             IFieldAccessExpressionSyntax expression)
         {
-            var referenceType = expression.Type.Known().UnderlyingReferenceType();
+            var referenceType = expression.DataType.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
 
             var reference = Reference.ToFieldAccess(graph, expression);
@@ -66,7 +66,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         // TODO encapsulate this in the graph class
         public static TempValue? For(ReachabilityGraph graph, IExpressionSyntax expression, DataType? type = null)
         {
-            type ??= expression.Type.Known();
+            type ??= expression.DataType.Known();
             var referenceType = type.UnderlyingReferenceType();
             if (referenceType is null) return null;
 

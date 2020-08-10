@@ -18,16 +18,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax
         public MaybeQualifiedName FullName { get; }
         public FixedList<IArgumentSyntax> Arguments { get; }
 
-        private DataType? type;
+        private DataType? dataType;
         [DisallowNull]
-        public DataType? Type
+        public DataType? DataType
         {
-            get => type;
+            get => dataType;
             set
             {
-                if (type != null)
+                if (dataType != null)
                     throw new InvalidOperationException("Can't set type repeatedly");
-                type = value ?? throw new ArgumentNullException(nameof(Type), "Can't set type to null");
+                dataType = value ?? throw new ArgumentNullException(nameof(DataType), "Can't set type to null");
             }
         }
 

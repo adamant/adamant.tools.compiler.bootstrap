@@ -58,12 +58,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                     return;
                 case IForeachExpressionSyntax foreachExpression:
                     WalkChildren(foreachExpression);
-                    foreachExpression.Type.Known();
+                    foreachExpression.DataType.Known();
                     foreachExpression.VariableType.Known();
                     return;
                 case IExpressionSyntax expression:
                     WalkChildren(expression);
-                    expression.Type.Known();
+                    expression.DataType.Known();
                     return;
             }
 

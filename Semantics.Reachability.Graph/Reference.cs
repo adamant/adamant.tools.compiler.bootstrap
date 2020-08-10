@@ -72,7 +72,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         public static Reference ToNewContextObject(ReachabilityGraph graph, IExpressionSyntax expression)
         {
-            var referenceType = expression.Type.Known().UnderlyingReferenceType()
+            var referenceType = expression.DataType.Known().UnderlyingReferenceType()
                                 ?? throw new ArgumentException("Must be a parameter with a reference type",
                                     nameof(expression));
 
@@ -102,7 +102,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         private static Reference ToExpressionObject(ReachabilityGraph graph, IExpressionSyntax expression)
         {
-            var referenceType = expression.Type.Known().UnderlyingReferenceType()
+            var referenceType = expression.DataType.Known().UnderlyingReferenceType()
                                 ?? throw new ArgumentException("Must be a parameter with a reference type",
                                     nameof(expression));
 

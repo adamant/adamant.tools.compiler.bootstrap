@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         /// <summary>
         /// The type of the foreach expression overall, not of the variable
         /// </summary>
-        [DisallowNull] new DataType? Type { get; set; }
+        [DisallowNull] new DataType? DataType { get; set; }
         [DisallowNull] DataType? VariableType { get; set; }
         ref IExpressionSyntax InExpression { get; }
     }
