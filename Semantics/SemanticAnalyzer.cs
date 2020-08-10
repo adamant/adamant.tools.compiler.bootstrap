@@ -16,7 +16,6 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Namespaces;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Variables;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Validation;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.BindingMutability;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.DefiniteAssignment;
@@ -109,9 +108,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         {
             // Resolve symbols for the entities
             new EntitySymbolBuilder(diagnostics, symbolTree).Build(entities);
-
-            // Build symbols for bindings
-            VariableSymbolBuilder.BuildFor(entities);
 
             // Basic Analysis includes: Name Binding, Type Checking, Constant Folding
             new BasicAnalyzer(stringSymbol, diagnostics).Check(entities);
