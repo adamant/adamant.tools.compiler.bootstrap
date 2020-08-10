@@ -49,7 +49,7 @@ MethodDeclaration: MemberDeclaration, CallableDeclaration = Name Symbol:Promise<
 AbstractMethodDeclaration: MethodDeclaration;
 ConcreteMethodDeclaration: MethodDeclaration, ConcreteCallableDeclaration;
 ConstructorDeclaration: MemberDeclaration, ConcreteCallableDeclaration = ImplicitSelfParameter:SelfParameter;
-FieldDeclaration: MemberDeclaration = Name Symbol:Promise<FieldSymbol> TypeSyntax:Type DataType:Promise<DataType>;
+FieldDeclaration: MemberDeclaration = Name Symbol:Promise<FieldSymbol> TypeSyntax:Type;
 
 // Parameters
 Parameter: 'ISyntax', IBindingMetadata = Name? Unused:bool DataType:Promise<DataType>;

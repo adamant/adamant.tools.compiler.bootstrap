@@ -209,7 +209,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         new Name Name { get; }
         new Promise<FieldSymbol> Symbol { get; }
         ITypeSyntax TypeSyntax { get; }
-        Promise<DataType> DataType { get; }
     }
 
     [Closed(

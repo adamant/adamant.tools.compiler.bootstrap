@@ -47,7 +47,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                     return;
                 case IFieldDeclarationSyntax fieldDeclaration:
                     WalkChildren(fieldDeclaration);
-                    _ = fieldDeclaration.DataType.Result;
+                    _ = fieldDeclaration.Symbol.Result.DataType;
                     return;
                 case ITypeSyntax type:
                     WalkChildren(type);

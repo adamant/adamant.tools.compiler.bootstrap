@@ -85,9 +85,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
             if (!field.Symbol.TryBeginFulfilling(AddCircularDefinitionError)) return;
 
             var resolver = new TypeResolver(field.File, diagnostics);
-            //var type = resolver.Evaluate(field.TypeSyntax);
-            //var symbol = new FieldSymbol(field.DeclaringClass.Symbol.Result, field.Name, field.IsMutableBinding, type);
-            //field.Symbol.Fulfill(symbol);
+            var type = resolver.Evaluate(field.TypeSyntax);
+            var symbol = new FieldSymbol(field.DeclaringClass.Symbol.Result, field.Name, field.IsMutableBinding, type);
+            field.Symbol.Fulfill(symbol);
+            symbolTree.Add(symbol);
 
             void AddCircularDefinitionError()
             {
@@ -135,17 +136,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
                         else
                         {
                             fieldParameter.SetIsMutableBinding(field.IsMutableBinding);
-                            if (field.DataType.TryBeginFulfilling(() =>
-                                diagnostics.Add(TypeError.CircularDefinition(field.File, field.NameSpan,
-                                    field.Name.ToSimpleName()))))
-                            {
-                                //var resolver = new BasicBodyAnalyzer(field.File, stringSymbol, diagnostics);
-                                field.DataType.BeginFulfilling();
-                                //var type = resolver.EvaluateType(field.TypeSyntax);
-                                //field.DataType.Fulfill(type);
-                            }
-
-                            parameter.DataType.Fulfill(field.DataType.Result);
+                            ResolveField(field);
+                            parameter.DataType.Fulfill(field.Symbol.Result.DataType);
                         }
                     }
                     break;
@@ -156,9 +148,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
             ISelfParameterSyntax selfParameter,
             IClassDeclarationSyntax declaringClass)
         {
-            var declaringType = declaringClass.Symbol.Result.DeclaresDataType;
+            var selfType = declaringClass.Symbol.Result.DeclaresDataType;
             selfParameter.DataType.BeginFulfilling();
-            var selfType = (ObjectType)declaringType;
             if (selfParameter.MutableSelf) selfType = selfType.ForConstructorSelf();
             selfParameter.DataType.Fulfill(selfType);
             return selfType;
@@ -170,8 +161,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
             TypeResolver resolver)
         {
             returnTypePromise.BeginFulfilling();
-            var returnType = returnTypeSyntax != null ? resolver.Evaluate(returnTypeSyntax) : DataType.Void;
-
+            var returnType = returnTypeSyntax != null
+                ? resolver.Evaluate(returnTypeSyntax) : DataType.Void;
             returnTypePromise.Fulfill(returnType);
         }
 

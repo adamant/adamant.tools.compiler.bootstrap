@@ -5,7 +5,6 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
 
@@ -89,13 +88,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     break;
                 }
                 case IFieldDeclarationSyntax field:
-                    if (field.DataType.TryBeginFulfilling(() =>
-                        diagnostics.Add(TypeError.CircularDefinition(field.File, field.NameSpan, field.Name.ToSimpleName()))))
-                    {
-                        var resolver = new BasicTypeAnalyzer(field.File, diagnostics);
-                        var type = resolver.Evaluate(field.TypeSyntax);
-                        field.DataType.Fulfill(type);
-                    }
+                    // Resolved by EntitySymbolResolver, just need to set metadata
+                    var resolver = new BasicTypeAnalyzer(field.File, diagnostics);
+                    resolver.Evaluate(field.TypeSyntax);
                     break;
                 case IFunctionDeclarationSyntax function:
                 {
@@ -104,13 +99,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     ResolveReturnType(function.ReturnDataType, function.ReturnType, analyzer);
                     break;
                 }
-                case IClassDeclarationSyntax @class:
+                case IClassDeclarationSyntax _:
                     // Resolved by EntitySymbolResolver
                     break;
             }
         }
 
-        private void ResolveTypesInParameters(
+        private static void ResolveTypesInParameters(
             BasicTypeAnalyzer analyzer,
             IEnumerable<IConstructorParameterSyntax> parameters,
             IClassDeclarationSyntax? declaringClass)
@@ -149,17 +144,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         else
                         {
                             fieldParameter.SetIsMutableBinding(field.IsMutableBinding);
-                            if (field.DataType.TryBeginFulfilling(() =>
-                                diagnostics.Add(TypeError.CircularDefinition(field.File, field.NameSpan,
-                                    field.Name.ToSimpleName()))))
-                            {
-                                var resolver = new BasicBodyAnalyzer(field.File, stringSymbol, diagnostics);
-                                field.DataType.BeginFulfilling();
-                                var type = resolver.EvaluateType(field.TypeSyntax);
-                                field.DataType.Fulfill(type);
-                            }
-
-                            parameter.DataType.Fulfill(field.DataType.Result);
+                            parameter.DataType.Fulfill(field.Symbol.Result.DataType);
                         }
                     }
                     break;
@@ -227,7 +212,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     if (field.Initializer != null)
                     {
                         var resolver = new BasicBodyAnalyzer(field.File, stringSymbol, diagnostics);
-                        resolver.CheckType(ref field.Initializer, field.DataType.Result);
+                        resolver.CheckType(ref field.Initializer, field.Symbol.Result.DataType);
                     }
                     break;
                 case IConstructorDeclarationSyntax constructor:

@@ -19,11 +19,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public ITypeSyntax TypeSyntax { get; }
         private IExpressionSyntax? initializer;
         [DisallowNull] public ref IExpressionSyntax? Initializer => ref initializer;
-        public Promise<DataType> DataType { get; } = new Promise<DataType>();
-
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        DataType IBindingMetadata.DataType => DataType.Result;
+        DataType IBindingMetadata.DataType => Symbol.Result.DataType;
 
         public FieldDeclarationSyntax(
             IClassDeclarationSyntax declaringClass,
