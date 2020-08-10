@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes.Declarations
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 {
     internal class Namespace
     {

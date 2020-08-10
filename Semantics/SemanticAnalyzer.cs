@@ -10,7 +10,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
@@ -52,7 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             NamespaceSymbolBuilder.BuildNamespaceSymbols(package);
 
             // Build up lexical scopes down to the declaration level
-            new LexicalDeclarationScopesBuilder().BuildFor(package);
+            new LexicalScopesBuilder().BuildFor(package);
 
             // TODO remove old scopes builder
             var stringSymbol = BuildScopes(package, diagnostics);

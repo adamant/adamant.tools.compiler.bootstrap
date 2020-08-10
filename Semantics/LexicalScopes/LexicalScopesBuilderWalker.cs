@@ -8,14 +8,14 @@ using Adamant.Tools.Compiler.Bootstrap.LexicalScopes;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes.Declarations
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 {
-    internal class LexicalDeclarationScopesBuilderWalker : SyntaxWalker<LexicalScope>
+    internal class LexicalScopesBuilderWalker : SyntaxWalker<LexicalScope>
     {
         private readonly NestedScope globalScope;
         private readonly FixedDictionary<NamespaceName, Namespace> namespaces;
 
-        public LexicalDeclarationScopesBuilderWalker(
+        public LexicalScopesBuilderWalker(
             NestedScope globalScope,
             FixedDictionary<NamespaceName, Namespace> namespaces)
         {
