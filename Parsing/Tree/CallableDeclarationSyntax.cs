@@ -36,8 +36,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public FixedList<IParameterSyntax> Parameters { get; }
         IEnumerable<IBindingMetadata> IFunctionMetadata.Parameters => Parameters;
-        public DataTypePromise ReturnDataType { get; } = new DataTypePromise();
-        DataType IFunctionMetadata.ReturnDataType => ReturnDataType.Fulfilled();
+        public Promise<DataType> ReturnDataType { get; } = new Promise<DataType>();
+        DataType IFunctionMetadata.ReturnDataType => ReturnDataType.Result;
         public FixedList<IReachabilityAnnotationSyntax> ReachabilityAnnotations { get; }
 
         public MetadataSet ChildMetadata { get; protected set; }

@@ -74,7 +74,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
                 case IConstructorDeclarationSyntax constructor:
                 {
-                    var selfType = constructor.DeclaringClass.DeclaresDataType.Fulfilled();
+                    var selfType = constructor.DeclaringClass.DeclaresDataType.Result;
                     constructor.SelfParameterType = ResolveTypesInParameter(constructor.ImplicitSelfParameter, constructor.DeclaringClass);
                     var analyzer = new BasicTypeAnalyzer(constructor.File, diagnostics);
                     ResolveTypesInParameters(analyzer, constructor.Parameters, constructor.DeclaringClass);
@@ -164,7 +164,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                                 field.DataType.Fulfill(type);
                             }
 
-                            parameter.DataType.Fulfill(field.DataType.Fulfilled());
+                            parameter.DataType.Fulfill(field.DataType.Result);
                         }
                     }
                     break;
@@ -175,7 +175,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             ISelfParameterSyntax selfParameter,
             IClassDeclarationSyntax declaringClass)
         {
-            var declaringType = declaringClass.DeclaresDataType.Fulfilled();
+            var declaringType = declaringClass.DeclaresDataType.Result;
             selfParameter.DataType.BeginFulfilling();
             var selfType = (ObjectType)declaringType;
             if (selfParameter.MutableSelf) selfType = selfType.ForConstructorSelf();
@@ -184,7 +184,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         }
 
         private static void ResolveReturnType(
-            DataTypePromise returnTypePromise,
+            Promise<DataType> returnTypePromise,
             ITypeSyntax? returnTypeSyntax,
             BasicTypeAnalyzer analyzer)
         {
@@ -205,20 +205,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IFunctionDeclarationSyntax function:
                 {
                     var resolver = new BasicBodyAnalyzer(function.File, stringSymbol, diagnostics,
-                        function.ReturnDataType.Fulfilled());
+                        function.ReturnDataType.Result);
                     resolver.ResolveTypes(function.Body);
                     break;
                 }
                 case IAssociatedFunctionDeclarationSyntax associatedFunction:
                 {
                     var resolver = new BasicBodyAnalyzer(associatedFunction.File, stringSymbol, diagnostics,
-                        associatedFunction.ReturnDataType.Fulfilled());
+                        associatedFunction.ReturnDataType.Result);
                     resolver.ResolveTypes(associatedFunction.Body);
                     break;
                 }
                 case IConcreteMethodDeclarationSyntax method:
                 {
-                    var resolver = new BasicBodyAnalyzer(method.File, stringSymbol, diagnostics, method.ReturnDataType.Fulfilled());
+                    var resolver = new BasicBodyAnalyzer(method.File, stringSymbol, diagnostics, method.ReturnDataType.Result);
                     resolver.ResolveTypes(method.Body);
                     break;
                 }
@@ -229,7 +229,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     if (field.Initializer != null)
                     {
                         var resolver = new BasicBodyAnalyzer(field.File, stringSymbol, diagnostics);
-                        resolver.CheckType(ref field.Initializer, field.DataType.Fulfilled());
+                        resolver.CheckType(ref field.Initializer, field.DataType.Result);
                     }
                     break;
                 case IConstructorDeclarationSyntax constructor:

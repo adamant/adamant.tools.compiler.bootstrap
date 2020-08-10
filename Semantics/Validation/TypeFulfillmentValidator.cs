@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
             switch (syntax)
             {
                 case IClassDeclarationSyntax classDeclaration:
-                    classDeclaration.DeclaresDataType.Fulfilled();
+                    _ = classDeclaration.DeclaresDataType.Result;
                     // Don't recur into body, we will see those as separate members
                     return;
                 case IConstructorDeclarationSyntax constructorDeclaration:
@@ -31,23 +31,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                     return;
                 case IMethodDeclarationSyntax methodDeclaration:
                     WalkChildren(methodDeclaration);
-                    methodDeclaration.ReturnDataType.Fulfilled();
+                    _ = methodDeclaration.ReturnDataType.Result;
                     return;
                 case IFunctionDeclarationSyntax functionDeclaration:
                     WalkChildren(functionDeclaration);
-                    functionDeclaration.ReturnDataType.Fulfilled();
+                    _ = functionDeclaration.ReturnDataType.Result;
                     return;
                 case IAssociatedFunctionDeclarationSyntax associatedFunctionDeclaration:
                     WalkChildren(associatedFunctionDeclaration);
-                    associatedFunctionDeclaration.ReturnDataType.Fulfilled();
+                    _ = associatedFunctionDeclaration.ReturnDataType.Result;
                     return;
                 case IParameterSyntax parameter:
                     WalkChildren(parameter);
-                    parameter.DataType.Fulfilled();
+                    _ = parameter.DataType.Result;
                     return;
                 case IFieldDeclarationSyntax fieldDeclaration:
                     WalkChildren(fieldDeclaration);
-                    fieldDeclaration.DataType.Fulfilled();
+                    _ = fieldDeclaration.DataType.Result;
                     return;
                 case ITypeSyntax type:
                     WalkChildren(type);

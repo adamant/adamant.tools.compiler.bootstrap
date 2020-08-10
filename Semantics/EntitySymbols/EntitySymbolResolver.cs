@@ -145,7 +145,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
                                 //field.DataType.Fulfill(type);
                             }
 
-                            parameter.DataType.Fulfill(field.DataType.Fulfilled());
+                            parameter.DataType.Fulfill(field.DataType.Result);
                         }
                     }
                     break;
@@ -156,7 +156,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
             ISelfParameterSyntax selfParameter,
             IClassDeclarationSyntax declaringClass)
         {
-            var declaringType = declaringClass.DeclaresDataType.Fulfilled();
+            var declaringType = declaringClass.DeclaresDataType.Result;
             selfParameter.DataType.BeginFulfilling();
             var selfType = (ObjectType)declaringType;
             if (selfParameter.MutableSelf) selfType = selfType.ForConstructorSelf();
@@ -165,7 +165,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
         }
 
         private static void ResolveReturnType(
-            DataTypePromise returnTypePromise,
+            Promise<DataType> returnTypePromise,
             ITypeSyntax? returnTypeSyntax,
             TypeResolver resolver)
         {

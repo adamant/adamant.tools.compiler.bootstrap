@@ -113,7 +113,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
             if (declarations.TryGetValue(symbol, out var declaration))
                 return declaration;
 
-            var selfType = classDeclaration.DeclaresDataType.Fulfilled();
+            var selfType = classDeclaration.DeclaresDataType.Result;
             var selfParameter = new Parameter(false, SpecialNames.Self, selfType);
             var parameters = selfParameter.Yield().ToFixedList();
 

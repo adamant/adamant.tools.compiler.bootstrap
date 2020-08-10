@@ -159,14 +159,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         new Name Name { get; }
         new Promise<FunctionSymbol> Symbol { get; }
         ITypeSyntax? ReturnType { get; }
-        DataTypePromise ReturnDataType { get; }
+        Promise<DataType> ReturnDataType { get; }
     }
 
     public partial interface IAssociatedFunctionDeclarationSyntax : IMemberDeclarationSyntax, IConcreteCallableDeclarationSyntax
     {
         new Name Name { get; }
         ITypeSyntax? ReturnType { get; }
-        DataTypePromise ReturnDataType { get; }
+        Promise<DataType> ReturnDataType { get; }
     }
 
     [Closed(
@@ -188,7 +188,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         new Promise<MethodSymbol> Symbol { get; }
         ISelfParameterSyntax SelfParameter { get; }
         ITypeSyntax? ReturnType { get; }
-        DataTypePromise ReturnDataType { get; }
+        Promise<DataType> ReturnDataType { get; }
     }
 
     public partial interface IAbstractMethodDeclarationSyntax : IMethodDeclarationSyntax
@@ -209,7 +209,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         new Name Name { get; }
         new Promise<FieldSymbol> Symbol { get; }
         ITypeSyntax TypeSyntax { get; }
-        DataTypePromise DataType { get; }
+        Promise<DataType> DataType { get; }
     }
 
     [Closed(
@@ -221,7 +221,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     {
         Name? Name { get; }
         bool Unused { get; }
-        DataTypePromise DataType { get; }
+        Promise<DataType> DataType { get; }
     }
 
     public partial interface INamedParameterSyntax : IParameterSyntax, IConstructorParameterSyntax

@@ -40,19 +40,19 @@ NamespaceDeclaration: NonMemberDeclaration, Declaration = IsGlobalQualified:bool
 // Non-Member Entity Declarations
 NonMemberEntityDeclaration: EntityDeclaration, NonMemberDeclaration = Name;
 ClassDeclaration: NonMemberEntityDeclaration = MutableModifier:IMutableKeywordToken? Name Symbol:Promise<TypeSymbol> Members:MemberDeclaration*;
-FunctionDeclaration: NonMemberEntityDeclaration, ConcreteCallableDeclaration = IsExternalFunction:bool Name Symbol:Promise<FunctionSymbol> ReturnType:Type? ReturnDataType:DataTypePromise;
-AssociatedFunctionDeclaration: MemberDeclaration, ConcreteCallableDeclaration = Name ReturnType:Type? ReturnDataType:DataTypePromise;
+FunctionDeclaration: NonMemberEntityDeclaration, ConcreteCallableDeclaration = IsExternalFunction:bool Name Symbol:Promise<FunctionSymbol> ReturnType:Type? ReturnDataType:Promise<DataType>;
+AssociatedFunctionDeclaration: MemberDeclaration, ConcreteCallableDeclaration = Name ReturnType:Type? ReturnDataType:Promise<DataType>;
 
 // Member Declarations
 MemberDeclaration: EntityDeclaration = DeclaringClass:ClassDeclaration;
-MethodDeclaration: MemberDeclaration, CallableDeclaration = Name Symbol:Promise<MethodSymbol> SelfParameter ReturnType:Type? ReturnDataType:DataTypePromise;
+MethodDeclaration: MemberDeclaration, CallableDeclaration = Name Symbol:Promise<MethodSymbol> SelfParameter ReturnType:Type? ReturnDataType:Promise<DataType>;
 AbstractMethodDeclaration: MethodDeclaration;
 ConcreteMethodDeclaration: MethodDeclaration, ConcreteCallableDeclaration;
 ConstructorDeclaration: MemberDeclaration, ConcreteCallableDeclaration = ImplicitSelfParameter:SelfParameter;
-FieldDeclaration: MemberDeclaration = Name Symbol:Promise<FieldSymbol> TypeSyntax:Type DataType:DataTypePromise;
+FieldDeclaration: MemberDeclaration = Name Symbol:Promise<FieldSymbol> TypeSyntax:Type DataType:Promise<DataType>;
 
 // Parameters
-Parameter: 'ISyntax', IBindingMetadata = Name? Unused:bool DataType:DataTypePromise;
+Parameter: 'ISyntax', IBindingMetadata = Name? Unused:bool DataType:Promise<DataType>;
 NamedParameter: Parameter, ConstructorParameter = Name TypeSyntax:Type DefaultValue:Expression?;
 ConstructorParameter: Parameter;
 SelfParameter: Parameter = MutableSelf:bool;

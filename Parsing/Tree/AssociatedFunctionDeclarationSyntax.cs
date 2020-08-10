@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public new FixedList<INamedParameterSyntax> Parameters { get; }
         public ITypeSyntax? ReturnType { get; }
-        DataType IFunctionMetadata.ReturnDataType => ReturnDataType.Fulfilled();
+        DataType IFunctionMetadata.ReturnDataType => ReturnDataType.Result;
         public IBodySyntax Body { get; }
 
         public AssociatedFunctionDeclarationSyntax(

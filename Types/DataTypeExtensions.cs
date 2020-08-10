@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Types
 {
@@ -59,6 +60,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
             if (!type.Assigned().IsKnown) throw new InvalidOperationException($"Type {type} not known");
 
             return type!;
+        }
+
+        [DebuggerHidden]
+        public static DataType Known(this Promise<DataType> promise)
+        {
+            var type = promise.Result;
+            if (!type.IsKnown) throw new InvalidOperationException($"Type {type} not known");
+
+            return type;
         }
 
         public static ReferenceType? UnderlyingReferenceType(this DataType type)

@@ -36,12 +36,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public Promise<TypeSymbol> Symbol { get; } = new Promise<TypeSymbol>();
         IPromise<Symbol> IEntityDeclarationSyntax.Symbol => Symbol;
         public FixedList<IMemberDeclarationSyntax> Members { get; }
-        public DataTypePromise DeclaresDataType { get; } = new DataTypePromise();
+        public Promise<DataType> DeclaresDataType { get; } = new Promise<DataType>();
         public MetadataSet ChildMetadata { get; protected set; }
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        DataType ITypeMetadata.DeclaresDataType => DeclaresDataType.Fulfilled();
+        DataType ITypeMetadata.DeclaresDataType => DeclaresDataType.Result;
 
         public ClassDeclarationSyntax(
             NamespaceName containingNamespaceName,
@@ -71,7 +71,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             if (Members.Any(m => m is IConstructorDeclarationSyntax))
                 return;
 
-            var constructor = new DefaultConstructor((ObjectType)DeclaresDataType.Fulfilled());
+            var constructor = new DefaultConstructor((ObjectType)DeclaresDataType.Result);
             ChildMetadata = new MetadataSet(ChildMetadata.Append<IMetadata>(constructor));
         }
 
