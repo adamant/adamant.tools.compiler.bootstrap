@@ -122,5 +122,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         {
             return values.Any(v => v);
         }
+
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IEnumerable<T> NotNull<T>(this IEnumerable<T?> values)
+            where T : class
+        {
+            return values.Where(v => !(v is null)).Select(v => v!);
+        }
     }
 }

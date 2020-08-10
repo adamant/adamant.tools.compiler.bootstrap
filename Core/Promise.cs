@@ -30,14 +30,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
         }
 
         [DebuggerHidden]
-        public bool TryBeginFulfilling(Action whenInProgress)
+        public bool TryBeginFulfilling(Action? whenInProgress = null)
         {
             switch (State)
             {
                 default:
                     throw ExhaustiveMatch.Failed(State);
                 case PromiseState.InProgress:
-                    whenInProgress();
+                    whenInProgress?.Invoke();
                     return false;
                 case PromiseState.Fulfilled:
                     // We have already resolved it
@@ -67,6 +67,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
 
                 return value;
             }
+        }
+
+        public IPromise<S>? As<S>()
+        {
+            if (this is IPromise<S> promise) return promise;
+            if (State == PromiseState.Fulfilled
+                && value is S convertedValue)
+                return new Promise<S>(convertedValue);
+            return null;
         }
 
         // Useful for debugging

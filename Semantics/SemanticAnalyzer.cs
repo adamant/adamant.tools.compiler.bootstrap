@@ -112,7 +112,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             FixedList<IEntityDeclarationSyntax> entities,
             ITypeMetadata? stringSymbol,
             Diagnostics diagnostics,
-            SymbolTree symbolTree)
+            SymbolTreeBuilder symbolTree)
         {
             // Resolve symbols for the entities
             new EntitySymbolResolver(diagnostics, symbolTree).Resolve(entities);

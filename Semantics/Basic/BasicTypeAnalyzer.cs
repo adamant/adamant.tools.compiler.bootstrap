@@ -42,17 +42,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         case 0:
                             diagnostics.Add(NameBindingError.CouldNotBindName(file, typeName.Span));
                             typeName.ReferencedMetadata = UnknownMetadata.Instance;
-                            typeSyntax.NamedType = DataType.Unknown;
+                            if (typeName.NamedType is null)
+                                typeName.NamedType = DataType.Unknown;
                             break;
                         case 1:
                             var metadata = metadatas.Single();
                             typeName.ReferencedMetadata = metadata;
-                            typeName.NamedType = metadata.DeclaresDataType;
+                            if (typeName.NamedType is null)
+                                typeName.NamedType = metadata.DeclaresDataType;
                             break;
                         default:
                             diagnostics.Add(NameBindingError.AmbiguousName(file, typeName.Span));
                             typeName.ReferencedMetadata = UnknownMetadata.Instance;
-                            typeName.NamedType = DataType.Unknown;
+                            if (typeName.NamedType is null)
+                                typeName.NamedType =  DataType.Unknown;
                             break;
                     }
                     break;
@@ -62,17 +65,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     var type = Evaluate(referenceCapability.ReferentType);
                     if (type == DataType.Unknown)
                         return DataType.Unknown;
-                    if (type is ReferenceType referenceType)
-                        referenceCapability.NamedType = referenceType.To(referenceCapability.Capability);
-                    else
-                        referenceCapability.NamedType = DataType.Unknown;
+                    if (referenceCapability.NamedType is null)
+                    {
+                        if (type is ReferenceType referenceType)
+                            referenceCapability.NamedType = referenceType.To(referenceCapability.Capability);
+                        else
+                            referenceCapability.NamedType = DataType.Unknown;
+                    }
                     break;
                 }
                 case IOptionalTypeSyntax optionalType:
                 {
                     var referent = Evaluate(optionalType.Referent);
-                    return optionalType.NamedType = new OptionalType(referent);
+                    if (optionalType.NamedType is null)
+                        optionalType.NamedType = new OptionalType(referent);
                 }
+                break;
             }
 
             return typeSyntax.NamedType ?? throw new InvalidOperationException();

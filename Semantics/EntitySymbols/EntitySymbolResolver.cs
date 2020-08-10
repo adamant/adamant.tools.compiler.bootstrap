@@ -15,9 +15,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
     public class EntitySymbolResolver
     {
         private readonly Diagnostics diagnostics;
-        private readonly SymbolTree symbolTree;
+        private readonly SymbolTreeBuilder symbolTree;
 
-        public EntitySymbolResolver(Diagnostics diagnostics, SymbolTree symbolTree)
+        public EntitySymbolResolver(Diagnostics diagnostics, SymbolTreeBuilder symbolTree)
         {
             this.diagnostics = diagnostics;
             this.symbolTree = symbolTree;
@@ -98,7 +98,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
         private void ResolveFunction(IFunctionDeclarationSyntax function)
         {
             var resolver = new TypeResolver(function.File, diagnostics);
-            //ResolveTypesInParameters(resolver, function.Parameters, null);
+            ResolveTypesInParameters(resolver, function.Parameters, null);
             //ResolveReturnType(function.ReturnDataType, function.ReturnType, resolver);
         }
 
@@ -185,6 +185,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
 
             var symbol = new ObjectTypeSymbol(@class.ContainingNamespaceSymbol!, classType);
             @class.Symbol.Fulfill(symbol);
+            symbolTree.Add(symbol);
             //@class.CreateDefaultConstructor();
 
             void AddCircularDefinitionError()

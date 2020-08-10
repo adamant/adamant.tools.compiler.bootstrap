@@ -16,9 +16,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
 
         private static void AssertHasReferencedSymbol(
             ISyntax syntax,
-            IMetadata? referencedSymbol)
+            IMetadata? referencedMetadata)
         {
-            if (referencedSymbol is null)
+            if (referencedMetadata is null)
                 throw new Exception($"Expression doesn't have referenced symbol `{syntax}`");
         }
 

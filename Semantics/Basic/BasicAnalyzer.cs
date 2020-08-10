@@ -132,12 +132,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     default:
                         throw ExhaustiveMatch.Failed(parameter);
                     case INamedParameterSyntax namedParameter:
-                    {
-                        parameter.DataType.BeginFulfilling();
-                        var type = analyzer.Evaluate(namedParameter.TypeSyntax);
-                        parameter.DataType.Fulfill(type);
-                    }
-                    break;
+                        // It could already be fulfilled by the type resolver
+                        if (parameter.DataType.TryBeginFulfilling())
+                        {
+                            var type = analyzer.Evaluate(namedParameter.TypeSyntax);
+                            parameter.DataType.Fulfill(type);
+                        }
+                        else
+                        {
+                            // Still need to analyze to assign referenced metadata
+                            analyzer.Evaluate(namedParameter.TypeSyntax);
+                        }
+                        break;
                     case IFieldParameterSyntax fieldParameter:
                     {
                         parameter.DataType.BeginFulfilling();

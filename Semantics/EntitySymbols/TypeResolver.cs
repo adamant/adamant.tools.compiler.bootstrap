@@ -36,12 +36,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
                     return null;
                 case ITypeNameSyntax typeName:
                 {
-                    var symbolPromises = typeName.LookupInContainingScope().OfType<Promise<ObjectTypeSymbol>>().ToFixedList();
+                    var symbolPromises = typeName.LookupInContainingScope().Select(p => p.As<TypeSymbol>()).NotNull().ToFixedList();
                     switch (symbolPromises.Count)
                     {
                         case 0:
                             diagnostics.Add(NameBindingError.CouldNotBindName(file, typeName.Span));
-                            typeName.ReferencedSymbol = Promise.ForValue(default(ObjectTypeSymbol));
+                            typeName.ReferencedSymbol = Promise.ForValue(default(TypeSymbol));
                             typeName.NamedType = DataType.Unknown;
                             break;
                         case 1:
@@ -52,7 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
                             break;
                         default:
                             diagnostics.Add(NameBindingError.AmbiguousName(file, typeName.Span));
-                            typeName.ReferencedSymbol = Promise.ForValue(default(ObjectTypeSymbol));
+                            typeName.ReferencedSymbol = Promise.ForValue(default(TypeSymbol));
                             typeName.NamedType = DataType.Unknown;
                             break;
                     }
