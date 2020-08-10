@@ -9,7 +9,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Primitives;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes.Declaration
 {
     public class DeclarationLexicalScopesBuilder
     {

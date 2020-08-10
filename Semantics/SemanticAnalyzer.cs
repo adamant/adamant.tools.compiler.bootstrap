@@ -14,7 +14,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes.Declaration;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Moves;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Namespaces;

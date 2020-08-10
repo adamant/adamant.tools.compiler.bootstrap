@@ -34,6 +34,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                 case IEntityDeclarationSyntax syn:
                     CheckSymbol(syn, syn.Symbol);
                     break;
+                    //case ITypeNameSyntax syn:
+                    //    CheckReferencedSymbol(syn, syn.ReferencedSymbol);
+                    //    break;
             }
 
             WalkChildren(syntax);
@@ -49,6 +52,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
 
             if (!symbolTree.Contains(promise.Result))
                 throw new Exception($"Symbol isn't in the symbol tree '{promise.Result}'");
+        }
+
+        private static void CheckReferencedSymbol(ISyntax syntax, IPromise<Symbol?> promise)
+        {
+            if (promise.State != PromiseState.Fulfilled)
+                throw new Exception($"Syntax doesn't have a referenced symbol '{syntax}'");
+
+            if (promise.Result is null)
+                throw new Exception($"Syntax has unknown referenced symbol '{syntax}'");
         }
     }
 }
