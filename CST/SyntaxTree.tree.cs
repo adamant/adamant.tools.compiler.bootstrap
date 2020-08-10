@@ -391,7 +391,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface IForeachExpressionSyntax : IExpressionSyntax
     {
-        SimpleName VariableName { get; }
+        Name VariableName { get; }
         Promise<VariableSymbol> Symbol { get; }
         ITypeSyntax? TypeSyntax { get; }
         IBlockExpressionSyntax Block { get; }

@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
@@ -16,9 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public bool IsMutableBinding { get; }
         MaybeQualifiedName IMetadata.FullName => FullVariableName;
         private MaybeQualifiedName FullVariableName { get; }
-        [DebuggerHidden]
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public SimpleName VariableName => FullVariableName.UnqualifiedName;
+        public Name VariableName { get; }
         public Promise<VariableSymbol> Symbol { get; } = new Promise<VariableSymbol>();
         public bool VariableIsLiveAfterAssignment { get; set; } = true;
 
@@ -47,6 +44,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             TextSpan span,
             bool isMutableBinding,
             MaybeQualifiedName fullVariableName,
+            Name variableName,
             ITypeSyntax? typeSyntax,
             IExpressionSyntax inExpression,
             IBlockExpressionSyntax block)
@@ -54,6 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         {
             IsMutableBinding = isMutableBinding;
             FullVariableName = fullVariableName;
+            VariableName = variableName;
             this.inExpression = inExpression;
             Block = block;
             TypeSyntax = typeSyntax;

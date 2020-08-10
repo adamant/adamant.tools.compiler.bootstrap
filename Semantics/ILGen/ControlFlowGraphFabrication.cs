@@ -270,7 +270,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
 
                     var variableType = (IntegerType)exp.VariableType.Assigned();
                     var loopVariable = graph.AddVariable(exp.IsMutableBinding,
-                                            variableType, CurrentScope, exp.VariableName);
+                                            variableType, CurrentScope, exp.FullName.UnqualifiedName);
                     var loopVariablePlace = loopVariable.Place(exp.Span);
                     var loopVariableReference = loopVariable.Reference(exp.Span);
 
