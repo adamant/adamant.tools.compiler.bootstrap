@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -67,23 +66,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 {
                     var analyzer = new BasicTypeAnalyzer(method.File, diagnostics);
                     method.SelfParameterType = ResolveTypesInParameter(method.SelfParameter, method.DeclaringClass);
-                    ResolveTypesInParameters(analyzer, method.Parameters, method.DeclaringClass);
+                    ResolveTypesInParameters(analyzer, method.Parameters);
                     ResolveReturnType(method.ReturnDataType, method.ReturnType, analyzer);
                     break;
                 }
                 case IConstructorDeclarationSyntax constructor:
                 {
-                    var selfType = constructor.DeclaringClass.Symbol.Result.DeclaresDataType;
-                    constructor.SelfParameterType = ResolveTypesInParameter(constructor.ImplicitSelfParameter, constructor.DeclaringClass);
                     var analyzer = new BasicTypeAnalyzer(constructor.File, diagnostics);
-                    ResolveTypesInParameters(analyzer, constructor.Parameters, constructor.DeclaringClass);
-                    // TODO deal with return type here
+                    ResolveTypesInParameters(analyzer, constructor.Parameters);
                     break;
                 }
                 case IAssociatedFunctionDeclarationSyntax associatedFunction:
                 {
                     var analyzer = new BasicTypeAnalyzer(associatedFunction.File, diagnostics);
-                    ResolveTypesInParameters(analyzer, associatedFunction.Parameters, null);
+                    ResolveTypesInParameters(analyzer, associatedFunction.Parameters);
                     ResolveReturnType(associatedFunction.ReturnDataType, associatedFunction.ReturnType, analyzer);
                     break;
                 }
@@ -95,7 +91,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IFunctionDeclarationSyntax function:
                 {
                     var analyzer = new BasicTypeAnalyzer(function.File, diagnostics);
-                    ResolveTypesInParameters(analyzer, function.Parameters, null);
+                    ResolveTypesInParameters(analyzer, function.Parameters);
                     ResolveReturnType(function.ReturnDataType, function.ReturnType, analyzer);
                     break;
                 }
@@ -107,8 +103,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private static void ResolveTypesInParameters(
             BasicTypeAnalyzer analyzer,
-            IEnumerable<IConstructorParameterSyntax> parameters,
-            IClassDeclarationSyntax? declaringClass)
+            IEnumerable<IConstructorParameterSyntax> parameters)
         {
             foreach (var parameter in parameters)
                 switch (parameter)
@@ -128,26 +123,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             analyzer.Evaluate(namedParameter.TypeSyntax);
                         }
                         break;
-                    case IFieldParameterSyntax fieldParameter:
-                    {
-                        parameter.DataType.BeginFulfilling();
-                        var field = (declaringClass ?? throw new InvalidOperationException("Field parameter outside of class declaration"))
-                                    .Members.OfType<IFieldDeclarationSyntax>()
-                                    .SingleOrDefault(f => f.Name == fieldParameter.Name);
-                        if (field is null)
-                        {
-                            fieldParameter.SetIsMutableBinding(false);
-                            fieldParameter.DataType.Fulfill(DataType.Unknown);
-                            // TODO report an error
-                            throw new NotImplementedException();
-                        }
-                        else
-                        {
-                            fieldParameter.SetIsMutableBinding(field.IsMutableBinding);
-                            parameter.DataType.Fulfill(field.Symbol.Result.DataType);
-                        }
-                    }
-                    break;
+                    case IFieldParameterSyntax _:
+                        // Resolved by EntitySymbolResolver
+                        break;
                 }
         }
 
@@ -155,11 +133,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             ISelfParameterSyntax selfParameter,
             IClassDeclarationSyntax declaringClass)
         {
-            var declaringType = declaringClass.Symbol.Result.DeclaresDataType;
-            selfParameter.DataType.BeginFulfilling();
-            var selfType = (ObjectType)declaringType;
-            if (selfParameter.MutableSelf) selfType = selfType.ForConstructorSelf();
-            selfParameter.DataType.Fulfill(selfType);
+            var selfType = declaringClass.Symbol.Result.DeclaresDataType;
+            if (selfParameter.DataType.TryBeginFulfilling())
+            {
+                if (selfParameter.MutableSelf) selfType = selfType.ForConstructorSelf();
+                selfParameter.DataType.Fulfill(selfType);
+            }
             return selfType;
         }
 

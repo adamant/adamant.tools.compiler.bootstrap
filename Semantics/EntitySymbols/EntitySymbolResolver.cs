@@ -53,14 +53,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
                     break;
                 }
                 case IConstructorDeclarationSyntax constructor:
-                {
-                    //var selfType = constructor.DeclaringClass.DeclaresDataType.Fulfilled();
-                    //constructor.SelfParameterType = ResolveTypesInParameter(constructor.ImplicitSelfParameter, constructor.DeclaringClass);
-                    //var analyzer = new BasicTypeAnalyzer(constructor.File, diagnostics);
-                    //ResolveTypesInParameters(analyzer, constructor.Parameters, constructor.DeclaringClass);
-                    //// TODO deal with return type here
+                    ResolveConstructor(constructor);
                     break;
-                }
                 case IAssociatedFunctionDeclarationSyntax associatedFunction:
                     ResolveAssociatedFunction(associatedFunction);
                     break;
@@ -74,6 +68,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
                     ResolveClass(syn);
                     break;
             }
+        }
+
+        private void ResolveConstructor(IConstructorDeclarationSyntax constructor)
+        {
+            var selfType = constructor.DeclaringClass.Symbol.Result.DeclaresDataType;
+            constructor.SelfParameterType = ResolveTypesInParameter(constructor.ImplicitSelfParameter, constructor.DeclaringClass);
+            var resolver = new TypeResolver(constructor.File, diagnostics);
+            ResolveTypesInParameters(resolver, constructor.Parameters, constructor.DeclaringClass);
+            // TODO deal with return type here
         }
 
         private void ResolveAssociatedFunction(IAssociatedFunctionDeclarationSyntax associatedFunction)
