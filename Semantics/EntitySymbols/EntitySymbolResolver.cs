@@ -156,7 +156,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
             ISelfParameterSyntax selfParameter,
             IClassDeclarationSyntax declaringClass)
         {
-            var declaringType = declaringClass.DeclaresDataType.Result;
+            var declaringType = declaringClass.Symbol.Result.DeclaresDataType;
             selfParameter.DataType.BeginFulfilling();
             var selfType = (ObjectType)declaringType;
             if (selfParameter.MutableSelf) selfType = selfType.ForConstructorSelf();
@@ -186,7 +186,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
             var symbol = new ObjectTypeSymbol(@class.ContainingNamespaceSymbol!, classType);
             @class.Symbol.Fulfill(symbol);
             symbolTree.Add(symbol);
-            //@class.CreateDefaultConstructor();
+            var defaultConstructorSymbol = @class.CreateDefaultConstructor();
+            if (!(defaultConstructorSymbol is null))
+                symbolTree.Add(defaultConstructorSymbol);
 
             void AddCircularDefinitionError()
             {

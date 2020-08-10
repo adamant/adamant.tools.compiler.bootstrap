@@ -39,7 +39,7 @@ NamespaceDeclaration: NonMemberDeclaration, Declaration = IsGlobalQualified:bool
 
 // Non-Member Entity Declarations
 NonMemberEntityDeclaration: EntityDeclaration, NonMemberDeclaration = Name;
-ClassDeclaration: NonMemberEntityDeclaration = MutableModifier:IMutableKeywordToken? Name Symbol:Promise<TypeSymbol> Members:MemberDeclaration*;
+ClassDeclaration: NonMemberEntityDeclaration = MutableModifier:IMutableKeywordToken? Name Symbol:Promise<ObjectTypeSymbol> Members:MemberDeclaration*;
 FunctionDeclaration: NonMemberEntityDeclaration, ConcreteCallableDeclaration = IsExternalFunction:bool Name Symbol:Promise<FunctionSymbol> ReturnType:Type? ReturnDataType:Promise<DataType>;
 AssociatedFunctionDeclaration: MemberDeclaration, ConcreteCallableDeclaration = Name ReturnType:Type? ReturnDataType:Promise<DataType>;
 

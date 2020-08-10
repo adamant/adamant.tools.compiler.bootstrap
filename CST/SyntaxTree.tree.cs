@@ -149,7 +149,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     {
         IMutableKeywordToken? MutableModifier { get; }
         new Name Name { get; }
-        new Promise<TypeSymbol> Symbol { get; }
+        new Promise<ObjectTypeSymbol> Symbol { get; }
         FixedList<IMemberDeclarationSyntax> Members { get; }
     }
 

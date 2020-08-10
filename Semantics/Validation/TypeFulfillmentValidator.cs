@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
             switch (syntax)
             {
                 case IClassDeclarationSyntax classDeclaration:
-                    _ = classDeclaration.DeclaresDataType.Result;
+                    _ = classDeclaration.Symbol.Result.DeclaresDataType;
                     // Don't recur into body, we will see those as separate members
                     return;
                 case IConstructorDeclarationSyntax constructorDeclaration:

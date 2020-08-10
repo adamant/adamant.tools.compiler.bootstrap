@@ -33,15 +33,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public IMutableKeywordToken? MutableModifier { get; }
         public MaybeQualifiedName FullName { get; }
         public Name Name { get; }
-        public Promise<TypeSymbol> Symbol { get; } = new Promise<TypeSymbol>();
+        public Promise<ObjectTypeSymbol> Symbol { get; } = new Promise<ObjectTypeSymbol>();
         IPromise<Symbol> IEntityDeclarationSyntax.Symbol => Symbol;
         public FixedList<IMemberDeclarationSyntax> Members { get; }
-        public Promise<DataType> DeclaresDataType { get; } = new Promise<DataType>();
         public MetadataSet ChildMetadata { get; protected set; }
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        DataType ITypeMetadata.DeclaresDataType => DeclaresDataType.Result;
+        DataType ITypeMetadata.DeclaresDataType => Symbol.Result.DeclaresDataType;
 
         public ClassDeclarationSyntax(
             NamespaceName containingNamespaceName,
@@ -66,13 +65,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Span = TextSpan.Covering(headerSpan, bodySpan);
         }
 
-        public void CreateDefaultConstructor()
+        public ConstructorSymbol? CreateDefaultConstructor()
         {
             if (Members.Any(m => m is IConstructorDeclarationSyntax))
-                return;
+                return null;
 
-            var constructor = new DefaultConstructor((ObjectType)DeclaresDataType.Result);
+            var constructedType = (ObjectType)Symbol.Result.DeclaresDataType;
+            var symbol = new ConstructorSymbol(Symbol.Result, null, FixedList<DataType>.Empty);
+
+            var constructor = new DefaultConstructor(symbol, constructedType);
             ChildMetadata = new MetadataSet(ChildMetadata.Append<IMetadata>(constructor));
+            return symbol;
         }
 
         public override string ToString()
