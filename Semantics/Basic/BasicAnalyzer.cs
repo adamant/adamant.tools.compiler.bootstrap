@@ -80,7 +80,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IFieldDeclarationSyntax field:
                 {
                     var resolver = new BasicTypeAnalyzer(field.File, diagnostics);
-                    resolver.Evaluate(field.TypeSyntax);
+                    resolver.Evaluate(field.Type);
                     break;
                 }
                 case IFunctionDeclarationSyntax function:

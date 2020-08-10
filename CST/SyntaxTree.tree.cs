@@ -210,7 +210,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     {
         new Name Name { get; }
         new Promise<FieldSymbol> Symbol { get; }
-        ITypeSyntax TypeSyntax { get; }
+        ITypeSyntax Type { get; }
     }
 
     [Closed(

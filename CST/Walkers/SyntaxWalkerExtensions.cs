@@ -59,7 +59,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Walkers
                     walker.Walk(functionDeclaration.Body, arg);
                     break;
                 case IFieldDeclarationSyntax fieldDeclaration:
-                    walker.Walk(fieldDeclaration.TypeSyntax, arg);
+                    walker.Walk(fieldDeclaration.Type, arg);
                     walker.Walk(fieldDeclaration.Initializer, arg);
                     break;
                 case IArgumentSyntax argument:

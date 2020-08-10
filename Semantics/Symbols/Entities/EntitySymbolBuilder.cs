@@ -115,7 +115,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
 
             field.Symbol.BeginFulfilling();
             var resolver = new TypeResolver(field.File, diagnostics);
-            var type = resolver.Evaluate(field.TypeSyntax);
+            var type = resolver.Evaluate(field.Type);
             var symbol = new FieldSymbol(field.DeclaringClass.Symbol.Result, field.Name, field.IsMutableBinding, type);
             field.Symbol.Fulfill(symbol);
             symbolTree.Add(symbol);

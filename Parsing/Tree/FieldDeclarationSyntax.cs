@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public new Name Name { get; }
         public Promise<FieldSymbol> Symbol { get; } = new Promise<FieldSymbol>();
         protected override IPromise<Symbol> SymbolPromise => Symbol;
-        public ITypeSyntax TypeSyntax { get; }
+        public ITypeSyntax Type { get; }
         private IExpressionSyntax? initializer;
         [DisallowNull] public ref IExpressionSyntax? Initializer => ref initializer;
         [DebuggerHidden]
@@ -32,19 +32,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             MaybeQualifiedName fullName,
             TextSpan nameSpan,
             Name name,
-            ITypeSyntax typeSyntax,
+            ITypeSyntax type,
             IExpressionSyntax? initializer)
             : base(declaringClass, span, file, accessModifier, fullName, nameSpan, name)
         {
             IsMutableBinding = mutableBinding;
             Name = name;
-            TypeSyntax = typeSyntax;
+            Type = type;
             this.initializer = initializer;
         }
 
         public override string ToString()
         {
-            var result = $"{Name}: {TypeSyntax}";
+            var result = $"{Name}: {Type}";
             if (Initializer != null)
                 result += Initializer.ToString();
             result += ";";
