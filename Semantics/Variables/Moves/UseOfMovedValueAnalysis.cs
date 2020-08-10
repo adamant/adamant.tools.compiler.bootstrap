@@ -6,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Moves
 {
     /// <summary>
     /// Uses a data flow analysis of variables that may have their value moved

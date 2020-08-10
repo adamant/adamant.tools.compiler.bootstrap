@@ -7,21 +7,20 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Builders;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes.Declaration;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Moves;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Namespaces;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Namespaces;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Validation;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.BindingMutability;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.DefiniteAssignment;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Moves;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Shadowing;
 using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics
@@ -51,8 +50,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             NamespaceSymbolBuilder.BuildNamespaceSymbols(package);
 
-            BuildDeclarationScopes(package);
+            // Build up lexical scopes down to the declaration level
+            new DeclarationLexicalScopesBuilder().BuildFor(package);
 
+            // TODO remove old scopes builder
             var stringSymbol = BuildScopes(package, diagnostics);
 
             // Make a list of all the entity declarations (i.e. not namespaces)
@@ -75,15 +76,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             var references = package.References.Values.ToFixedList();
             return new Package(package.SymbolTreeBuilder.Build(), diagnostics.Build(), references, declarations, entryPoint);
-        }
-
-        /// <summary>
-        /// Build up lexical scopes down to the declaration level
-        /// </summary>
-        private static void BuildDeclarationScopes(PackageSyntax package)
-        {
-            var builder = new DeclarationLexicalScopesBuilder();
-            builder.BuildFor(package);
         }
 
         private static ITypeMetadata? BuildScopes(
@@ -116,6 +108,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         {
             // Resolve symbols for the entities
             new EntitySymbolResolver(diagnostics, symbolTree).Resolve(entities);
+
+            // Build lexical sco
 
             // Basic Analysis includes: Name Binding, Type Checking, Constant Folding
             new BasicAnalyzer(stringSymbol, diagnostics).Check(entities);

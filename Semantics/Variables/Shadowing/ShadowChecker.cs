@@ -6,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.CST.Walkers;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Shadowing
 {
     /// <summary>
     /// Enforces rules disallowing local variable shadowing

@@ -9,7 +9,7 @@ using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
 {
     /// <summary>
     /// Analyzes an <see cref="ITypeSyntax" /> to evaluate which type it refers to.

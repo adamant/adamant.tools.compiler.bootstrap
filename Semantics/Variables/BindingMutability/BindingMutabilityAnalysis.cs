@@ -4,7 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.BindingMutability
 {
     /// <summary>
     /// Uses a data flow analysis of variables that are definitely unassigned to

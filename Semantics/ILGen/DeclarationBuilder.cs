@@ -7,11 +7,10 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.TerminatorInstructions;
 using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
 {
     public class DeclarationBuilder
     {

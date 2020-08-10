@@ -5,7 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.DefiniteAssignment
 {
     // TODO check definite assignment of fields in constructors
     internal class DefiniteAssignmentAnalysis : IForwardDataFlowAnalysis<VariableFlags>

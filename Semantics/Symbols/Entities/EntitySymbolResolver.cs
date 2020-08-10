@@ -10,7 +10,7 @@ using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.EntitySymbols
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
 {
     public class EntitySymbolResolver
     {

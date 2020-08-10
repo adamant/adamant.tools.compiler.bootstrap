@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Shadowing
 {
     public class EmptyBindingScope : BindingScope
     {

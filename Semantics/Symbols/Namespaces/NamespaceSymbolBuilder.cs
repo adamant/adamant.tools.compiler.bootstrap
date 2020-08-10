@@ -5,7 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Namespaces
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Namespaces
 {
     public class NamespaceSymbolBuilder : SyntaxWalker<NamespaceOrPackageSymbol>
     {
