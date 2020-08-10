@@ -10,9 +10,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols.Trees
     /// </summary>
     public class SymbolTreeBuilder : SymbolTree
     {
-        public PackageSymbol Package { get; }
+        public PackageSymbol? Package { get; }
         private readonly IDictionary<Symbol, ISet<Symbol>> symbolChildren = new Dictionary<Symbol, ISet<Symbol>>();
         public override IEnumerable<Symbol> Symbols => symbolChildren.Keys;
+
+        public SymbolTreeBuilder()
+        {
+            Package = null;
+        }
 
         public SymbolTreeBuilder(PackageSymbol package)
         {
@@ -42,7 +47,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols.Trees
             if (!symbolChildren.TryGetValue(symbol, out var children))
             {
                 // Add to parent's children
-                GetOrAdd(symbol.ContainingSymbol!).Add(symbol);
+                if (!(symbol.ContainingSymbol is null))
+                    GetOrAdd(symbol.ContainingSymbol).Add(symbol);
                 children = new HashSet<Symbol>();
                 symbolChildren.Add(symbol, children);
             }
@@ -51,7 +57,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols.Trees
 
         public FixedSymbolTree Build()
         {
+            if (Package is null)
+                throw new InvalidOperationException($"Can't build {nameof(FixedSymbolTree)} without a package");
             return new FixedSymbolTree(Package, symbolChildren.ToFixedDictionary(e => e.Key, e => e.Value.ToFixedSet()));
+        }
+
+        public PrimitiveSymbolTree BuildPrimitives()
+        {
+            if (!(Package is null))
+                throw new InvalidOperationException($"Can't build {nameof(PrimitiveSymbolTree)} WITH a package");
+            return new PrimitiveSymbolTree(symbolChildren.ToFixedDictionary(e => e.Key, e => e.Value.ToFixedSet()));
         }
     }
 }

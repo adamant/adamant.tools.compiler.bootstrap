@@ -6,6 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.LexicalScopes;
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Primitives;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
@@ -30,6 +31,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 
         private static FixedList<NonMemberEntitySymbol> GetAllDeclarationSymbols(PackageSyntax package)
         {
+            var primitiveSymbols = Primitive.SymbolTree.Symbols
+                                            .Where(s => s.ContainingSymbol is null)
+                                            .Select(s => new NonMemberEntitySymbol(s));
+
             var packageSymbols = package.CompilationUnits
                                         .SelectMany(cu => cu.AllEntityDeclarations)
                                         .OfType<INonMemberEntityDeclarationSyntax>()
@@ -40,7 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                                            .SelectMany(p => p.SymbolTree.Symbols)
                                            .Where(s => s.ContainingSymbol is NamespaceOrPackageSymbol)
                                            .Select(s => new NonMemberEntitySymbol(s));
-            return packageSymbols.Concat(referencedSymbols).ToFixedList();
+            return primitiveSymbols.Concat(packageSymbols).Concat(referencedSymbols).ToFixedList();
         }
 
         private static FixedDictionary<NamespaceName, Namespace> BuildNamespaces(

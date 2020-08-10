@@ -23,10 +23,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 
         public NonMemberEntitySymbol(Symbol symbol)
         {
-            if (!(symbol.ContainingSymbol is NamespaceOrPackageSymbol containingSymbol))
+            if (!(symbol.ContainingSymbol is NamespaceOrPackageSymbol
+                  || symbol.ContainingSymbol is null))
                 throw new ArgumentException("Symbol must be for a non-member entity", nameof(symbol));
+            var containingSymbol = symbol.ContainingSymbol as NamespaceOrPackageSymbol;
             InCurrentPackage = false;
-            ContainingNamespace = containingSymbol.NamespaceName;
+            ContainingNamespace = containingSymbol?.NamespaceName ?? NamespaceName.Global;
             Name = symbol.Name ?? throw new ArgumentException("Symbol must have a name", nameof(symbol));
             Symbol = Promise.ForValue(symbol);
         }
