@@ -1,14 +1,15 @@
 using System.Collections.Generic;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.LexicalScopes
 {
-    public class PackagesScope<TSymbol> : LexicalScope<TSymbol>
+    public class PackagesScope : LexicalScope
     {
-        internal override PackagesScope<TSymbol> ContainingPackagesScope => this;
+        internal override PackagesScope ContainingPackagesScope => this;
         public PackageSymbol CurrentPackage { get; }
         private readonly FixedDictionary<Name, PackageSymbol> packageAliases;
 
@@ -23,14 +24,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.LexicalScopes
             return packageAliases.TryGetValue(name, out var package) ? package : null;
         }
 
-        public override IEnumerable<TSymbol> LookupInGlobalScope(TypeName name)
+        public override IEnumerable<IPromise<Symbol>> LookupInGlobalScope(TypeName name)
         {
-            return Enumerable.Empty<TSymbol>();
+            return Enumerable.Empty<IPromise<Symbol>>();
         }
 
-        public override IEnumerable<TSymbol> Lookup(TypeName name, bool includeNested = true)
+        public override IEnumerable<IPromise<Symbol>> Lookup(TypeName name, bool includeNested = true)
         {
-            return Enumerable.Empty<TSymbol>();
+            return Enumerable.Empty<IPromise<Symbol>>();
         }
     }
 }

@@ -3,14 +3,13 @@ using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.LexicalScopes;
-using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal abstract class DeclarationSyntax : Syntax, IDeclarationSyntax
     {
-        private LexicalScope<IPromise<Symbol>>? containingLexicalScope;
-        public LexicalScope<IPromise<Symbol>> ContainingLexicalScope
+        private LexicalScope? containingLexicalScope;
+        public LexicalScope ContainingLexicalScope
         {
             [DebuggerStepThrough]
             get => containingLexicalScope

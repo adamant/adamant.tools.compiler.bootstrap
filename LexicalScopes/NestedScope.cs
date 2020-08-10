@@ -1,22 +1,42 @@
 using System.Collections.Generic;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.LexicalScopes
 {
-    public class NestedScope<TSymbol> : LexicalScope<TSymbol>
+    public class NestedScope : LexicalScope
     {
-        internal override PackagesScope<TSymbol> ContainingPackagesScope { get; }
-        private readonly LexicalScope<TSymbol> containingScope;
+        internal override PackagesScope ContainingPackagesScope { get; }
+        private readonly LexicalScope containingScope;
         private readonly bool isGlobalScope;
-        private readonly FixedDictionary<TypeName, FixedSet<TSymbol>> symbolsInScope;
-        private readonly FixedDictionary<TypeName, FixedSet<TSymbol>> symbolsInNestedScopes;
+        private readonly FixedDictionary<TypeName, FixedSet<IPromise<Symbol>>> symbolsInScope;
+        private readonly FixedDictionary<TypeName, FixedSet<IPromise<Symbol>>> symbolsInNestedScopes;
 
-        internal NestedScope(
-            LexicalScope<TSymbol> containingScope,
+        public static NestedScope Create(
+            LexicalScope containingScope,
+            FixedDictionary<TypeName, FixedSet<IPromise<Symbol>>> symbolsInScope,
+            FixedDictionary<TypeName, FixedSet<IPromise<Symbol>>>? symbolsInNestedScopes = null)
+        {
+            return new NestedScope(containingScope, false, symbolsInScope,
+                symbolsInNestedScopes ?? FixedDictionary<TypeName, FixedSet<IPromise<Symbol>>>.Empty);
+        }
+
+        public static NestedScope CreateGlobal(
+            LexicalScope containingScope,
+            FixedDictionary<TypeName, FixedSet<IPromise<Symbol>>> symbolsInScope,
+            FixedDictionary<TypeName, FixedSet<IPromise<Symbol>>>? symbolsInNestedScopes)
+        {
+            return new NestedScope(containingScope, true, symbolsInScope,
+                symbolsInNestedScopes ?? FixedDictionary<TypeName, FixedSet<IPromise<Symbol>>>.Empty);
+        }
+
+        private NestedScope(
+            LexicalScope containingScope,
             bool isGlobalScope,
-            FixedDictionary<TypeName, FixedSet<TSymbol>> symbolsInScope,
-            FixedDictionary<TypeName, FixedSet<TSymbol>> symbolsInNestedScopes)
+            FixedDictionary<TypeName, FixedSet<IPromise<Symbol>>> symbolsInScope,
+            FixedDictionary<TypeName, FixedSet<IPromise<Symbol>>> symbolsInNestedScopes)
         {
             ContainingPackagesScope = containingScope.ContainingPackagesScope;
             this.containingScope = containingScope;
@@ -25,37 +45,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.LexicalScopes
             this.symbolsInNestedScopes = symbolsInNestedScopes;
         }
 
-        public override IEnumerable<TSymbol> LookupInGlobalScope(TypeName name)
+        public override IEnumerable<IPromise<Symbol>> LookupInGlobalScope(TypeName name)
         {
             return !isGlobalScope ? containingScope.LookupInGlobalScope(name) : Lookup(name, false);
         }
 
-        public override IEnumerable<TSymbol> Lookup(TypeName name, bool includeNested = true)
+        public override IEnumerable<IPromise<Symbol>> Lookup(TypeName name, bool includeNested = true)
         {
             if (symbolsInScope.TryGetValue(name, out var symbols)) return symbols;
             if (includeNested && symbolsInNestedScopes.TryGetValue(name, out symbols)) return symbols;
             return containingScope.Lookup(name, includeNested);
-        }
-    }
-
-    public static class NestedScope
-    {
-        public static NestedScope<TSymbol> Create<TSymbol>(
-            LexicalScope<TSymbol> containingScope,
-            FixedDictionary<TypeName, FixedSet<TSymbol>> symbolsInScope,
-            FixedDictionary<TypeName, FixedSet<TSymbol>>? symbolsInNestedScopes = null)
-        {
-            return new NestedScope<TSymbol>(containingScope, false, symbolsInScope,
-                symbolsInNestedScopes ?? FixedDictionary<TypeName, FixedSet<TSymbol>>.Empty);
-        }
-
-        public static NestedScope<TSymbol> CreateGlobal<TSymbol>(
-            LexicalScope<TSymbol> containingScope,
-            FixedDictionary<TypeName, FixedSet<TSymbol>> symbolsInScope,
-            FixedDictionary<TypeName, FixedSet<TSymbol>>? symbolsInNestedScopes)
-        {
-            return new NestedScope<TSymbol>(containingScope, true, symbolsInScope,
-                symbolsInNestedScopes ?? FixedDictionary<TypeName, FixedSet<TSymbol>>.Empty);
         }
     }
 }

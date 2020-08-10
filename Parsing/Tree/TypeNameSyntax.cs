@@ -18,8 +18,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     /// </summary>
     internal class TypeNameSyntax : TypeSyntax, ITypeNameSyntax
     {
-        private LexicalScope<IPromise<Symbol>>? containingLexicalScope;
-        public LexicalScope<IPromise<Symbol>> ContainingLexicalScope
+        private LexicalScope? containingLexicalScope;
+        public LexicalScope ContainingLexicalScope
         {
             [DebuggerStepThrough]
             get => containingLexicalScope

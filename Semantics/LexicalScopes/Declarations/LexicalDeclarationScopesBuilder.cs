@@ -68,16 +68,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes.Declarations
 
             return nsSymbols.ToFixedDictionary(ns => ns.Name);
         }
-        private static PackagesScope<IPromise<Symbol>> BuildPackagesScope(PackageSyntax package)
+        private static PackagesScope BuildPackagesScope(PackageSyntax package)
         {
             var packageAliases = package.References
                                   .ToDictionary(p => p.Key, p => p.Value.Symbol)
                                   .ToFixedDictionary();
-            return new PackagesScope<IPromise<Symbol>>(package.Symbol, packageAliases);
+            return new PackagesScope(package.Symbol, packageAliases);
         }
 
-        private static NestedScope<IPromise<Symbol>> BuildGlobalScope(
-            PackagesScope<IPromise<Symbol>> packagesScope,
+        private static NestedScope BuildGlobalScope(
+            PackagesScope packagesScope,
             Namespace globalNamespace)
         {
             var allPackagesGlobalScope = NestedScope.CreateGlobal(packagesScope, globalNamespace.Symbols, globalNamespace.NestedSymbols);
