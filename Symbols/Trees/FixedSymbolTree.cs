@@ -22,6 +22,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols.Trees
             this.symbolChildren = symbolChildren;
         }
 
+        public override bool Contains(Symbol symbol)
+        {
+            return symbolChildren.ContainsKey(symbol);
+        }
+
         public override IEnumerable<Symbol> Children(Symbol symbol)
         {
             if (symbol.Package != Package)

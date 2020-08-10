@@ -10,11 +10,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
         typeof(MethodSymbol))]
     public abstract class FunctionOrMethodSymbol : InvokableSymbol
     {
+        public new Symbol ContainingSymbol { get; }
         public new Name Name { get; }
         public DataType ReturnDataType { get; }
         protected FunctionOrMethodSymbol(Symbol containingSymbol, Name name, FixedList<DataType> parameterDataTypes, DataType returnDataType)
             : base(containingSymbol, name, parameterDataTypes)
         {
+            ContainingSymbol = containingSymbol;
             Name = name;
             ReturnDataType = returnDataType;
         }

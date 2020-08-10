@@ -124,6 +124,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             diagnostics.ThrowIfFatalErrors();
 
 #if DEBUG
+            new SymbolValidator(symbolTree).Walk(entities);
             new TypeFulfillmentValidator().Walk(entities);
             new ReferencedSymbolValidator().Walk(entities);
             new TypeKnownValidator().Walk(entities);

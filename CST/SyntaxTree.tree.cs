@@ -165,6 +165,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IAssociatedFunctionDeclarationSyntax : IMemberDeclarationSyntax, IConcreteCallableDeclarationSyntax
     {
         new Name Name { get; }
+        new Promise<FunctionSymbol> Symbol { get; }
         ITypeSyntax? ReturnType { get; }
         Promise<DataType> ReturnDataType { get; }
     }
@@ -201,6 +202,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface IConstructorDeclarationSyntax : IMemberDeclarationSyntax, IConcreteCallableDeclarationSyntax
     {
+        new Promise<ConstructorSymbol> Symbol { get; }
         ISelfParameterSyntax ImplicitSelfParameter { get; }
     }
 

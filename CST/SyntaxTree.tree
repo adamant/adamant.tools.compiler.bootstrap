@@ -41,14 +41,14 @@ NamespaceDeclaration: NonMemberDeclaration, Declaration = IsGlobalQualified:bool
 NonMemberEntityDeclaration: EntityDeclaration, NonMemberDeclaration = Name;
 ClassDeclaration: NonMemberEntityDeclaration = MutableModifier:IMutableKeywordToken? Name Symbol:Promise<ObjectTypeSymbol> Members:MemberDeclaration*;
 FunctionDeclaration: NonMemberEntityDeclaration, ConcreteCallableDeclaration = IsExternalFunction:bool Name Symbol:Promise<FunctionSymbol> ReturnType:Type? ReturnDataType:Promise<DataType>;
-AssociatedFunctionDeclaration: MemberDeclaration, ConcreteCallableDeclaration = Name ReturnType:Type? ReturnDataType:Promise<DataType>;
+AssociatedFunctionDeclaration: MemberDeclaration, ConcreteCallableDeclaration = Name Symbol:Promise<FunctionSymbol> ReturnType:Type? ReturnDataType:Promise<DataType>;
 
 // Member Declarations
 MemberDeclaration: EntityDeclaration = DeclaringClass:ClassDeclaration;
 MethodDeclaration: MemberDeclaration, CallableDeclaration = Name Symbol:Promise<MethodSymbol> SelfParameter ReturnType:Type? ReturnDataType:Promise<DataType>;
 AbstractMethodDeclaration: MethodDeclaration;
 ConcreteMethodDeclaration: MethodDeclaration, ConcreteCallableDeclaration;
-ConstructorDeclaration: MemberDeclaration, ConcreteCallableDeclaration = ImplicitSelfParameter:SelfParameter;
+ConstructorDeclaration: MemberDeclaration, ConcreteCallableDeclaration = Symbol:Promise<ConstructorSymbol> ImplicitSelfParameter:SelfParameter;
 FieldDeclaration: MemberDeclaration = Name Symbol:Promise<FieldSymbol> TypeSyntax:Type;
 
 // Parameters

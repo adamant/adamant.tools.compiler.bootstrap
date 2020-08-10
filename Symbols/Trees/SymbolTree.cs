@@ -11,6 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols.Trees
     public abstract class SymbolTree
     {
         public abstract IEnumerable<Symbol> Symbols { get; }
+        public abstract bool Contains(Symbol symbol);
         public abstract IEnumerable<Symbol> Children(Symbol symbol);
     }
 }

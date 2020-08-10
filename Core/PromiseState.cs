@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.Core
 {
-    internal enum PromiseState
+    public enum PromiseState
     {
         Pending = 0,
         InProgress,

@@ -116,7 +116,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             // Only "static" names are in scope. Other names must use `self.`
             var symbols = @class.Members.OfType<IAssociatedFunctionDeclarationSyntax>()
                                 .GroupBy(m => m.Name, m => m.Symbol)
-                                .ToFixedDictionary(e => (TypeName)e.Key, e => e.ToFixedSet());
+                                .ToFixedDictionary(e => (TypeName)e.Key, e => e.ToFixedSet<IPromise<Symbol>>());
 
             return NestedScope.Create(containingScope, symbols);
         }

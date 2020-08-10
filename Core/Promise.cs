@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
     [DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
     public class Promise<T> : IPromise<T>
     {
-        private PromiseState State { get; set; }
+        public PromiseState State { get; private set; }
         private T value = default!;
 
         public Promise()

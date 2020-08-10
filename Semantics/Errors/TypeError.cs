@@ -1,7 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
-using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using UnaryOperator = Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.UnaryOperator;
 
@@ -62,10 +61,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
                 "Expression must be of type `bool`");
         }
 
-        public static Diagnostic CircularDefinition(CodeFile file, TextSpan span, MaybeQualifiedName typeDeclarationName)
+        public static Diagnostic CircularDefinition(CodeFile file, TextSpan span, IClassDeclarationSyntax @class)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3006,
-                $"Declaration of type `{typeDeclarationName}` is part of a circular definition");
+                $"Declaration of type `{@class.ContainingNamespaceName}.{@class.Name}` is part of a circular definition");
         }
 
         public static Diagnostic CannotConvert(CodeFile file, ISyntax expression, DataType ofType, DataType toType)

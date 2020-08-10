@@ -11,17 +11,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
     /// </summary>
     public sealed class FunctionSymbol : FunctionOrMethodSymbol
     {
-        public new NamespaceOrPackageSymbol ContainingSymbol { get; }
         public new Name Name { get; }
 
         public FunctionSymbol(
-            NamespaceOrPackageSymbol containingSymbol,
+            Symbol containingSymbol,
             Name name,
             FixedList<DataType> parameterDataTypes,
             DataType returnDataType)
             : base(containingSymbol, name, parameterDataTypes, returnDataType)
         {
-            ContainingSymbol = containingSymbol;
             Name = name;
         }
 
