@@ -476,9 +476,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     {
     }
 
-    public partial interface INameExpressionSyntax : IAssignableExpressionSyntax, IHasContainingScope
+    public partial interface INameExpressionSyntax : IAssignableExpressionSyntax, IHasContainingScope, IHasContainingLexicalScope
     {
-        SimpleName Name { get; }
+        Name? Name { get; }
+        SimpleName SimpleName { get; }
+        Promise<BindingSymbol?> ReferencedSymbol { get; }
     }
 
     public partial interface INewObjectExpressionSyntax : IExpressionSyntax

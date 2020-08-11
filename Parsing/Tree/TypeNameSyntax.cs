@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.LexicalScopes;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Scopes;
@@ -52,10 +54,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name = name;
         }
 
-        public IEnumerable<IPromise<Symbol>> LookupInContainingScope()
+        public IEnumerable<IPromise<TypeSymbol>> LookupInContainingScope()
         {
             if (containingLexicalScope != null)
-                return containingLexicalScope.Lookup(Name);
+                return containingLexicalScope.Lookup(Name).Select(p => p.As<TypeSymbol>()).NotNull();
 
             throw new InvalidOperationException($"Can't lookup type name without {nameof(ContainingLexicalScope)}");
         }

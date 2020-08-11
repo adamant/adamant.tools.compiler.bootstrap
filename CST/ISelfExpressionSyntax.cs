@@ -7,6 +7,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface ISelfExpressionSyntax
     {
         [DisallowNull] IBindingMetadata? ReferencedBinding { get; set; }
-        FixedList<IMetadata> LookupInContainingScope();
+        FixedList<IMetadata> LookupMetadataInContainingScope();
     }
 }

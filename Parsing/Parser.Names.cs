@@ -1,4 +1,3 @@
-using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Parsing.Tree;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
@@ -9,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         private NameSyntax ParseName()
         {
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
-            var name = new SimpleName(identifier.Value);
+            var name = identifier.Value;
             return new NameSyntax(identifier.Span, name);
         }
     }

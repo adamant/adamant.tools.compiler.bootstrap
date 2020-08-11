@@ -100,7 +100,7 @@ LiteralExpression: Expression;
 LoopExpression: Expression = Block:BlockExpression;
 MethodInvocationExpression: InvocationExpression = MethodNameSyntax:CallableName;
 MoveExpression: Expression;
-NameExpression: AssignableExpression, IHasContainingScope = Name:SimpleName;
+NameExpression: AssignableExpression, IHasContainingScope, IHasContainingLexicalScope = Name? SimpleName ReferencedSymbol:Promise<BindingSymbol?>;
 NewObjectExpression: Expression = Type:TypeName ConstructorName:CallableName? Arguments:Argument*;
 NextExpression: Expression;
 NoneLiteralExpression: LiteralExpression;

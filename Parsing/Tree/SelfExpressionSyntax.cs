@@ -50,7 +50,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             IsImplicit = isImplicit;
         }
 
-        public FixedList<IMetadata> LookupInContainingScope()
+        public FixedList<IMetadata> LookupMetadataInContainingScope()
         {
             if (ContainingScope != null) return ContainingScope.LookupMetadata(SpecialNames.Self);
             throw new InvalidOperationException();

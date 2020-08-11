@@ -536,7 +536,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     var contextType = InferType(ref exp.ContextExpression, !isSelfField);
                     var contextSymbol = exp.Field.ContainingScope.Assigned().GetMetadataForType(contextType);
                     var member = exp.Field;
-                    var memberSymbols = contextSymbol.Lookup(member.Name).OfType<IBindingMetadata>().ToFixedList();
+                    var memberSymbols = contextSymbol.Lookup(member.SimpleName).OfType<IBindingMetadata>().ToFixedList();
                     var type = AssignReferencedSymbolAndType(member, memberSymbols);
                     // In many contexts, variable names are implicitly shared
                     if (implicitShare) type = InsertImplicitShareIfNeeded(ref expression, type);
@@ -695,7 +695,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     var contextType = InferType(ref exp.ContextExpression, !isSelfField);
                     var contextSymbol = exp.Field.ContainingScope.Assigned().GetMetadataForType(contextType);
                     var member = exp.Field;
-                    var memberSymbols = contextSymbol.Lookup(member.Name).OfType<IBindingMetadata>().ToFixedList();
+                    var memberSymbols = contextSymbol.Lookup(member.SimpleName).OfType<IBindingMetadata>().ToFixedList();
                     var type = AssignReferencedSymbolAndType(member, memberSymbols);
                     exp.Field.Semantics ??= ExpressionSemantics.CreateReference;
                     exp.Semantics = exp.Field.Semantics.Assigned();
@@ -800,8 +800,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 // if implicit self
                 memberAccess.ContextExpression is null
                     ? null
-                    : MethodContextAsName(memberAccess.ContextExpression)?.Qualify(memberAccess.Field.Name),
-                INameExpressionSyntax nameExpression => nameExpression.Name,
+                    : MethodContextAsName(memberAccess.ContextExpression)?.Qualify(memberAccess.Field.SimpleName),
+                INameExpressionSyntax nameExpression => nameExpression.SimpleName,
                 _ => null
             };
         }
@@ -896,42 +896,62 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         public DataType InferNameType(INameExpressionSyntax nameExpression)
         {
-            var metadatas = nameExpression.LookupInContainingScope();
-            DataType type;
-            switch (metadatas.Count)
+            nameExpression.ReferencedSymbol.BeginFulfilling();
+            if (nameExpression.Name is null)
+            {
+                // Name unknown, no error
+                nameExpression.ReferencedBinding = UnknownMetadata.Instance;
+                nameExpression.ReferencedSymbol.Fulfill(null);
+                return nameExpression.DataType = DataType.Unknown;
+            }
+
+            DataType? type = null;
+            var symbols = nameExpression.LookupInContainingScope().ToFixedList();
+            switch (symbols.Count)
             {
                 case 0:
                     diagnostics.Add(NameBindingError.CouldNotBindName(file, nameExpression.Span));
-                    nameExpression.ReferencedBinding = UnknownMetadata.Instance;
+                    nameExpression.ReferencedSymbol.Fulfill(null);
                     type = DataType.Unknown;
                     break;
                 case 1:
-                {
-                    var metadata = metadatas.Single();
-                    switch (metadata)
-                    {
-                        case IBindingMetadata binding:
-                        {
-                            nameExpression.ReferencedBinding = binding;
-                            type = binding.DataType;
-                        }
-                        break;
-                        default:
-                            diagnostics.Add(NameBindingError.CouldNotBindName(file, nameExpression.Span));
-                            nameExpression.ReferencedBinding = UnknownMetadata.Instance;
-                            type = DataType.Unknown;
-                            break;
-                    }
+                    //var symbol = symbols.Single().Result;
+                    // TODO fulfill the ReferencedSymbol once we have a correct symbol
+                    //nameExpression.ReferencedSymbol.Fulfill(symbol);
+                    //type = symbol.DataType;
                     break;
-                }
                 default:
                     diagnostics.Add(NameBindingError.AmbiguousName(file, nameExpression.Span));
-                    nameExpression.ReferencedBinding = UnknownMetadata.Instance;
+                    nameExpression.ReferencedSymbol.Fulfill(null);
                     type = DataType.Unknown;
                     break;
             }
 
-            return nameExpression.DataType = type;
+            // TODO remove old metadata code
+            var metadatas = nameExpression.LookupMetadataInContainingScope();
+            switch (metadatas.Count)
+            {
+                case 0:
+                    nameExpression.ReferencedBinding = UnknownMetadata.Instance;
+                    break;
+                case 1:
+                {
+                    var metadata = metadatas.Single();
+                    nameExpression.ReferencedBinding = metadata switch
+                    {
+                        IBindingMetadata binding => binding,
+                        _ => UnknownMetadata.Instance
+                    };
+                    // TODO remove once symbol determines this
+                    type = nameExpression.ReferencedBinding.DataType;
+                    break;
+                }
+                default:
+                    nameExpression.ReferencedBinding = UnknownMetadata.Instance;
+                    break;
+            }
+
+            return nameExpression.DataType = type!;
         }
 
         private DataType InferSelfType(ISelfExpressionSyntax selfExpression)
@@ -977,7 +997,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     throw new InvalidOperationException("Invalid containing symbol for body");
             }
 
-            var metadatas = selfExpression.LookupInContainingScope();
+            // TODO remove old metadata code
+            var metadatas = selfExpression.LookupMetadataInContainingScope();
             switch (metadatas.Count)
             {
                 case 0:

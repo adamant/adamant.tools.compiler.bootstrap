@@ -5,7 +5,6 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
-using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
 
@@ -36,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                     return null;
                 case ITypeNameSyntax typeName:
                 {
-                    var symbolPromises = typeName.LookupInContainingScope().Select(p => p.As<TypeSymbol>()).NotNull().ToFixedList();
+                    var symbolPromises = typeName.LookupInContainingScope().ToFixedList();
                     typeName.ReferencedSymbol.BeginFulfilling();
                     switch (symbolPromises.Count)
                     {

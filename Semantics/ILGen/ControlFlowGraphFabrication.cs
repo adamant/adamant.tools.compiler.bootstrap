@@ -605,7 +605,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IFieldAccessExpressionSyntax exp:
                 {
                     var context = ConvertToOperand(exp.ContextExpression);
-                    currentBlock!.Add(new FieldAccessInstruction(resultPlace, context, exp.Field.Name, exp.Span, CurrentScope));
+                    currentBlock!.Add(new FieldAccessInstruction(resultPlace, context, exp.Field.SimpleName, exp.Span, CurrentScope));
                 }
                 break;
                 case IFunctionInvocationExpressionSyntax exp:
@@ -726,7 +726,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IFieldAccessExpressionSyntax exp:
                 {
                     var context = ConvertToOperand(exp.ContextExpression);
-                    return new FieldPlace(context, exp.Field.Name, exp.Span);
+                    return new FieldPlace(context, exp.Field.SimpleName, exp.Span);
                 }
                 case ISelfExpressionSyntax exp:
                     return new VariablePlace(Variable.Self, exp.Span);

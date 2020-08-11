@@ -7,12 +7,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     /// Used within the parse to represent a name that we aren't yet sure whether
     /// it is a name expression, or a callable name
     /// </summary>
-    internal struct NameSyntax
+    internal readonly struct NameSyntax
     {
         public TextSpan Span { get; }
-        public SimpleName Name { get; }
+        public Name Name { get; }
 
-        public NameSyntax(TextSpan span, SimpleName name)
+        public NameSyntax(TextSpan span, Name name)
         {
             Span = span;
             Name = name;
@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public CallableNameSyntax ToCallable()
         {
-            return new CallableNameSyntax(Span, Name);
+            return new CallableNameSyntax(Span, Name.ToSimpleName());
         }
     }
 }

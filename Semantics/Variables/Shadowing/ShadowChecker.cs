@@ -62,7 +62,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Shadowing
                 case INameExpressionSyntax nameExpression:
                 {
                     // This checks for cases where a variable was shadowed, but then used later
-                    if (!bindingScope.Lookup(nameExpression.Name, out var binding)) return;
+                    if (!bindingScope.Lookup(nameExpression.SimpleName, out var binding)) return;
                     if (binding.WasShadowedBy.Any())
                         diagnostics.Add(SemanticError.CantShadow(callableDeclaration.File, binding.WasShadowedBy[^1].NameSpan, nameExpression.Span));
                     return;

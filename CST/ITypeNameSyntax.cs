@@ -6,6 +6,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
     public partial interface ITypeNameSyntax
     {
-        IEnumerable<IPromise<Symbol>> LookupInContainingScope();
+        IEnumerable<IPromise<TypeSymbol>> LookupInContainingScope();
     }
 }
