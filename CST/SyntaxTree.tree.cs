@@ -482,7 +482,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface INewObjectExpressionSyntax : IExpressionSyntax
     {
-        ITypeNameSyntax TypeSyntax { get; }
+        ITypeNameSyntax Type { get; }
         ICallableNameSyntax? ConstructorName { get; }
         FixedList<IArgumentSyntax> Arguments { get; }
     }

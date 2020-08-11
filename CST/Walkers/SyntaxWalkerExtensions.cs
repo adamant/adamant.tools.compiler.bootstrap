@@ -143,7 +143,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Walkers
                     walker.Walk(assignmentExpression.RightOperand, arg);
                     break;
                 case INewObjectExpressionSyntax newObjectExpression:
-                    walker.Walk(newObjectExpression.TypeSyntax, arg);
+                    walker.Walk(newObjectExpression.Type, arg);
                     walker.Walk(newObjectExpression.ConstructorName, arg);
                     foreach (var argument in newObjectExpression.Arguments)
                         walker.Walk(argument, arg);

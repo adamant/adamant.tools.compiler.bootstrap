@@ -101,7 +101,7 @@ LoopExpression: Expression = Block:BlockExpression;
 MethodInvocationExpression: InvocationExpression = MethodNameSyntax:CallableName;
 MoveExpression: Expression;
 NameExpression: AssignableExpression, IHasContainingScope = Name:SimpleName;
-NewObjectExpression: Expression = TypeSyntax:TypeName ConstructorName:CallableName? Arguments:Argument*;
+NewObjectExpression: Expression = Type:TypeName ConstructorName:CallableName? Arguments:Argument*;
 NextExpression: Expression;
 NoneLiteralExpression: LiteralExpression;
 ReturnExpression: Expression;

@@ -428,7 +428,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 {
                     var argumentTypes = exp.Arguments.Select(argument => InferType(ref argument.Expression)).ToFixedList();
                     // TODO handle named constructors here
-                    var constructingType = typeAnalyzer.Evaluate(exp.TypeSyntax);
+                    var constructingType = typeAnalyzer.Evaluate(exp.Type);
                     if (!constructingType.IsKnown)
                     {
                         diagnostics.Add(NameBindingError.CouldNotBindConstructor(file, exp.Span));
@@ -436,7 +436,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         return exp.DataType  = DataType.Unknown;
                     }
                     var constructedType = (ObjectType)constructingType;
-                    var typeSymbol = exp.TypeSyntax.ContainingScope.Assigned().GetMetadataForType(constructedType);
+                    var typeSymbol = exp.Type.ContainingScope.Assigned().GetMetadataForType(constructedType);
                     var constructors = typeSymbol.ChildMetadata[SpecialNames.New].OfType<IFunctionMetadata>().ToFixedList();
                     constructors = ResolveOverload(constructors, argumentTypes);
                     switch (constructors.Count)

@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         /// though, the type name is the name of the unnamed constructor. Thus,
         /// this expression's type could be either an object type, or member type.
         /// </summary>
-        public ITypeNameSyntax TypeSyntax { get; }
+        public ITypeNameSyntax Type { get; }
 
         public ICallableNameSyntax? ConstructorName { get; }
 
@@ -42,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IArgumentSyntax> arguments)
             : base(span, ExpressionSemantics.Acquire)
         {
-            TypeSyntax = typeSyntax;
+            Type = typeSyntax;
             Arguments = arguments;
             ConstructorName = constructorName;
         }
@@ -52,7 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public override string ToString()
         {
             var name = ConstructorName != null ? "."+ConstructorName : "";
-            return $"new {TypeSyntax}{name}({string.Join(", ", Arguments)})";
+            return $"new {Type}{name}({string.Join(", ", Arguments)})";
         }
     }
 }
