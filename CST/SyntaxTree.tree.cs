@@ -279,6 +279,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface ITypeNameSyntax : ITypeSyntax, IHasContainingScope, IHasContainingLexicalScope
     {
         TypeName Name { get; }
+        Promise<TypeSymbol?> ReferencedSymbol { get; }
     }
 
     public partial interface IOptionalTypeSyntax : ITypeSyntax
@@ -502,6 +503,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface ISelfExpressionSyntax : IExpressionSyntax, IHasContainingScope
     {
         bool IsImplicit { get; }
+        Promise<SelfParameterSymbol?> ReferencedSymbol { get; }
     }
 
     public partial interface IShareExpressionSyntax : IExpressionSyntax

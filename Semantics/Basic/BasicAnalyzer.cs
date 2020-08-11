@@ -35,8 +35,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         public void Check(FixedList<IEntityDeclarationSyntax> entities)
         {
-            // Function bodies are checked after signatures to ensure that all function invocation
-            // expressions can get a type for the invoked function.
             foreach (var entity in entities)
                 ResolveBodyTypes(entity);
         }

@@ -31,20 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             }
         }
         public TypeName Name { get; }
-
-        private IPromise<TypeSymbol?>? referencedSymbol;
-        public IPromise<TypeSymbol?> ReferencedSymbol
-        {
-            get => referencedSymbol
-                   ?? throw new InvalidOperationException($"{nameof(ReferencedSymbol)} not yet assigned");
-            set
-            {
-                if (referencedSymbol != null)
-                    throw new InvalidOperationException($"Can't set {nameof(ReferencedSymbol)} repeatedly");
-
-                referencedSymbol = value;
-            }
-        }
+        public Promise<TypeSymbol?> ReferencedSymbol { get; } = new Promise<TypeSymbol?>();
 
         private Scope? containingScope;
         [DisallowNull]

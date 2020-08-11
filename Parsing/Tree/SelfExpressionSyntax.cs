@@ -7,6 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Scopes;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
@@ -14,6 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal class SelfExpressionSyntax : ExpressionSyntax, ISelfExpressionSyntax
     {
         public bool IsImplicit { get; }
+        public Promise<SelfParameterSymbol?> ReferencedSymbol { get; } = new Promise<SelfParameterSymbol?>();
 
         private IBindingMetadata? referencedSymbol;
         [DisallowNull]

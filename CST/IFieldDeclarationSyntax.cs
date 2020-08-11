@@ -5,7 +5,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
     public partial interface IFieldDeclarationSyntax : IBindingMetadata
     {
-        //new DataTypePromise DataType { get; }
         [DisallowNull] ref IExpressionSyntax? Initializer { get; }
     }
 }

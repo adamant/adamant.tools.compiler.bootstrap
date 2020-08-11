@@ -37,22 +37,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                 case ITypeNameSyntax typeName:
                 {
                     var symbolPromises = typeName.LookupInContainingScope().Select(p => p.As<TypeSymbol>()).NotNull().ToFixedList();
+                    typeName.ReferencedSymbol.BeginFulfilling();
                     switch (symbolPromises.Count)
                     {
                         case 0:
                             diagnostics.Add(NameBindingError.CouldNotBindName(file, typeName.Span));
-                            typeName.ReferencedSymbol = Promise.ForValue(default(TypeSymbol));
+                            typeName.ReferencedSymbol.Fulfill(null);
                             typeName.NamedType = DataType.Unknown;
                             break;
                         case 1:
-                            var symbolPromise = symbolPromises.Single();
-                            typeName.ReferencedSymbol = symbolPromise;
-                            var symbol = symbolPromise.Result;
+                            var symbol = symbolPromises.Single().Result;
+                            typeName.ReferencedSymbol.Fulfill(symbol);
                             typeName.NamedType = symbol.DeclaresDataType;
                             break;
                         default:
                             diagnostics.Add(NameBindingError.AmbiguousName(file, typeName.Span));
-                            typeName.ReferencedSymbol = Promise.ForValue(default(TypeSymbol));
+                            typeName.ReferencedSymbol.Fulfill(null);
                             typeName.NamedType = DataType.Unknown;
                             break;
                     }

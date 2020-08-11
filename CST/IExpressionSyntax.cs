@@ -4,7 +4,6 @@ using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
-
     public partial interface IExpressionSyntax
     {
         [DisallowNull] DataType? DataType { get; set; }

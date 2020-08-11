@@ -65,7 +65,7 @@ CanReachAnnotation: ReachabilityAnnotation = CanReach:NameExpression*;
 
 // Types
 Type;
-TypeName: Type, IHasContainingScope, IHasContainingLexicalScope = Name:'TypeName';
+TypeName: Type, IHasContainingScope, IHasContainingLexicalScope = Name:'TypeName' ReferencedSymbol:Promise<TypeSymbol?>;
 OptionalType: Type = Referent:Type;
 CapabilityType: Type = ReferentType:Type Capability:ReferenceCapability;
 
@@ -105,7 +105,7 @@ NewObjectExpression: Expression = Type:TypeName ConstructorName:CallableName? Ar
 NextExpression: Expression;
 NoneLiteralExpression: LiteralExpression;
 ReturnExpression: Expression;
-SelfExpression: Expression, IHasContainingScope = IsImplicit:bool;
+SelfExpression: Expression, IHasContainingScope = IsImplicit:bool ReferencedSymbol:Promise<SelfParameterSymbol?>;
 ShareExpression: Expression = SharedSymbol:IBindingMetadata;
 StringLiteralExpression: LiteralExpression = Value:string;
 UnaryOperatorExpression: Expression = Fixity:UnaryOperatorFixity Operator:UnaryOperator;
