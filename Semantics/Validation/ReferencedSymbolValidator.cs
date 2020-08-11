@@ -41,10 +41,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                     WalkChildren(callableName);
                     AssertHasReferencedSymbol(callableName, callableName.ReferencedFunctionMetadata);
                     return;
-                case ITypeNameSyntax typeName:
-                    WalkChildren(typeName);
-                    AssertHasReferencedSymbol(typeName, typeName.ReferencedMetadata);
-                    return;
                 case IMoveExpressionSyntax move:
                     WalkChildren(move);
                     AssertHasReferencedSymbol(move, move.MovedSymbol);

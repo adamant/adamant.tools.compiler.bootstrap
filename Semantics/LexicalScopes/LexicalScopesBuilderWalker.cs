@@ -93,9 +93,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     containingScope = BuildVariableScope(containingScope, foreachExpression.VariableName, foreachExpression.Symbol);
                     Walk(foreachExpression.Block, containingScope);
                     return;
-                case IExpressionSyntax _:
-                    // Skip and don't walk children
-                    return;
             }
 
             WalkChildren(syntax, containingScope);

@@ -11,6 +11,7 @@ using Adamant.Tools.Compiler.Bootstrap.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
 using DataType = Adamant.Tools.Compiler.Bootstrap.Types.DataType;
@@ -31,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         private readonly ITypeMetadata? stringSymbol;
         private readonly Diagnostics diagnostics;
         private readonly DataType? returnType;
-        private readonly BasicTypeAnalyzer typeAnalyzer;
+        private readonly TypeResolver typeAnalyzer;
 
         public BasicBodyAnalyzer(
             CodeFile file,
@@ -43,7 +44,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             this.stringSymbol = stringSymbol;
             this.diagnostics = diagnostics;
             this.returnType = returnType;
-            typeAnalyzer = new BasicTypeAnalyzer(file, diagnostics);
+            typeAnalyzer = new TypeResolver(file, diagnostics);
         }
 
         public void ResolveTypes(IBodySyntax body)
