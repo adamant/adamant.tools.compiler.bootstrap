@@ -393,7 +393,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     {
         Name VariableName { get; }
         Promise<VariableSymbol> Symbol { get; }
-        ITypeSyntax? TypeSyntax { get; }
+        ITypeSyntax? Type { get; }
         IBlockExpressionSyntax Block { get; }
     }
 

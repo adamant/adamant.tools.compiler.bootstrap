@@ -467,7 +467,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
                 case IForeachExpressionSyntax exp:
                 {
-                    var declaredType = typeAnalyzer.Evaluate(exp.TypeSyntax);
+                    var declaredType = typeAnalyzer.Evaluate(exp.Type);
                     var expressionType = CheckForeachInType(declaredType, ref exp.InExpression);
                     exp.VariableType =  declaredType ?? expressionType;
                     // TODO check the break types

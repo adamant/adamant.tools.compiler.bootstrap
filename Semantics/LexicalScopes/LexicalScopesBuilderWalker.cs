@@ -88,7 +88,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     }
                     return;
                 case IForeachExpressionSyntax foreachExpression:
-                    Walk(foreachExpression.TypeSyntax, containingScope);
+                    Walk(foreachExpression.Type, containingScope);
                     Walk(foreachExpression.InExpression, containingScope);
                     containingScope = BuildVariableScope(containingScope, foreachExpression.VariableName, foreachExpression.Symbol);
                     Walk(foreachExpression.Block, containingScope);

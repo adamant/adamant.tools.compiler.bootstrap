@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public Promise<VariableSymbol> Symbol { get; } = new Promise<VariableSymbol>();
         public bool VariableIsLiveAfterAssignment { get; set; } = true;
 
-        public ITypeSyntax? TypeSyntax { get; }
+        public ITypeSyntax? Type { get; }
         DataType IBindingMetadata.DataType => VariableType ?? throw new InvalidOperationException();
 
         private DataType? variableType;
@@ -55,7 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             VariableName = variableName;
             this.inExpression = inExpression;
             Block = block;
-            TypeSyntax = typeSyntax;
+            Type = typeSyntax;
         }
 
         protected override OperatorPrecedence ExpressionPrecedence => OperatorPrecedence.Min;
@@ -63,7 +63,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public override string ToString()
         {
             var binding = IsMutableBinding ? "var " : "";
-            return $"foreach {binding}{VariableName}: {TypeSyntax} in {InExpression} {Block}";
+            return $"foreach {binding}{VariableName}: {Type} in {InExpression} {Block}";
         }
     }
 }

@@ -170,7 +170,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Walkers
                     walker.Walk(breakExpression.Value, arg);
                     break;
                 case IForeachExpressionSyntax foreachExpression:
-                    walker.Walk(foreachExpression.TypeSyntax, arg);
+                    walker.Walk(foreachExpression.Type, arg);
                     walker.Walk(foreachExpression.InExpression, arg);
                     walker.Walk(foreachExpression.Block, arg);
                     break;

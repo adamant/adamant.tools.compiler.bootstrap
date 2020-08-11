@@ -73,7 +73,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
                     Walk(constructor.Body, containingScope);
                     return;
                 case IForeachExpressionSyntax foreachExpression:
-                    Walk(foreachExpression.TypeSyntax, containingScope);
+                    Walk(foreachExpression.Type, containingScope);
                     Walk(foreachExpression.InExpression, containingScope);
                     containingScope = new NestedScope(containingScope, foreachExpression);
                     Walk(foreachExpression.Block, containingScope);
