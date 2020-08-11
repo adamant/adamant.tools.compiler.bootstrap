@@ -54,12 +54,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             new LexicalScopesBuilder().BuildFor(package);
 
             // TODO remove old scopes builder
-            var stringSymbol = BuildScopes(package, diagnostics);
+            var stringMetadata = BuildScopes(package, diagnostics);
 
             // Make a list of all the entity declarations (i.e. not namespaces)
             var entities = GetEntityDeclarations(package);
 
-            CheckSemantics(entities, stringSymbol, diagnostics, package.SymbolTreeBuilder);
+            CheckSemantics(entities, stringMetadata, diagnostics, package.SymbolTreeBuilder);
 
             // If there are errors from the semantics phase, don't continue on
             diagnostics.ThrowIfFatalErrors();
@@ -84,12 +84,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         {
             var scopesBuilder = new PackageScopesBuilder(package, diagnostics);
             scopesBuilder.BuildScopesFor(package);
-            var stringSymbol = scopesBuilder.GlobalScope.LookupMetadataInGlobalScope(new SimpleName("String"))
+            var stringMetadata = scopesBuilder.GlobalScope.LookupMetadataInGlobalScope(new SimpleName("String"))
                                             .OfType<ITypeMetadata>().FirstOrDefault();
-            if (stringSymbol is null)
+            if (stringMetadata is null)
                 // TODO we are assuming there is a compilation unit. This should be generated against the package itself
                 diagnostics.Add(SemanticError.NoStringTypeDefined(package.CompilationUnits[0].CodeFile));
-            return stringSymbol;
+            return stringMetadata;
         }
 
         private static FixedList<IEntityDeclarationSyntax> GetEntityDeclarations(
@@ -102,7 +102,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
         private static void CheckSemantics(
             FixedList<IEntityDeclarationSyntax> entities,
-            ITypeMetadata? stringSymbol,
+            ITypeMetadata? stringMetadata,
             Diagnostics diagnostics,
             SymbolTreeBuilder symbolTree)
         {
@@ -110,7 +110,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             new EntitySymbolBuilder(diagnostics, symbolTree).Build(entities);
 
             // Basic Analysis includes: Name Binding, Type Checking, Constant Folding
-            new BasicAnalyzer(stringSymbol, diagnostics).Check(entities);
+            new BasicAnalyzer(stringMetadata, diagnostics).Check(entities);
 
             // If there are errors from the basic analysis phase, don't continue on
             diagnostics.ThrowIfFatalErrors();

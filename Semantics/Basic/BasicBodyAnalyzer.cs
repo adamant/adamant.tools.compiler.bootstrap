@@ -29,19 +29,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
     public class BasicBodyAnalyzer
     {
         private readonly CodeFile file;
-        private readonly ITypeMetadata? stringSymbol;
+        private readonly ITypeMetadata? stringMetadata;
         private readonly Diagnostics diagnostics;
         private readonly DataType? returnType;
         private readonly TypeResolver typeAnalyzer;
 
         public BasicBodyAnalyzer(
             CodeFile file,
-            ITypeMetadata? stringSymbol,
+            ITypeMetadata? stringMetadata,
             Diagnostics diagnostics,
             DataType? returnType = null)
         {
             this.file = file;
-            this.stringSymbol = stringSymbol;
+            this.stringMetadata = stringMetadata;
             this.diagnostics = diagnostics;
             this.returnType = returnType;
             typeAnalyzer = new TypeResolver(file, diagnostics);
@@ -311,7 +311,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IIntegerLiteralExpressionSyntax exp:
                     return exp.DataType = new IntegerConstantType(exp.Value);
                 case IStringLiteralExpressionSyntax exp:
-                    return exp.DataType = stringSymbol?.DeclaresDataType ?? DataType.Unknown;
+                    return exp.DataType = stringMetadata?.DeclaresDataType ?? DataType.Unknown;
                 case IBoolLiteralExpressionSyntax exp:
                     return exp.DataType = exp.Value ? DataType.True : DataType.False;
                 case IBinaryOperatorExpressionSyntax binaryOperatorExpression:
