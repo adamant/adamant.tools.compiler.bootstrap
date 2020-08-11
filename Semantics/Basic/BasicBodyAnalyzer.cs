@@ -12,6 +12,8 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
+using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
 using DataType = Adamant.Tools.Compiler.Bootstrap.Types.DataType;
@@ -29,18 +31,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
     public class BasicBodyAnalyzer
     {
         private readonly CodeFile file;
+        private readonly Symbol containingSymbol;
+        private readonly SymbolTreeBuilder symbolTree;
         private readonly ITypeMetadata? stringMetadata;
         private readonly Diagnostics diagnostics;
         private readonly DataType? returnType;
         private readonly TypeResolver typeAnalyzer;
 
         public BasicBodyAnalyzer(
-            CodeFile file,
+            IEntityDeclarationSyntax containingDeclaration,
+            SymbolTreeBuilder symbolTree,
             ITypeMetadata? stringMetadata,
             Diagnostics diagnostics,
             DataType? returnType = null)
         {
-            this.file = file;
+            file = containingDeclaration.File;
+            containingSymbol = containingDeclaration.Symbol.Result;
+            this.symbolTree = symbolTree;
             this.stringMetadata = stringMetadata;
             this.diagnostics = diagnostics;
             this.returnType = returnType;
@@ -929,41 +936,65 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private DataType InferSelfType(ISelfExpressionSyntax selfExpression)
         {
-            var metadatas = selfExpression.LookupInContainingScope();
             DataType type;
-            switch (metadatas.Count)
+            selfExpression.ReferencedSymbol.BeginFulfilling();
+            switch (containingSymbol)
             {
-                case 0:
+                default:
+                    throw ExhaustiveMatch.Failed(containingSymbol);
+                case MethodSymbol _:
+                case ConstructorSymbol _:
+                    var symbols = symbolTree.Children(containingSymbol).OfType<SelfParameterSymbol>().ToList();
+                    switch (symbols.Count)
+                    {
+                        case 0:
+                            diagnostics.Add(NameBindingError.CouldNotBindName(file, selfExpression.Span));
+                            type = DataType.Unknown;
+                            selfExpression.ReferencedSymbol.Fulfill(null);
+                            break;
+                        case 1:
+                            var symbol = symbols.Single();
+                            type = symbol.DataType;
+                            selfExpression.ReferencedSymbol.Fulfill(symbol);
+                            break;
+                        default:
+                            diagnostics.Add(NameBindingError.AmbiguousName(file, selfExpression.Span));
+                            type = DataType.Unknown;
+                            selfExpression.ReferencedSymbol.Fulfill(null);
+                            break;
+                    }
+                    break;
+                case FunctionSymbol _:
                     diagnostics.Add(selfExpression.IsImplicit
                         ? SemanticError.ImplicitSelfOutsideMethod(file, selfExpression.Span)
                         : SemanticError.SelfOutsideMethod(file, selfExpression.Span));
-                    selfExpression.ReferencedBinding = UnknownMetadata.Instance;
                     type = DataType.Unknown;
+                    selfExpression.ReferencedSymbol.Fulfill(null);
+                    break;
+                case NamespaceOrPackageSymbol _:
+                case BindingSymbol _:
+                case TypeSymbol _:
+                    throw new InvalidOperationException("Invalid containing symbol for body");
+            }
+
+            var metadatas = selfExpression.LookupInContainingScope();
+            switch (metadatas.Count)
+            {
+                case 0:
+                    selfExpression.ReferencedBinding = UnknownMetadata.Instance;
                     break;
                 case 1:
                 {
                     var metadata = metadatas.Single();
-                    switch (metadata)
+                    selfExpression.ReferencedBinding = metadata switch
                     {
-                        case IBindingMetadata binding:
-                        {
-                            selfExpression.ReferencedBinding = binding;
-                            type = binding.DataType;
-                        }
-                        break;
-                        default:
-                            diagnostics.Add(NameBindingError.CouldNotBindName(file, selfExpression.Span));
-                            selfExpression.ReferencedBinding = UnknownMetadata.Instance;
-                            type = DataType.Unknown;
-                            break;
-                    }
-
+                        IBindingMetadata binding => binding,
+                        _ => UnknownMetadata.Instance
+                    };
                     break;
                 }
                 default:
-                    diagnostics.Add(NameBindingError.AmbiguousName(file, selfExpression.Span));
                     selfExpression.ReferencedBinding = UnknownMetadata.Instance;
-                    type = DataType.Unknown;
                     break;
             }
 

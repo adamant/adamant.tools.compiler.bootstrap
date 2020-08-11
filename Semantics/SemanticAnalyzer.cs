@@ -110,7 +110,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             new EntitySymbolBuilder(diagnostics, symbolTree).Build(entities);
 
             // Basic Analysis includes: Name Binding, Type Checking, Constant Folding
-            new BasicAnalyzer(stringMetadata, diagnostics).Check(entities);
+            new BasicAnalyzer(symbolTree, stringMetadata, diagnostics).Check(entities);
 
             // If there are errors from the basic analysis phase, don't continue on
             diagnostics.ThrowIfFatalErrors();

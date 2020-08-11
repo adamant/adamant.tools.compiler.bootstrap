@@ -2,6 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata;
+using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
@@ -24,11 +25,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
     /// </summary>
     public class BasicAnalyzer
     {
+        private readonly SymbolTreeBuilder symbolTree;
         private readonly ITypeMetadata? stringMetadata;
         private readonly Diagnostics diagnostics;
 
-        public BasicAnalyzer(ITypeMetadata? stringMetadata, Diagnostics diagnostics)
+        public BasicAnalyzer(SymbolTreeBuilder symbolTree, ITypeMetadata? stringMetadata, Diagnostics diagnostics)
         {
+            this.symbolTree = symbolTree;
             this.stringMetadata = stringMetadata;
             this.diagnostics = diagnostics;
         }
@@ -47,21 +50,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     throw ExhaustiveMatch.Failed(declaration);
                 case IFunctionDeclarationSyntax function:
                 {
-                    var resolver = new BasicBodyAnalyzer(function.File, stringMetadata, diagnostics,
+                    var resolver = new BasicBodyAnalyzer(function, symbolTree, stringMetadata, diagnostics,
                         function.ReturnDataType.Result);
                     resolver.ResolveTypes(function.Body);
                     break;
                 }
                 case IAssociatedFunctionDeclarationSyntax associatedFunction:
                 {
-                    var resolver = new BasicBodyAnalyzer(associatedFunction.File, stringMetadata, diagnostics,
+                    var resolver = new BasicBodyAnalyzer(associatedFunction, symbolTree, stringMetadata, diagnostics,
                         associatedFunction.ReturnDataType.Result);
                     resolver.ResolveTypes(associatedFunction.Body);
                     break;
                 }
                 case IConcreteMethodDeclarationSyntax method:
                 {
-                    var resolver = new BasicBodyAnalyzer(method.File, stringMetadata, diagnostics, method.ReturnDataType.Result);
+                    var resolver = new BasicBodyAnalyzer(method, symbolTree, stringMetadata, diagnostics, method.ReturnDataType.Result);
                     resolver.ResolveTypes(method.Body);
                     break;
                 }
@@ -71,13 +74,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IFieldDeclarationSyntax field:
                     if (field.Initializer != null)
                     {
-                        var resolver = new BasicBodyAnalyzer(field.File, stringMetadata, diagnostics);
+                        var resolver = new BasicBodyAnalyzer(field, symbolTree, stringMetadata, diagnostics);
                         resolver.CheckType(ref field.Initializer, field.Symbol.Result.DataType);
                     }
                     break;
                 case IConstructorDeclarationSyntax constructor:
                 {
-                    var resolver = new BasicBodyAnalyzer(constructor.File, stringMetadata, diagnostics, constructor.ImplicitSelfParameter.Symbol.Result.DataType);
+                    var resolver = new BasicBodyAnalyzer(constructor, symbolTree, stringMetadata, diagnostics, constructor.ImplicitSelfParameter.Symbol.Result.DataType);
                     resolver.ResolveTypes(constructor.Body);
                     break;
                 }
