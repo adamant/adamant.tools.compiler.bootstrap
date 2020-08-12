@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                     return;
                 case IShareExpressionSyntax share:
                     WalkChildren(share);
-                    AssertHasReferencedSymbol(share, share.SharedSymbol);
+                    AssertHasReferencedSymbol(share, share.SharedMetadata);
                     return;
             }
 

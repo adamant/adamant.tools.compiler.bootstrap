@@ -140,7 +140,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     _ = referenceType ?? throw new InvalidOperationException("Can't share value type");
 
                     // The referent should be a name or `self` so we don't need to evaluate it
-                    var variable = graph.TryGetVariableFor(exp.SharedSymbol.Assigned());
+                    var variable = graph.TryGetVariableFor(exp.SharedMetadata.Assigned());
                     if (!(variable is null))
                     {
                         var temp = TempValue.For(graph, exp);

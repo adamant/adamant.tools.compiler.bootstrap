@@ -20,13 +20,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
         }
 
         [DisallowNull]
-        public IBindingMetadata SharedSymbol { [DebuggerStepThrough] get; }
+        public IBindingMetadata SharedMetadata { [DebuggerStepThrough] get; }
 
         public ImplicitShareExpressionSyntax(IExpressionSyntax referent, DataType type, IBindingMetadata sharedSymbol)
             : base(type, referent.Span, ExpressionSemantics.Share)
         {
             this.referent = referent;
-            this.SharedSymbol = sharedSymbol ?? throw new ArgumentNullException(nameof(sharedSymbol));
+            this.SharedMetadata = sharedSymbol ?? throw new ArgumentNullException(nameof(sharedSymbol));
         }
 
         public override string ToString()
