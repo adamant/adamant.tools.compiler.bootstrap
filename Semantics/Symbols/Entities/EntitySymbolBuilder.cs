@@ -108,10 +108,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
             BuildParameterSymbols(symbol, associatedFunction.Parameters, parameterTypes);
         }
 
-        private void BuildFieldSymbol(IFieldDeclarationSyntax field)
+        private FieldSymbol BuildFieldSymbol(IFieldDeclarationSyntax field)
         {
             if (field.Symbol.State == PromiseState.Fulfilled)
-                return;
+                return field.Symbol.Result;
 
             field.Symbol.BeginFulfilling();
             var resolver = new TypeResolver(field.File, diagnostics);
@@ -119,6 +119,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
             var symbol = new FieldSymbol(field.DeclaringClass.Symbol.Result, field.Name, field.IsMutableBinding, type);
             field.Symbol.Fulfill(symbol);
             symbolTree.Add(symbol);
+            return symbol;
         }
 
         private void BuildFunctionSymbol(IFunctionDeclarationSyntax function)
@@ -176,18 +177,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
                         var field = (declaringClass ?? throw new InvalidOperationException("Field parameter outside of class declaration"))
                                     .Members.OfType<IFieldDeclarationSyntax>()
                                     .SingleOrDefault(f => f.Name == fieldParameter.Name);
+                        fieldParameter.ReferencedSymbol.BeginFulfilling();
                         if (field is null)
                         {
                             fieldParameter.SetIsMutableBinding(false);
                             types.Add(DataType.Unknown);
+                            fieldParameter.ReferencedSymbol.Fulfill(null);
                             // TODO report an error
                             throw new NotImplementedException();
                         }
                         else
                         {
                             fieldParameter.SetIsMutableBinding(field.IsMutableBinding);
-                            BuildFieldSymbol(field);
-                            types.Add(field.Symbol.Result.DataType);
+                            var fieldSymbol = BuildFieldSymbol(field);
+                            fieldParameter.ReferencedSymbol.Fulfill(fieldSymbol);
+                            types.Add(fieldSymbol.DataType);
                         }
                     }
                     break;
@@ -203,10 +207,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
         {
             foreach (var (param, type) in parameters.Zip(types))
             {
-                param.Symbol.BeginFulfilling();
-                var symbol = new VariableSymbol(containingSymbol, param.Name, 0, param.IsMutableBinding, type);
-                param.Symbol.Fulfill(symbol);
-                symbolTree.Add(symbol);
+                switch (param)
+                {
+                    default:
+                        throw ExhaustiveMatch.Failed(param);
+                    case INamedParameterSyntax namedParam:
+                    {
+                        namedParam.Symbol.BeginFulfilling();
+                        var symbol = new VariableSymbol(containingSymbol, namedParam.Name,
+                            namedParam.DeclarationNumber.Result, namedParam.IsMutableBinding, type);
+                        namedParam.Symbol.Fulfill(symbol);
+                        symbolTree.Add(symbol);
+                    }
+                    break;
+                    case IFieldParameterSyntax _:
+                        // Referenced field already assigned
+                        break;
+                }
             }
         }
 

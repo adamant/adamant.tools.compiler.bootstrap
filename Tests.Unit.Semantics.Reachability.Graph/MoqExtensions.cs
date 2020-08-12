@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Reachability.Gra
 {
     public static class MoqExtensions
     {
-        public static IReturnsResult<TMock> Returns<TMock>(this IReturns<TMock, Promise<DataType>> mock, DataType type)
+        public static IReturnsResult<TMock> Returns<TMock>(this IReturns<TMock, IPromise<DataType>> mock, DataType type)
             where TMock : class
         {
             var promise = new Promise<DataType>();

@@ -4,7 +4,6 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
@@ -16,13 +15,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public Name? Name { get; }
-        IPromise<BindingSymbol> IParameterSyntax.Symbol => SymbolPromise;
-        protected abstract IPromise<BindingSymbol> SymbolPromise { get; }
+        public abstract IPromise<DataType> DataType { get; }
         public bool Unused { get; }
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        DataType IBindingMetadata.DataType => SymbolPromise.Result.DataType;
+        DataType IBindingMetadata.DataType => DataType.Result;
 
         protected ParameterSyntax(TextSpan span, MaybeQualifiedName fullName, Name? name)
             : base(span)

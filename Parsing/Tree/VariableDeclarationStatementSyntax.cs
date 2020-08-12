@@ -15,6 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public bool IsMutableBinding { [DebuggerStepThrough] get; }
         public MaybeQualifiedName FullName { [DebuggerStepThrough] get; }
         public Name Name { get; }
+        public Promise<int?> DeclarationNumber { get; } = new Promise<int?>();
         public Promise<VariableSymbol> Symbol { get; } = new Promise<VariableSymbol>();
         public TextSpan NameSpan { [DebuggerStepThrough] get; }
         public ITypeSyntax? Type { [DebuggerStepThrough] get; }

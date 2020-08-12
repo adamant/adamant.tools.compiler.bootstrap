@@ -164,7 +164,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             IEnumerable<IConstructorParameterSyntax> parameters,
             LexicalScope containingScope)
         {
-            var symbols = parameters.GroupBy(p => p.Name, p => p.Symbol)
+            var symbols = parameters.OfType<INamedParameterSyntax>()
+                                    .GroupBy(p => p.Name, p => p.Symbol)
                                     .ToFixedDictionary(e => (TypeName)e.Key, e => e.ToFixedSet<IPromise<Symbol>>());
             return NestedScope.Create(containingScope, symbols);
         }

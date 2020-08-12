@@ -11,12 +11,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
     {
         public new InvokableSymbol ContainingSymbol { get; }
         public new Name Name { get; }
-        public int DeclarationNumber { get; }
+        public int? DeclarationNumber { get; }
 
         public VariableSymbol(
             InvokableSymbol containingSymbol,
             Name name,
-            int declarationNumber,
+            int? declarationNumber,
             bool isMutableBinding,
             DataType dataType)
             : base(containingSymbol, name, isMutableBinding, dataType)
@@ -46,7 +46,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
         public override string ToString()
         {
             var mutable = IsMutableBinding ? "mut " : "";
-            return $"{ContainingSymbol} {{{mutable}{Name}: {DataType}}}";
+            var declarationNumber = DeclarationNumber is null ? "" : "#" + DeclarationNumber;
+            return $"{ContainingSymbol} {{{mutable}{Name}{declarationNumber}: {DataType}}}";
         }
     }
 }

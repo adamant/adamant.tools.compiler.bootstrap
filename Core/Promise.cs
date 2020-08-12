@@ -53,8 +53,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
         public T Fulfill(T value)
         {
             Requires.That(nameof(State), State == PromiseState.InProgress, "must be in progress is " + State);
+            this.value = value;
             State = PromiseState.Fulfilled;
-            this.value = value ?? throw new ArgumentNullException(nameof(value));
             return value;
         }
 
@@ -69,12 +69,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
             }
         }
 
-        public IPromise<S>? As<S>()
+        public IPromise<TSub>? As<TSub>()
         {
-            if (this is IPromise<S> promise) return promise;
-            if (State == PromiseState.Fulfilled
-                && value is S convertedValue)
-                return new Promise<S>(convertedValue);
+            if (this is IPromise<TSub> convertedPromise) return convertedPromise;
+            if (State == PromiseState.Fulfilled && Result is TSub convertedValue)
+                return new Promise<TSub>(convertedValue);
             return null;
         }
 

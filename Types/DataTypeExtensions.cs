@@ -63,7 +63,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         }
 
         [DebuggerHidden]
-        public static DataType Known(this Promise<DataType> promise)
+        public static DataType Known(this IPromise<DataType> promise)
         {
             var type = promise.Result;
             if (!type.IsKnown) throw new InvalidOperationException($"Type {type} not known");

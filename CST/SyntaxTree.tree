@@ -52,11 +52,11 @@ ConstructorDeclaration: MemberDeclaration, ConcreteCallableDeclaration = Symbol:
 FieldDeclaration: MemberDeclaration = Name Symbol:Promise<FieldSymbol> Type;
 
 // Parameters
-Parameter: 'ISyntax', IBindingMetadata = Name? Symbol:IPromise<BindingSymbol> Unused:bool;
-ConstructorParameter: Parameter = Name Symbol:Promise<VariableSymbol>;
-NamedParameter: Parameter, ConstructorParameter = Type DefaultValue:Expression?;
+Parameter: 'ISyntax', IBindingMetadata = Name? DataType:IPromise<DataType> Unused:bool;
+ConstructorParameter: Parameter = Name;
+NamedParameter: Parameter, ConstructorParameter = DeclarationNumber:Promise<int?> Type Symbol:Promise<VariableSymbol> DefaultValue:Expression?;
 SelfParameter: Parameter = MutableSelf:bool Symbol:Promise<SelfParameterSymbol>;
-FieldParameter: Parameter, ConstructorParameter = DefaultValue:Expression?;
+FieldParameter: Parameter, ConstructorParameter = ReferencedSymbol:Promise<FieldSymbol?> DefaultValue:Expression?;
 
 // Annotations
 ReachabilityAnnotation;
@@ -73,7 +73,7 @@ CapabilityType: Type = ReferentType:Type Capability:ReferenceCapability;
 Statement;
 ResultStatement: Statement, BlockOrResult;
 BodyStatement: Statement;
-VariableDeclarationStatement: BodyStatement, IBindingMetadata = NameSpan:TextSpan Name Symbol:Promise<VariableSymbol> Type? InferMutableType:bool;
+VariableDeclarationStatement: BodyStatement, IBindingMetadata = NameSpan:TextSpan Name DeclarationNumber:Promise<int?> Symbol:Promise<VariableSymbol> Type? InferMutableType:bool;
 ExpressionStatement: BodyStatement;
 
 // Expressions
@@ -86,7 +86,7 @@ BoolLiteralExpression: LiteralExpression = Value:bool;
 BorrowExpression: Expression;
 BreakExpression: Expression;
 FieldAccessExpression: AssignableExpression = AccessOperator Field:NameExpression;
-ForeachExpression: Expression = VariableName:Name Symbol:Promise<VariableSymbol> Type? Block:BlockExpression;
+ForeachExpression: Expression = VariableName:Name DeclarationNumber:Promise<int?> Symbol:Promise<VariableSymbol> Type? Block:BlockExpression;
 FunctionInvocationExpression: InvocationExpression = FunctionNameSyntax:CallableName;
 IfExpression: Expression, ElseClause = ThenBlock:BlockOrResult ElseClause?;
 ImplicitConversionExpression: Expression = Expression DataType;

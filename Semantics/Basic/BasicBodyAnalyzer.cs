@@ -16,8 +16,6 @@ using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
-using DataType = Adamant.Tools.Compiler.Bootstrap.Types.DataType;
-using UnaryOperator = Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.UnaryOperator;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 {
@@ -90,6 +88,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private void ResolveTypes(IVariableDeclarationStatementSyntax variableDeclaration)
         {
+            variableDeclaration.Symbol.BeginFulfilling();
             DataType type;
             if (variableDeclaration.Type != null)
             {
@@ -114,6 +113,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             }
 
             variableDeclaration.DataType = type;
+            var symbol = new VariableSymbol((InvokableSymbol)containingSymbol, variableDeclaration.Name,
+                variableDeclaration.DeclarationNumber.Result, variableDeclaration.IsMutableBinding, type);
+            variableDeclaration.Symbol.Fulfill(symbol);
+            symbolTree.Add(symbol);
         }
 
         /// <summary>
@@ -475,9 +478,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
                 case IForeachExpressionSyntax exp:
                 {
+                    exp.Symbol.BeginFulfilling();
                     var declaredType = typeAnalyzer.Evaluate(exp.Type);
                     var expressionType = CheckForeachInType(declaredType, ref exp.InExpression);
                     exp.VariableType =  declaredType ?? expressionType;
+                    var symbol = new VariableSymbol((InvokableSymbol)containingSymbol, exp.VariableName,
+                        exp.DeclarationNumber.Result, exp.IsMutableBinding, exp.VariableType);
+                    exp.Symbol.Fulfill(symbol);
+                    symbolTree.Add(symbol);
+
                     // TODO check the break types
                     InferBlockType(exp.Block);
                     // TODO assign correct type to the expression
@@ -915,10 +924,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     type = DataType.Unknown;
                     break;
                 case 1:
-                    //var symbol = symbols.Single().Result;
+                    var symbol = symbols.Single().Result;
                     // TODO fulfill the ReferencedSymbol once we have a correct symbol
-                    //nameExpression.ReferencedSymbol.Fulfill(symbol);
-                    //type = symbol.DataType;
+                    nameExpression.ReferencedSymbol.Fulfill(symbol);
+                    type = symbol.DataType;
                     break;
                 default:
                     diagnostics.Add(NameBindingError.AmbiguousName(file, nameExpression.Span));

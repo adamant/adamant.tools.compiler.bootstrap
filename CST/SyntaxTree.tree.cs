@@ -221,7 +221,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IParameterSyntax : ISyntax, IBindingMetadata
     {
         Name? Name { get; }
-        IPromise<BindingSymbol> Symbol { get; }
+        IPromise<DataType> DataType { get; }
         bool Unused { get; }
     }
 
@@ -231,23 +231,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IConstructorParameterSyntax : IParameterSyntax
     {
         new Name Name { get; }
-        new Promise<VariableSymbol> Symbol { get; }
     }
 
     public partial interface INamedParameterSyntax : IParameterSyntax, IConstructorParameterSyntax
     {
+        Promise<int?> DeclarationNumber { get; }
         ITypeSyntax Type { get; }
+        Promise<VariableSymbol> Symbol { get; }
         IExpressionSyntax? DefaultValue { get; }
     }
 
     public partial interface ISelfParameterSyntax : IParameterSyntax
     {
         bool MutableSelf { get; }
-        new Promise<SelfParameterSymbol> Symbol { get; }
+        Promise<SelfParameterSymbol> Symbol { get; }
     }
 
     public partial interface IFieldParameterSyntax : IParameterSyntax, IConstructorParameterSyntax
     {
+        Promise<FieldSymbol?> ReferencedSymbol { get; }
         IExpressionSyntax? DefaultValue { get; }
     }
 
@@ -315,6 +317,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     {
         TextSpan NameSpan { get; }
         Name Name { get; }
+        Promise<int?> DeclarationNumber { get; }
         Promise<VariableSymbol> Symbol { get; }
         ITypeSyntax? Type { get; }
         bool InferMutableType { get; }
@@ -393,6 +396,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IForeachExpressionSyntax : IExpressionSyntax
     {
         Name VariableName { get; }
+        Promise<int?> DeclarationNumber { get; }
         Promise<VariableSymbol> Symbol { get; }
         ITypeSyntax? Type { get; }
         IBlockExpressionSyntax Block { get; }

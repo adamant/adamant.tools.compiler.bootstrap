@@ -16,6 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         MaybeQualifiedName IMetadata.FullName => FullVariableName;
         private MaybeQualifiedName FullVariableName { get; }
         public Name VariableName { get; }
+        public Promise<int?> DeclarationNumber { get; } = new Promise<int?>();
         public Promise<VariableSymbol> Symbol { get; } = new Promise<VariableSymbol>();
         public bool VariableIsLiveAfterAssignment { get; set; } = true;
 

@@ -8,6 +8,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.DeclarationNumbers;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes;
@@ -106,6 +107,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             Diagnostics diagnostics,
             SymbolTreeBuilder symbolTree)
         {
+            DeclarationNumberAssigner.AssignIn(entities);
+
             // Resolve symbols for the entities
             new EntitySymbolBuilder(diagnostics, symbolTree).Build(entities);
 
