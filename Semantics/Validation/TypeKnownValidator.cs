@@ -54,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                     return;
                 case IVariableDeclarationStatementSyntax variableDeclaration:
                     WalkChildren(variableDeclaration);
-                    variableDeclaration.DataType.Known();
+                    variableDeclaration.Symbol.Result.DataType.Known();
                     return;
                 case IForeachExpressionSyntax foreachExpression:
                     WalkChildren(foreachExpression);

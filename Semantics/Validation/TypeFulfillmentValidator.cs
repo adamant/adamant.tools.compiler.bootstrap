@@ -40,10 +40,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                     WalkChildren(type);
                     type.NamedType.Assigned();
                     return;
-                case IVariableDeclarationStatementSyntax variableDeclaration:
-                    WalkChildren(variableDeclaration);
-                    variableDeclaration.DataType.Assigned();
-                    return;
                 case IForeachExpressionSyntax foreachExpression:
                     WalkChildren(foreachExpression);
                     foreachExpression.DataType.Assigned();

@@ -119,7 +119,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IVariableDeclarationStatementSyntax variableDeclaration:
                 {
                     var variable = graph.AddVariable(variableDeclaration.IsMutableBinding,
-                        variableDeclaration.DataType.Assigned(),
+                        variableDeclaration.Symbol.Result.DataType,
                         CurrentScope, variableDeclaration.FullName.UnqualifiedName);
                     if (variableDeclaration.Initializer != null)
                     {

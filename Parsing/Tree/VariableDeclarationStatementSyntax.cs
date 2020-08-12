@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -20,23 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public TextSpan NameSpan { [DebuggerStepThrough] get; }
         public ITypeSyntax? Type { [DebuggerStepThrough] get; }
         public bool InferMutableType { [DebuggerStepThrough] get; }
-
-        DataType IBindingMetadata.DataType => DataType ?? throw new InvalidOperationException();
-        private DataType? type;
-        [DisallowNull]
-        public DataType? DataType
-        {
-            [DebuggerStepThrough]
-            get => type;
-            set
-            {
-                if (type != null)
-                    throw new InvalidOperationException("Can't set type repeatedly");
-                type = value ?? throw new ArgumentNullException(nameof(DataType),
-                           "Can't set type to null");
-            }
-        }
-
+        DataType IBindingMetadata.DataType => Symbol.Result.DataType;
         [SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification =
             "Can't be readonly because a reference to it is exposed")]
         private IExpressionSyntax? initializer;

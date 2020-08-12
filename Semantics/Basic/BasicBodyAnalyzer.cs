@@ -112,7 +112,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     diagnostics.Add(TypeError.CannotConvert(file, variableDeclaration.Initializer, initializerType, type));
             }
 
-            variableDeclaration.DataType = type;
             var symbol = new VariableSymbol((InvokableSymbol)containingSymbol, variableDeclaration.Name,
                 variableDeclaration.DeclarationNumber.Result, variableDeclaration.IsMutableBinding, type);
             variableDeclaration.Symbol.Fulfill(symbol);
