@@ -59,7 +59,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                 case IForeachExpressionSyntax foreachExpression:
                     WalkChildren(foreachExpression);
                     foreachExpression.DataType.Known();
-                    foreachExpression.VariableType.Known();
+                    foreachExpression.Symbol.Result.DataType.Known();
                     return;
                 case IExpressionSyntax expression:
                     WalkChildren(expression);

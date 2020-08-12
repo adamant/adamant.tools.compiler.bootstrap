@@ -47,7 +47,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                 case IForeachExpressionSyntax foreachExpression:
                     WalkChildren(foreachExpression);
                     foreachExpression.DataType.Assigned();
-                    foreachExpression.VariableType.Assigned();
                     return;
                 case IExpressionSyntax expression:
                     WalkChildren(expression);

@@ -1,5 +1,3 @@
-using System;
-using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Metadata;
@@ -21,21 +19,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public bool VariableIsLiveAfterAssignment { get; set; } = true;
 
         public ITypeSyntax? Type { get; }
-        DataType IBindingMetadata.DataType => VariableType ?? throw new InvalidOperationException();
+        DataType IBindingMetadata.DataType => Symbol.Result.DataType;
 
-        private DataType? variableType;
-        [DisallowNull]
-        public DataType? VariableType
-        {
-            get => variableType;
-            set
-            {
-                if (variableType != null)
-                    throw new InvalidOperationException("Can't set VariableType repeatedly");
-                variableType =
-                    value ?? throw new ArgumentNullException(nameof(value), "Can't set VariableType to null");
-            }
-        }
         private IExpressionSyntax inExpression;
         public ref IExpressionSyntax InExpression => ref inExpression;
 

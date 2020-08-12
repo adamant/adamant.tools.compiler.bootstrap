@@ -268,7 +268,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     var startExpression = inExpression.LeftOperand;
                     var endExpression = inExpression.RightOperand;
 
-                    var variableType = (IntegerType)exp.VariableType.Assigned();
+                    var variableType = (IntegerType)exp.Symbol.Result.DataType;
                     var loopVariable = graph.AddVariable(exp.IsMutableBinding,
                                             variableType, CurrentScope, exp.FullName.UnqualifiedName);
                     var loopVariablePlace = loopVariable.Place(exp.Span);

@@ -481,9 +481,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     exp.Symbol.BeginFulfilling();
                     var declaredType = typeAnalyzer.Evaluate(exp.Type);
                     var expressionType = CheckForeachInType(declaredType, ref exp.InExpression);
-                    exp.VariableType =  declaredType ?? expressionType;
+                    var variableType = declaredType ?? expressionType;
                     var symbol = new VariableSymbol((InvokableSymbol)containingSymbol, exp.VariableName,
-                        exp.DeclarationNumber.Result, exp.IsMutableBinding, exp.VariableType);
+                        exp.DeclarationNumber.Result, exp.IsMutableBinding, variableType);
                     exp.Symbol.Fulfill(symbol);
                     symbolTree.Add(symbol);
 
