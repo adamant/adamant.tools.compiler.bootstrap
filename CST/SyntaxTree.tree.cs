@@ -391,6 +391,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     {
         AccessOperator AccessOperator { get; }
         INameExpressionSyntax Field { get; }
+        IPromise<FieldSymbol?> ReferencedSymbol { get; }
     }
 
     public partial interface IForeachExpressionSyntax : IExpressionSyntax

@@ -46,12 +46,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                 case IVariableDeclarationStatementSyntax syn:
                     CheckSymbol(syn, syn.Symbol);
                     break;
-                    //case INameExpressionSyntax syn:
-                    //    CheckReferencedSymbol(syn, syn.ReferencedSymbol);
-                    //    break;
-                    //case ITypeNameSyntax syn:
-                    //    CheckReferencedSymbol(syn, syn.ReferencedSymbol);
-                    //    break;
+                case INameExpressionSyntax syn:
+                    CheckReferencedSymbol(syn, syn.ReferencedSymbol);
+                    break;
+                case ITypeNameSyntax syn:
+                    CheckReferencedSymbol(syn, syn.ReferencedSymbol);
+                    break;
             }
 
             WalkChildren(syntax);

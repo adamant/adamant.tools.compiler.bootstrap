@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Metadata;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
@@ -14,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public AccessOperator AccessOperator { get; }
         public INameExpressionSyntax Field { get; }
-
+        public IPromise<FieldSymbol?> ReferencedSymbol => Field.ReferencedSymbol.Select(s => (FieldSymbol?)s);
         [DisallowNull]
         public IBindingMetadata? ReferencedBinding
         {

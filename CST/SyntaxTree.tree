@@ -85,7 +85,7 @@ BlockExpression: Expression, BlockOrResult, BodyOrBlock;
 BoolLiteralExpression: LiteralExpression = Value:bool;
 BorrowExpression: Expression;
 BreakExpression: Expression;
-FieldAccessExpression: AssignableExpression = AccessOperator Field:NameExpression;
+FieldAccessExpression: AssignableExpression = AccessOperator Field:NameExpression ReferencedSymbol:IPromise<FieldSymbol?>;
 ForeachExpression: Expression = VariableName:Name DeclarationNumber:Promise<int?> Symbol:Promise<VariableSymbol> Type? Block:BlockExpression;
 FunctionInvocationExpression: InvocationExpression = FunctionNameSyntax:CallableName;
 IfExpression: Expression, ElseClause = ThenBlock:BlockOrResult ElseClause?;

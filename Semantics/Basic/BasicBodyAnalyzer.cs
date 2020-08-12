@@ -5,6 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
+using Adamant.Tools.Compiler.Bootstrap.LexicalScopes;
 using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Scopes;
@@ -542,10 +543,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     // Don't wrap the self expression in a share expression for field access
                     var isSelfField = exp.ContextExpression is ISelfExpressionSyntax;
                     var contextType = InferType(ref exp.ContextExpression, !isSelfField);
-                    var contextSymbol = exp.Field.ContainingScope.Assigned().GetMetadataForType(contextType);
                     var member = exp.Field;
-                    var memberSymbols = contextSymbol.Lookup(member.SimpleName).OfType<IBindingMetadata>().ToFixedList();
-                    var type = AssignReferencedSymbolAndType(member, memberSymbols);
+                    var contextSymbol = LookupSymbolForContextType(member.ContainingLexicalScope, contextType);
+                    var contextMetadata = member.ContainingScope.Assigned().GetMetadataForType(contextType);
+                    // TODO Deal with no context symbol
+                    var memberSymbols = symbolTree.Children(contextSymbol!).OfType<FieldSymbol>()
+                                                  .Where(s => s.Name == member.Name).ToFixedList();
+                    var memberMetadata = contextMetadata.Lookup(member.SimpleName).OfType<IBindingMetadata>().ToFixedList();
+                    var type = AssignReferencedSymbolAndType(member, memberMetadata, memberSymbols);
                     // In many contexts, variable names are implicitly shared
                     if (implicitShare) type = InsertImplicitShareIfNeeded(ref expression, type);
 
@@ -608,20 +613,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             // Value types aren't shared
             if (!(type is ReferenceType referenceType)) return type;
 
-            IBindingMetadata referencedSymbol;
+            IBindingMetadata referencedMetadata;
             switch (expression)
             {
                 case INameExpressionSyntax exp:
                     exp.Semantics = ExpressionSemantics.Share;
-                    referencedSymbol = exp.ReferencedBinding.Assigned();
+                    referencedMetadata = exp.ReferencedBinding.Assigned();
                     break;
                 case ISelfExpressionSyntax exp:
-                    referencedSymbol = exp.ReferencedBinding.Assigned();
+                    referencedMetadata = exp.ReferencedBinding.Assigned();
                     break;
                 case IFieldAccessExpressionSyntax exp:
                     exp.Field.Semantics = ExpressionSemantics.Share;
                     exp.Semantics = ExpressionSemantics.Share;
-                    referencedSymbol = exp.ReferencedBinding.Assigned();
+                    referencedMetadata = exp.ReferencedBinding.Assigned();
                     break;
                 default:
                     // implicit share isn't needed around other expressions
@@ -630,7 +635,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
             type = referenceType.To(ReferenceCapability.Shared);
 
-            expression = new ImplicitShareExpressionSyntax(expression, type, referencedSymbol);
+            expression = new ImplicitShareExpressionSyntax(expression, type, referencedMetadata);
 
             return type;
         }
@@ -640,15 +645,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             // Value types aren't shared
             if (!(type is ReferenceType referenceType)) return;
 
-            IBindingMetadata referencedSymbol;
+            IBindingMetadata referencedMetadata;
             switch (expression)
             {
                 case INameExpressionSyntax exp:
                     exp.Semantics = ExpressionSemantics.Borrow;
-                    referencedSymbol = exp.ReferencedBinding.Assigned();
+                    referencedMetadata = exp.ReferencedBinding.Assigned();
                     break;
                 case ISelfExpressionSyntax exp:
-                    referencedSymbol = exp.ReferencedBinding.Assigned();
+                    referencedMetadata = exp.ReferencedBinding.Assigned();
                     break;
                 default:
                     // implicit borrow isn't needed around other expressions
@@ -657,7 +662,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
             type = referenceType.To(ReferenceCapability.Borrowed);
 
-            expression = new ImplicitBorrowExpressionSyntax(expression, type, referencedSymbol);
+            expression = new ImplicitBorrowExpressionSyntax(expression, type, referencedMetadata);
         }
 
         private static void InsertImplicitMoveIfNeeded([NotNull] ref IExpressionSyntax expression, DataType type)
@@ -672,8 +677,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 // Implicit move not needed
                 return;
 
-            var referencedSymbol = name.ReferencedBinding.Assigned();
-            expression = new ImplicitMoveSyntax(expression, type, referencedSymbol);
+            var referencedMetadata = name.ReferencedBinding.Assigned();
+            expression = new ImplicitMoveSyntax(expression, type, referencedMetadata);
             name.Semantics = ExpressionSemantics.Acquire;
             expression.Semantics = ExpressionSemantics.Acquire;
         }
@@ -701,10 +706,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     // Don't wrap the self expression in a share expression for field access
                     var isSelfField = exp.ContextExpression is ISelfExpressionSyntax;
                     var contextType = InferType(ref exp.ContextExpression, !isSelfField);
-                    var contextSymbol = exp.Field.ContainingScope.Assigned().GetMetadataForType(contextType);
                     var member = exp.Field;
-                    var memberSymbols = contextSymbol.Lookup(member.SimpleName).OfType<IBindingMetadata>().ToFixedList();
-                    var type = AssignReferencedSymbolAndType(member, memberSymbols);
+                    var contextSymbol = LookupSymbolForContextType(member.ContainingLexicalScope, contextType);
+                    var contextMetadata = exp.Field.ContainingScope.Assigned().GetMetadataForType(contextType);
+                    // TODO Deal with no context symbol
+                    var memberSymbols = symbolTree.Children(contextSymbol!).OfType<FieldSymbol>().Where(s => s.Name == member.Name).ToFixedList();
+                    var memberMetadata = contextMetadata.Lookup(member.SimpleName).OfType<IBindingMetadata>().ToFixedList();
+                    var type = AssignReferencedSymbolAndType(member, memberMetadata, memberSymbols);
                     exp.Field.Semantics ??= ExpressionSemantics.CreateReference;
                     exp.Semantics = exp.Field.Semantics.Assigned();
                     return exp.DataType = type;
@@ -1068,28 +1076,36 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         }
 
         private DataType AssignReferencedSymbolAndType(
-            INameExpressionSyntax identifier,
-            FixedList<IBindingMetadata> memberSymbols)
+            INameExpressionSyntax exp,
+            FixedList<IBindingMetadata> matchingMetadata,
+            FixedList<FieldSymbol> matchingSymbols)
         {
-            switch (memberSymbols.Count)
+            exp.ReferencedBinding = matchingMetadata.Count switch
+            {
+                0 => UnknownMetadata.Instance,
+                1 => matchingMetadata.Single(),
+                _ => UnknownMetadata.Instance
+            };
+
+            exp.ReferencedSymbol.BeginFulfilling();
+            switch (matchingSymbols.Count)
             {
                 case 0:
-                    diagnostics.Add(NameBindingError.CouldNotBindMember(file, identifier.Span));
-                    identifier.ReferencedBinding = UnknownMetadata.Instance;
-                    identifier.Semantics = ExpressionSemantics.Never;
-                    return identifier.DataType = DataType.Unknown;
+                    diagnostics.Add(NameBindingError.CouldNotBindMember(file, exp.Span));
+                    exp.Semantics = ExpressionSemantics.Never;
+                    exp.ReferencedSymbol.Fulfill(null);
+                    return exp.DataType = DataType.Unknown;
                 case 1:
-                    var memberSymbol = memberSymbols.Single();
-                    identifier.ReferencedBinding = memberSymbol;
+                    var memberSymbol = matchingSymbols.Single();
                     switch (memberSymbol.DataType.Semantics)
                     {
                         default:
                             throw ExhaustiveMatch.Failed(memberSymbol.DataType.Semantics);
                         case TypeSemantics.Copy:
-                            identifier.Semantics = ExpressionSemantics.Copy;
+                            exp.Semantics = ExpressionSemantics.Copy;
                             break;
                         case TypeSemantics.Never:
-                            identifier.Semantics = ExpressionSemantics.Never;
+                            exp.Semantics = ExpressionSemantics.Never;
                             break;
                         case TypeSemantics.Reference:
                             // Needs to be assigned based on share/borrow expression
@@ -1099,12 +1115,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         case TypeSemantics.Void:
                             throw new InvalidOperationException("Can't assign semantics to void field");
                     }
-                    return identifier.DataType = memberSymbol.DataType;
+
+                    exp.ReferencedSymbol.Fulfill(memberSymbol);
+                    return exp.DataType = memberSymbol.DataType;
                 default:
-                    diagnostics.Add(NameBindingError.AmbiguousName(file, identifier.Span));
-                    identifier.ReferencedBinding = UnknownMetadata.Instance;
-                    identifier.Semantics = ExpressionSemantics.Never;
-                    return identifier.DataType = DataType.Unknown;
+                    diagnostics.Add(NameBindingError.AmbiguousName(file, exp.Span));
+                    exp.Semantics = ExpressionSemantics.Never;
+                    exp.ReferencedSymbol.Fulfill(null);
+                    return exp.DataType = DataType.Unknown;
             }
         }
 
@@ -1226,6 +1244,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             }).ToFixedList();
             // TODO Select most specific match
             return symbols;
+        }
+
+        private static TypeSymbol? LookupSymbolForContextType(LexicalScope containingScope, DataType dataType)
+        {
+            // TODO this shouldn't use LexicalScope at all, it has nothing to do with the lexical scope
+
+            return dataType switch
+            {
+                UnknownType _ => null,
+                ObjectType objectType => LookupSymbolForContextType(containingScope, objectType),
+                IntegerType integerType => containingScope
+                                           .LookupInGlobalScope(integerType.Name)
+                                           .Select(p => p.Result)
+                                           .OfType<TypeSymbol>().Single(),
+                _ => throw new NotImplementedException(
+                    $"{nameof(LookupSymbolForContextType)} not implemented for {dataType.GetType().Name}")
+            };
+        }
+
+        private static TypeSymbol? LookupSymbolForContextType(LexicalScope containingScope, ObjectType objectType)
+        {
+            // TODO this should really involve lookup in the symbol forest based on the package of the type
+            // Instead, we look up the type name in the global namespace, then make sure it has the correct namespace
+            return containingScope
+                   .LookupInGlobalScope(objectType.Name)
+                   .Select(p => p.As<ObjectTypeSymbol>()?.Result)
+                   .NotNull()
+                   .Single(s => s.DeclaresDataType.ContainingNamespace == objectType.ContainingNamespace);
         }
     }
 }
