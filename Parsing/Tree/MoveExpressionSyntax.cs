@@ -1,9 +1,7 @@
-using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
@@ -19,20 +17,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         {
             [DebuggerStepThrough]
             get => ref referent;
-        }
-
-        private IBindingMetadata? movedSymbol;
-        [DisallowNull]
-        public IBindingMetadata? MovedSymbol
-        {
-            [DebuggerStepThrough]
-            get => movedSymbol;
-            set
-            {
-                if (movedSymbol != null)
-                    throw new InvalidOperationException("Can't set referenced symbol repeatedly");
-                movedSymbol = value ?? throw new ArgumentNullException(nameof(value));
-            }
         }
 
         public Promise<BindingSymbol?> ReferencedSymbol { get; } = new Promise<BindingSymbol?>();

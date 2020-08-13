@@ -1,8 +1,6 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
@@ -15,19 +13,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         private IExpressionSyntax referent;
         public ref IExpressionSyntax Referent => ref referent;
         public Promise<BindingSymbol?> ReferencedSymbol { get; } = new Promise<BindingSymbol?>();
-
-        private IBindingMetadata? borrowedFromBinding;
-        [DisallowNull]
-        public IBindingMetadata? BorrowedFromBinding
-        {
-            get => borrowedFromBinding;
-            set
-            {
-                if (borrowedFromBinding != null)
-                    throw new InvalidOperationException($"Can't set {nameof(BorrowedFromBinding)} repeatedly");
-                borrowedFromBinding = value ?? throw new ArgumentNullException(nameof(value));
-            }
-        }
 
         public BorrowExpressionSyntax(TextSpan span, IExpressionSyntax referent)
             : base(span, ExpressionSemantics.Borrow)

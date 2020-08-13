@@ -255,7 +255,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                                     throw new NotImplementedException("Non-moveable type can't be moved");
                             }
 
-                            exp.MovedSymbol = nameExpression.ReferencedBinding!;
                             exp.ReferencedSymbol.Fulfill(nameExpression.ReferencedSymbol.Result);
                             exp.Semantics = ExpressionSemantics.Acquire;
                             return exp.DataType = type;
@@ -290,7 +289,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                                     throw new NotImplementedException("Non-mutable type can't be borrowed mutably");
                             }
 
-                            exp.BorrowedFromBinding = nameExpression.ReferencedBinding!;
                             exp.ReferencedSymbol.Fulfill(nameExpression.ReferencedSymbol.Result);
                             return exp.DataType = type;
                         }
@@ -616,23 +614,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             // Value types aren't shared
             if (!(type is ReferenceType referenceType)) return type;
 
-            IBindingMetadata referencedMetadata;
             BindingSymbol? referencedSymbol;
             switch (expression)
             {
                 case INameExpressionSyntax exp:
                     exp.Semantics = ExpressionSemantics.Share;
-                    referencedMetadata = exp.ReferencedBinding.Assigned();
                     referencedSymbol = exp.ReferencedSymbol.Result;
                     break;
                 case ISelfExpressionSyntax exp:
-                    referencedMetadata = exp.ReferencedBinding.Assigned();
                     referencedSymbol = exp.ReferencedSymbol.Result;
                     break;
                 case IFieldAccessExpressionSyntax exp:
                     exp.Field.Semantics = ExpressionSemantics.Share;
                     exp.Semantics = ExpressionSemantics.Share;
-                    referencedMetadata = exp.ReferencedBinding.Assigned();
                     referencedSymbol = exp.ReferencedSymbol.Result;
                     break;
                 default:
@@ -642,7 +636,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
             type = referenceType.To(ReferenceCapability.Shared);
 
-            expression = new ImplicitShareExpressionSyntax(expression, type, referencedSymbol, referencedMetadata);
+            expression = new ImplicitShareExpressionSyntax(expression, type, referencedSymbol);
 
             return type;
         }
@@ -652,17 +646,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             // Value types aren't shared
             if (!(type is ReferenceType referenceType)) return;
 
-            IBindingMetadata referencedMetadata;
             BindingSymbol? referencedSymbol;
             switch (expression)
             {
                 case INameExpressionSyntax exp:
                     exp.Semantics = ExpressionSemantics.Borrow;
-                    referencedMetadata = exp.ReferencedBinding.Assigned();
                     referencedSymbol = exp.ReferencedSymbol.Result;
                     break;
                 case ISelfExpressionSyntax exp:
-                    referencedMetadata = exp.ReferencedBinding.Assigned();
                     referencedSymbol = exp.ReferencedSymbol.Result;
                     break;
                 default:
@@ -672,7 +663,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
             type = referenceType.To(ReferenceCapability.Borrowed);
 
-            expression = new ImplicitBorrowExpressionSyntax(expression, type, referencedSymbol, referencedMetadata);
+            expression = new ImplicitBorrowExpressionSyntax(expression, type, referencedSymbol);
         }
 
         private static void InsertImplicitMoveIfNeeded([NotNull] ref IExpressionSyntax expression, DataType type)
@@ -687,9 +678,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 // Implicit move not needed
                 return;
 
-            var referencedMetadata = name.ReferencedBinding.Assigned();
             var referencedSymbol = name.ReferencedSymbol.Result;
-            expression = new ImplicitMoveSyntax(expression, type, referencedSymbol, referencedMetadata);
+            expression = new ImplicitMoveSyntax(expression, type, referencedSymbol);
             name.Semantics = ExpressionSemantics.Acquire;
             expression.Semantics = ExpressionSemantics.Acquire;
         }

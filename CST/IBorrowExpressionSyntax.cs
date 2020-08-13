@@ -1,6 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
-
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
     /// <summary>
@@ -11,6 +8,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IBorrowExpressionSyntax
     {
         ref IExpressionSyntax Referent { get; }
-        [DisallowNull] IBindingMetadata? BorrowedFromBinding { get; set; }
     }
 }
