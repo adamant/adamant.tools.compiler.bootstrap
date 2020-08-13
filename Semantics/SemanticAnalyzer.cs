@@ -127,7 +127,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 #if DEBUG
             new SymbolValidator(symbolTreeBuilder).Walk(entities);
             new TypeFulfillmentValidator().Walk(entities);
-            new ReferencedSymbolValidator().Walk(entities);
             new TypeKnownValidator().Walk(entities);
             new ExpressionSemanticsValidator().Walk(entities);
 #endif

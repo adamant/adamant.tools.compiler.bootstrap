@@ -1,9 +1,6 @@
-using System;
-using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
@@ -21,19 +18,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public IInvocableNameSyntax? ConstructorName { get; }
         public FixedList<IArgumentSyntax> Arguments { get; }
         public Promise<ConstructorSymbol?> ReferencedSymbol { get; } = new Promise<ConstructorSymbol?>();
-
-        private IFunctionMetadata? constructorSymbol;
-        [DisallowNull]
-        public IFunctionMetadata? ReferencedConstructor
-        {
-            get => constructorSymbol;
-            set
-            {
-                if (constructorSymbol != null)
-                    throw new InvalidOperationException($"Can't set {nameof(ReferencedConstructor)} repeatedly");
-                constructorSymbol = value ?? throw new ArgumentNullException(nameof(value));
-            }
-        }
 
         public NewObjectExpressionSyntax(
             TextSpan span,

@@ -448,22 +448,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     {
                         diagnostics.Add(NameBindingError.CouldNotBindConstructor(file, exp.Span));
                         exp.ReferencedSymbol.Fulfill(null);
-                        exp.ReferencedConstructor = UnknownMetadata.Instance;
                         return exp.DataType  = DataType.Unknown;
                     }
                     var constructedType = (ObjectType)constructingType;
                     // TODO handle null typesymbol
                     var typeSymbol = exp.Type.ReferencedSymbol.Result ?? throw new InvalidOperationException();
-                    var typeMetadata = exp.Type.ContainingScope.Assigned().GetMetadataForType(constructedType);
                     var constructorSymbols = symbolTreeBuilder.Children(typeSymbol).OfType<ConstructorSymbol>().ToFixedList();
-                    var constructorMetadatas = typeMetadata.ChildMetadata[SpecialNames.New].OfType<IFunctionMetadata>().ToFixedList();
-                    (constructorSymbols, constructorMetadatas) = ResolveOverload(constructorSymbols, constructorMetadatas, argumentTypes);
-                    exp.ReferencedConstructor =constructorMetadatas.Count switch
-                    {
-                        0 => UnknownMetadata.Instance,
-                        1 => constructorMetadatas.Single(),
-                        _ => UnknownMetadata.Instance,
-                    };
+                    constructorSymbols = ResolveOverload(constructorSymbols, argumentTypes);
                     switch (constructorSymbols.Count)
                     {
                         case 0:
@@ -789,17 +780,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             var contextSymbol = LookupSymbolForType(contextType);
             var methodSymbols = symbolTrees.Children(contextSymbol!).OfType<MethodSymbol>()
                                                  .Where(s => s.Name == methodInvocation.Name).ToFixedList();
-
-            var contextTypeMetadata = methodInvocation.MethodNameSyntax.ContainingScope.Assigned().GetMetadataForType(contextType);
-            contextTypeMetadata.ChildMetadata.TryGetValue((SimpleName)methodInvocation.MethodNameSyntax.Name, out var childSymbols);
-            var methodMetadatas = (childSymbols ?? FixedList<IMetadata>.Empty).OfType<IMethodMetadata>().ToFixedList();
-            (methodSymbols, methodMetadatas) = ResolveMethodOverload(contextType, methodSymbols, methodMetadatas, argumentTypes);
-            methodInvocation.MethodNameSyntax.ReferencedFunctionMetadata = methodMetadatas.Count switch
-            {
-                0 => UnknownMetadata.Instance,
-                1 => methodMetadatas.Single(),
-                _ => UnknownMetadata.Instance
-            };
+            methodSymbols = ResolveMethodOverload(contextType, methodSymbols, argumentTypes);
 
             switch (methodSymbols.Count)
             {
@@ -863,18 +844,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
             var argumentTypes = functionInvocationExpression.Arguments.Select(argument => InferType(ref argument.Expression)).ToFixedList();
             var functionSymbols = functionInvocationExpression.LookupInContainingScope().Select(s => s.Result).ToFixedList();
-
-            var functionName = functionInvocationExpression.FunctionNameSyntax;
-            var scope = functionName.ContainingScope.Assigned();
-            var functionMetadatas = scope.LookupMetadata(functionInvocationExpression.FullName)
-                .OfType<IFunctionMetadata>().ToFixedList();
-            (functionSymbols, functionMetadatas) = ResolveOverload(functionSymbols, functionMetadatas, argumentTypes);
-            functionName.ReferencedFunctionMetadata = functionMetadatas.Count switch
-            {
-                0 => UnknownMetadata.Instance,
-                1 => functionMetadatas.Single(),
-                _ => UnknownMetadata.Instance,
-            };
+            functionSymbols = ResolveOverload(functionSymbols, argumentTypes);
             switch (functionSymbols.Count)
             {
                 case 0:
@@ -1201,9 +1171,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         //    }
         //}
 
-        private static (FixedList<TSymbol> symbols, FixedList<IFunctionMetadata> metadata) ResolveOverload<TSymbol>(
+        private static FixedList<TSymbol> ResolveOverload<TSymbol>(
             FixedList<TSymbol> symbols,
-            FixedList<IFunctionMetadata> metadata,
             FixedList<DataType> argumentTypes)
             where TSymbol : InvocableSymbol
         {
@@ -1214,21 +1183,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 // TODO check compatibility over argument types
                 return true;
             }).ToFixedList();
-
-            metadata = metadata.Where(f =>
-            {
-                if (f.Arity() != argumentTypes.Count) return false;
-                // TODO check compatibility over argument types
-                return true;
-            }).ToFixedList();
             // TODO Select most specific match
-            return (symbols, metadata);
+            return symbols;
         }
 
-        private static (FixedList<MethodSymbol> symbols, FixedList<IMethodMetadata> metadata) ResolveMethodOverload(
+        private static FixedList<MethodSymbol> ResolveMethodOverload(
             DataType selfType,
             FixedList<MethodSymbol> symbols,
-            FixedList<IMethodMetadata> metadata,
             FixedList<DataType> argumentTypes)
         {
             // Filter down to symbols that could possible match
@@ -1242,18 +1203,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 return true;
             }).ToFixedList();
 
-            metadata = metadata.Where(f =>
-            {
-                if (f.Arity() != argumentTypes.Count)
-                    return false;
-                // TODO check compatibility of self type
-                _ = selfType;
-                // TODO check compatibility over argument types
-
-                return true;
-            }).ToFixedList();
             // TODO Select most specific match
-            return (symbols, metadata);
+            return symbols;
         }
 
         private TypeSymbol? LookupSymbolForType(DataType dataType)

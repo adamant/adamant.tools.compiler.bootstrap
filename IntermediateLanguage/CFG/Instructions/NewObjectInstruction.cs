@@ -2,14 +2,14 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Operands;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Places;
-using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions
 {
     public class NewObjectInstruction : InstructionWithResult
     {
-        public MaybeQualifiedName Constructor { get; }
+        public ConstructorSymbol Constructor { get; }
         /// <summary>
         /// The type being constructed
         /// </summary>
@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions
 
         public NewObjectInstruction(
             Place resultPlace,
-            MaybeQualifiedName constructor,
+            ConstructorSymbol constructor,
             ObjectType constructedType,
             FixedList<Operand> arguments,
             TextSpan span,

@@ -630,10 +630,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 break;
                 case INewObjectExpressionSyntax exp:
                 {
-                    var constructorName = exp.ReferencedConstructor!.FullName;
+                    var constructor = exp.ReferencedSymbol.Result ?? throw new InvalidOperationException();
                     var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
                     var constructedType = (ObjectType)exp.Type.NamedType.Assigned().Known();
-                    currentBlock!.Add(new NewObjectInstruction(resultPlace, constructorName, constructedType, args, exp.Span, CurrentScope));
+                    currentBlock!.Add(new NewObjectInstruction(resultPlace, constructor, constructedType, args, exp.Span, CurrentScope));
                 }
                 break;
                 case IStringLiteralExpressionSyntax exp:

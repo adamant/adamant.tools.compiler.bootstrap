@@ -1,6 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
-
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
     /// <summary>
@@ -8,6 +5,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     /// </summary>
     public partial interface IInvocableNameSyntax : IHasContainingScope
     {
-        [DisallowNull] IFunctionMetadata? ReferencedFunctionMetadata { get; set; }
     }
 }

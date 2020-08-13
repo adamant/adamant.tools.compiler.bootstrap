@@ -226,13 +226,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     break;
                 case MethodSymbol sym:
                     Mangle(sym.ContainingSymbol, builder);
-                    AppendSeparator(sym.ContainingSymbol, builder);
+                    builder.Append(Separator);
                     MangleMethod(sym, builder);
                     break;
                 case PrimitiveTypeSymbol sym:
                     Mangle(sym.ContainingSymbol, builder);
                     AppendSeparator(sym.ContainingSymbol, builder);
                     Mangle(sym.Name, builder);
+                    break;
+                case ConstructorSymbol sym:
+                    Mangle(sym.ContainingSymbol, builder);
+                    builder.Append(Separator);
+                    builder.Append("_new");
+                    if (!(sym.Name is null))
+                    {
+                        builder.Append("_");
+                        Mangle(sym.Name, builder);
+                    }
+                    builder.Append(Separator);
+                    builder.Append(sym.Arity + 1); // add one for self parameter
                     break;
             }
         }
