@@ -5,7 +5,6 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
-using Adamant.Tools.Compiler.Bootstrap.LexicalScopes;
 using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Scopes;
@@ -559,7 +558,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     var isSelfField = exp.ContextExpression is ISelfExpressionSyntax;
                     var contextType = InferType(ref exp.ContextExpression, !isSelfField);
                     var member = exp.Field;
-                    var contextSymbol = LookupSymbolForType(member.ContainingLexicalScope, contextType);
+                    var contextSymbol = LookupSymbolForType(contextType);
                     // TODO Deal with no context symbol
                     var memberSymbols = symbolTreeBuilder.Children(contextSymbol!).OfType<FieldSymbol>()
                                                   .Where(s => s.Name == member.Name).ToFixedList();
@@ -720,7 +719,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     var isSelfField = exp.ContextExpression is ISelfExpressionSyntax;
                     var contextType = InferType(ref exp.ContextExpression, !isSelfField);
                     var member = exp.Field;
-                    var contextSymbol = LookupSymbolForType(member.ContainingLexicalScope, contextType);
+                    var contextSymbol = LookupSymbolForType(contextType);
                     // TODO Deal with no context symbol
                     var memberSymbols = symbolTreeBuilder.Children(contextSymbol!).OfType<FieldSymbol>().Where(s => s.Name == member.Name).ToFixedList();
                     var type = AssignReferencedSymbolAndType(member, memberSymbols);
@@ -775,6 +774,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
             }
 
+            methodInvocation.ReferencedSymbol.BeginFulfilling();
+
+
             var argumentTypes = methodInvocation.Arguments.Select(argument => InferType(ref argument.Expression)).ToFixedList();
             var contextType = InferType(ref methodInvocation.ContextExpression, false);
             // If it is unknown, we already reported an error
@@ -784,40 +786,51 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 return methodInvocation.DataType = DataType.Unknown;
             };
 
-            var contextTypeSymbol = methodInvocation.MethodNameSyntax.ContainingScope.Assigned().GetMetadataForType(contextType);
-            contextTypeSymbol.ChildMetadata.TryGetValue((SimpleName)methodInvocation.MethodNameSyntax.Name, out var childSymbols);
+            var contextSymbol = LookupSymbolForType(contextType);
+            var methodSymbols = symbolTrees.Children(contextSymbol!).OfType<MethodSymbol>()
+                                                 .Where(s => s.Name == methodInvocation.Name).ToFixedList();
+
+            var contextTypeMetadata = methodInvocation.MethodNameSyntax.ContainingScope.Assigned().GetMetadataForType(contextType);
+            contextTypeMetadata.ChildMetadata.TryGetValue((SimpleName)methodInvocation.MethodNameSyntax.Name, out var childSymbols);
             var methodMetadatas = (childSymbols ?? FixedList<IMetadata>.Empty).OfType<IMethodMetadata>().ToFixedList();
-            methodMetadatas = ResolveOverload(contextType, methodMetadatas, argumentTypes);
-            switch (methodMetadatas.Count)
+            (methodSymbols, methodMetadatas) = ResolveMethodOverload(contextType, methodSymbols, methodMetadatas, argumentTypes);
+            methodInvocation.MethodNameSyntax.ReferencedFunctionMetadata = methodMetadatas.Count switch
+            {
+                0 => UnknownMetadata.Instance,
+                1 => methodMetadatas.Single(),
+                _ => UnknownMetadata.Instance
+            };
+
+            switch (methodSymbols.Count)
             {
                 case 0:
                     diagnostics.Add(NameBindingError.CouldNotBindMethod(file, methodInvocation.Span));
-                    methodInvocation.MethodNameSyntax.ReferencedFunctionMetadata = UnknownMetadata.Instance;
+                    methodInvocation.ReferencedSymbol.Fulfill(null);
                     methodInvocation.DataType = DataType.Unknown;
                     break;
                 case 1:
-                    var methodMetadata = methodMetadatas.Single();
-                    methodInvocation.MethodNameSyntax.ReferencedFunctionMetadata = methodMetadata;
+                    var methodSymbol = methodSymbols.Single();
+                    methodInvocation.ReferencedSymbol.Fulfill(methodSymbol);
 
-                    var selfParamType = methodMetadata.SelfParameterMetadata.DataType;
+                    var selfParamType = methodSymbol.SelfDataType;
                     InsertImplicitActionIfNeeded(ref methodInvocation.ContextExpression, selfParamType, implicitBorrowAllowed: true);
 
                     InsertImplicitConversionIfNeeded(ref methodInvocation.ContextExpression, selfParamType);
                     CheckArgumentTypeCompatibility(selfParamType, methodInvocation.ContextExpression);
 
-                    foreach (var (arg, type) in methodInvocation.Arguments.Zip(methodMetadata
-                                                                               .Parameters.Select(p => p.DataType)))
+                    foreach (var (arg, type) in methodInvocation.Arguments
+                                                                .Zip(methodSymbol.ParameterDataTypes))
                     {
                         InsertImplicitConversionIfNeeded(ref arg.Expression, type);
                         CheckArgumentTypeCompatibility(type, arg.Expression);
                     }
 
-                    methodInvocation.DataType = methodMetadata.ReturnDataType;
-                    AssignInvocationSemantics(methodInvocation, methodMetadata.ReturnDataType);
+                    methodInvocation.DataType = methodSymbol.ReturnDataType;
+                    AssignInvocationSemantics(methodInvocation, methodSymbol.ReturnDataType);
                     break;
                 default:
                     diagnostics.Add(NameBindingError.AmbiguousMethodCall(file, methodInvocation.Span));
-                    methodInvocation.MethodNameSyntax.ReferencedFunctionMetadata = UnknownMetadata.Instance;
+                    methodInvocation.ReferencedSymbol.Fulfill(null);
                     methodInvocation.DataType = DataType.Unknown;
                     break;
             }
@@ -1194,6 +1207,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             FixedList<DataType> argumentTypes)
             where TSymbol : InvocableSymbol
         {
+            // Filter down to symbols that could possible match
             symbols = symbols.Where(s =>
             {
                 if (s.Arity != argumentTypes.Count) return false;
@@ -1201,7 +1215,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 return true;
             }).ToFixedList();
 
-            // Filter down to symbols that could possible match
             metadata = metadata.Where(f =>
             {
                 if (f.Arity() != argumentTypes.Count) return false;
@@ -1212,13 +1225,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             return (symbols, metadata);
         }
 
-        private static FixedList<IMethodMetadata> ResolveOverload(
+        private static (FixedList<MethodSymbol> symbols, FixedList<IMethodMetadata> metadata) ResolveMethodOverload(
             DataType selfType,
-            FixedList<IMethodMetadata> symbols,
+            FixedList<MethodSymbol> symbols,
+            FixedList<IMethodMetadata> metadata,
             FixedList<DataType> argumentTypes)
         {
             // Filter down to symbols that could possible match
-            symbols = symbols.Where(f =>
+            symbols = symbols.Where(s =>
+            {
+                if (s.Arity != argumentTypes.Count) return false;
+                // TODO check compatibility of self type
+                _ = selfType;
+                // TODO check compatibility over argument types
+
+                return true;
+            }).ToFixedList();
+
+            metadata = metadata.Where(f =>
             {
                 if (f.Arity() != argumentTypes.Count)
                     return false;
@@ -1229,35 +1253,36 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 return true;
             }).ToFixedList();
             // TODO Select most specific match
-            return symbols;
+            return (symbols, metadata);
         }
 
-        private static TypeSymbol? LookupSymbolForType(LexicalScope containingScope, DataType dataType)
+        private TypeSymbol? LookupSymbolForType(DataType dataType)
         {
-            // TODO this shouldn't use LexicalScope at all, it has nothing to do with the lexical scope
-
             return dataType switch
             {
                 UnknownType _ => null,
-                ObjectType objectType => LookupSymbolForType(containingScope, objectType),
-                IntegerType integerType => containingScope
-                                           .LookupInGlobalScope(integerType.Name)
-                                           .Select(p => p.Result)
-                                           .OfType<TypeSymbol>().Single(),
+                ObjectType objectType => LookupSymbolForType(objectType),
+                IntegerType integerType => symbolTrees.PrimitiveSymbolTree
+                                                      .GlobalSymbols
+                                                      .OfType<TypeSymbol>()
+                                                      .Single(s => s.DeclaresDataType == integerType),
                 _ => throw new NotImplementedException(
                     $"{nameof(LookupSymbolForType)} not implemented for {dataType.GetType().Name}")
             };
         }
 
-        private static TypeSymbol? LookupSymbolForType(LexicalScope containingScope, ObjectType objectType)
+        private TypeSymbol? LookupSymbolForType(ObjectType objectType)
         {
-            // TODO this should really involve lookup in the symbol forest based on the package of the type
-            // Instead, we look up the type name in the global namespace, then make sure it has the correct namespace
-            return containingScope
-                   .LookupInGlobalScope(objectType.Name)
-                   .Select(p => p.As<ObjectTypeSymbol>()?.Result)
-                   .NotNull()
-                   .Single(s => s.DeclaresDataType.ContainingNamespace == objectType.ContainingNamespace);
+
+            var contextSymbols = symbolTrees.Packages.SafeCast<Symbol>();
+            foreach (var name in objectType.ContainingNamespace.Segments)
+            {
+                contextSymbols = contextSymbols.SelectMany(c => symbolTrees.Children(c))
+                                               .Where(s => s.Name == name);
+            }
+
+            return contextSymbols.SelectMany(c => symbolTrees.Children(c)).OfType<TypeSymbol>()
+                                 .Single(s => s.Name == objectType.Name);
         }
     }
 }

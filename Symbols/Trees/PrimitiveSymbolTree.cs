@@ -1,18 +1,21 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Symbols.Trees
 {
-    public class PrimitiveSymbolTree : ISymbolTree
+    public sealed class PrimitiveSymbolTree : ISymbolTree
     {
-        public PackageSymbol? Package => null;
+        PackageSymbol? ISymbolTree.Package => null;
+        public FixedSet<Symbol> GlobalSymbols { get; }
         private readonly FixedDictionary<Symbol, FixedSet<Symbol>> symbolChildren;
         public IEnumerable<Symbol> Symbols => symbolChildren.Keys;
 
         public PrimitiveSymbolTree(FixedDictionary<Symbol, FixedSet<Symbol>> symbolChildren)
         {
             this.symbolChildren = symbolChildren;
+            GlobalSymbols = symbolChildren.Keys.Where(s => s.ContainingSymbol is null).ToFixedSet();
         }
 
         public bool Contains(Symbol symbol)

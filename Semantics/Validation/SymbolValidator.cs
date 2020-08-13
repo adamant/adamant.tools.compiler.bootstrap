@@ -64,12 +64,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                 case INewObjectExpressionSyntax syn:
                     CheckReferencedSymbol(syn, syn.ReferencedSymbol);
                     break;
-                    //case IFunctionInvocationExpressionSyntax syn:
-                    //    CheckReferencedSymbol(syn, syn.ReferencedSymbol);
-                    //    break;
-                    //case IMethodInvocationExpressionSyntax syn:
-                    //    CheckReferencedSymbol(syn, syn.ReferencedSymbol);
-                    //    break;
+                case IFunctionInvocationExpressionSyntax syn:
+                    CheckReferencedSymbol(syn, syn.ReferencedSymbol);
+                    break;
+                case IMethodInvocationExpressionSyntax syn:
+                    CheckReferencedSymbol(syn, syn.ReferencedSymbol);
+                    break;
             }
 
             WalkChildren(syntax);

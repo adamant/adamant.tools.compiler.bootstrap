@@ -19,6 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
     /// </remarks>
     public sealed class ObjectType : ReferenceType
     {
+        // TODO this needs a containing package
         public NamespaceName ContainingNamespace { get; }
         public TypeName Name { get; }
         public MaybeQualifiedName FullName => ContainingNamespace.ToRootName().Qualify(Name.ToSimpleName());

@@ -37,6 +37,7 @@ ConcreteInvocableDeclaration: InvocableDeclaration = Body;
 
 // Non-Member Declarations
 NonMemberDeclaration: Declaration = ContainingNamespaceName:NamespaceName Name;
+// TODO if a compound namespace declaration was actually mutiple declarations, it would simplify other things
 NamespaceDeclaration: NonMemberDeclaration = IsGlobalQualified:bool DeclaredNames:NamespaceName FullName:NamespaceName Symbol:Promise<NamespaceOrPackageSymbol> UsingDirectives:UsingDirective* Declarations:NonMemberDeclaration*;
 
 // Non-Member Entity Declarations
