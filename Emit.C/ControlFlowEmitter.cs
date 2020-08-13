@@ -96,10 +96,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     string self = "";
                     if (ins.IsMethodCall) self = ConvertOperand(ins.Self!);
 
-                    var mangledName = nameMangler.Mangle(ins.FunctionName);
+                    var mangledName = nameMangler.Mangle(ins.Function);
                     var arguments = ins.Arguments.Select(ConvertOperand);
                     if (ins.IsMethodCall) arguments = arguments.Prepend(self);
-                    code.EndLine($"{mangledName}__{ins.Arity}({string.Join(", ", arguments)});");
+                    code.EndLine($"{mangledName}({string.Join(", ", arguments)});");
                 }
                 break;
                 case CallVirtualInstruction ins:
@@ -110,10 +110,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                         code.BeginLine("");
 
                     var self = ConvertOperand(ins.Self);
-                    var mangledName = nameMangler.Mangle(ins.Function.UnqualifiedName);
-                    var arity = ins.Arity + 1;
+                    var mangledName = nameMangler.MangleMethod(ins.Method);
                     var arguments = ins.Arguments.Select(ConvertOperand).Prepend(self);
-                    code.EndLine($"{self}._vtable->{mangledName}__{arity}({string.Join(", ", arguments)});");
+                    code.EndLine($"{self}._vtable->{mangledName}({string.Join(", ", arguments)});");
                 }
                 break;
             }

@@ -35,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         private readonly ITypeMetadata? stringMetadata;
         private readonly Diagnostics diagnostics;
         private readonly DataType? returnType;
-        private readonly TypeResolver typeAnalyzer;
+        private readonly TypeResolver typeResolver;
 
         public BasicBodyAnalyzer(
             IEntityDeclarationSyntax containingDeclaration,
@@ -52,7 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             this.diagnostics = diagnostics;
             this.symbolTrees = symbolTrees;
             this.returnType = returnType;
-            typeAnalyzer = new TypeResolver(file, diagnostics);
+            typeResolver = new TypeResolver(file, diagnostics);
         }
 
         public void ResolveTypes(IBodySyntax body)
@@ -95,7 +95,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             DataType type;
             if (variableDeclaration.Type != null)
             {
-                type = typeAnalyzer.Evaluate(variableDeclaration.Type);
+                type = typeResolver.Evaluate(variableDeclaration.Type);
                 CheckType(ref variableDeclaration.Initializer, type);
             }
             else if (variableDeclaration.Initializer != null)
@@ -443,7 +443,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     exp.ReferencedSymbol.BeginFulfilling();
                     var argumentTypes = exp.Arguments.Select(argument => InferType(ref argument.Expression)).ToFixedList();
                     // TODO handle named constructors here
-                    var constructingType = typeAnalyzer.Evaluate(exp.Type);
+                    var constructingType = typeResolver.Evaluate(exp.Type);
                     if (!constructingType.IsKnown)
                     {
                         diagnostics.Add(NameBindingError.CouldNotBindConstructor(file, exp.Span));
@@ -493,7 +493,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IForeachExpressionSyntax exp:
                 {
                     exp.Symbol.BeginFulfilling();
-                    var declaredType = typeAnalyzer.Evaluate(exp.Type);
+                    var declaredType = typeResolver.Evaluate(exp.Type);
                     var expressionType = CheckForeachInType(declaredType, ref exp.InExpression);
                     var variableType = declaredType ?? expressionType;
                     var symbol = new VariableSymbol((InvocableSymbol)containingSymbol, exp.VariableName,
@@ -1173,7 +1173,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         // Re-expose type analyzer to BasicAnalyzer
         public DataType EvaluateType(ITypeSyntax typeSyntax)
         {
-            return typeAnalyzer.Evaluate(typeSyntax);
+            return typeResolver.Evaluate(typeSyntax);
         }
 
         //private void InferExpressionTypeInInvocation(ExpressionSyntax callee, FixedList<DataType> argumentTypes)

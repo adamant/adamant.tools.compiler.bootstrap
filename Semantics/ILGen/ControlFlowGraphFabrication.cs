@@ -375,10 +375,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 break;
                 case IMethodInvocationExpressionSyntax exp:
                 {
-                    var methodName = exp.MethodNameSyntax.ReferencedFunctionMetadata!.FullName;
+                    var method = exp.ReferencedSymbol.Result ?? throw new InvalidOperationException();
                     var target = ConvertToOperand(exp.ContextExpression);
                     var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
-                    currentBlock!.Add(new CallVirtualInstruction(target, methodName, args, exp.Span, CurrentScope));
+                    currentBlock!.Add(new CallVirtualInstruction(target, method, args, exp.Span, CurrentScope));
                 }
                 break;
                 case IAssignmentExpressionSyntax exp:
@@ -413,7 +413,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     break;
                 case IFunctionInvocationExpressionSyntax exp:
                 {
-                    var functionName = exp.FunctionNameSyntax.ReferencedFunctionMetadata!.FullName;
+                    var functionName = exp.ReferencedSymbol.Result ?? throw new InvalidOperationException();
                     var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
                     currentBlock!.Add(CallInstruction.ForFunction(functionName, args, exp.Span, CurrentScope));
                 }
@@ -612,14 +612,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 break;
                 case IFunctionInvocationExpressionSyntax exp:
                 {
-                    var functionName = exp.FunctionNameSyntax.ReferencedFunctionMetadata!.FullName;
+                    var functionName = exp.ReferencedSymbol.Result ?? throw new InvalidOperationException();
                     var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
                     currentBlock!.Add(CallInstruction.ForFunction(resultPlace, functionName, args, exp.Span, CurrentScope));
                 }
                 break;
                 case IMethodInvocationExpressionSyntax exp:
                 {
-                    var methodName = exp.MethodNameSyntax.ReferencedFunctionMetadata!.FullName;
+                    var methodName = exp.ReferencedSymbol.Result ?? throw new InvalidOperationException();
                     var target = ConvertToOperand(exp.ContextExpression);
                     var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
                     if (exp.ContextExpression.DataType is ReferenceType)

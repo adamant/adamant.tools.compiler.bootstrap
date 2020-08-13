@@ -26,7 +26,7 @@ inline type type##__add(type x, type y) { return (type) { x._value + y._value };
 inline type type##__sub(type x, type y) { return (type) { x._value - y._value }; } \
 inline type type##__mul(type x, type y) { return (type) { x._value* y._value }; } \
 inline type type##__div(type x, type y) { return (type) { x._value / y._value }; } \
-inline type type##__remainder__1(type x, type y) { return (type) { x._value% y._value }; } \
+inline type type##__remainder__2(type x, type y) { return (type) { x._value% y._value }; } \
 inline _bool type##__eq(type x, type y) { return (_bool) { x._value == y._value }; } \
 inline _bool type##__ne(type x, type y) { return (_bool) { x._value != y._value }; } \
 inline _bool type##__lt(type x, type y) { return (_bool) { x._value < y._value }; } \
@@ -67,7 +67,7 @@ inline _int _convert___byte___int(_byte value) { return (_int) {value._value}; }
 typedef struct String String;
 
 // Intrinsic Functions
-String _uint__to_display_string__0(_uint value);
+String _uint__to_display_string__1(_uint value);
 _size intrinsics__mem_allocate__1(_size length);
 void intrinsics__mem_deallocate__1(_size ptr);
 void intrinsics__mem_copy__3(_size from_ptr, _size to_ptr, _size length);

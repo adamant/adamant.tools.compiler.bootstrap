@@ -21,7 +21,7 @@ extern inline type type##__add(type x, type y); \
 extern inline type type##__sub(type x, type y); \
 extern inline type type##__mul(type x, type y); \
 extern inline type type##__div(type x, type y); \
-extern inline type type##__remainder__1(type x, type y); \
+extern inline type type##__remainder__2(type x, type y); \
 extern inline _bool type##__eq(type x, type y); \
 extern inline _bool type##__ne(type x, type y); \
 extern inline _bool type##__lt(type x, type y); \
@@ -61,7 +61,7 @@ extern String___VTable String___vtable;
 String String___new__3(String _self, _size byte_count, _size bytes);
 
 // Intrinsic Functions
-String _uint__to_display_string__0(_uint value)
+String _uint__to_display_string__1(_uint value)
 {
     int length = snprintf(NULL, 0, "%u", value._value);
     char* str = malloc(length + 1);
