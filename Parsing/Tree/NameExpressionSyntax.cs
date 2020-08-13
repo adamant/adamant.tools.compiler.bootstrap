@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.LexicalScopes;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using Adamant.Tools.Compiler.Bootstrap.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
@@ -39,21 +36,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public Name? Name { get; }
         public SimpleName SimpleName { [DebuggerStepThrough] get; }
         public Promise<BindingSymbol?> ReferencedSymbol { get; } = new Promise<BindingSymbol?>();
-
-        private Scope? containingScope;
-        [DisallowNull]
-        public Scope? ContainingScope
-        {
-            [DebuggerStepThrough]
-            get => containingScope;
-            set
-            {
-                if (containingScope != null)
-                    throw new InvalidOperationException("Can't set containing scope repeatedly");
-                containingScope = value ?? throw new ArgumentNullException(nameof(value));
-            }
-        }
-
         public bool VariableIsLiveAfter { get; set; } = true;
 
         public NameExpressionSyntax(TextSpan span, Name? name)
@@ -61,13 +43,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         {
             Name = name;
             SimpleName = name?.ToSimpleName() ?? SpecialNames.Unknown;
-        }
-
-        public FixedList<IMetadata> LookupMetadataInContainingScope()
-        {
-            if (ContainingScope != null)
-                return ContainingScope.LookupMetadata(SimpleName);
-            throw new InvalidOperationException();
         }
 
         public IEnumerable<IPromise<BindingSymbol>> LookupInContainingScope()

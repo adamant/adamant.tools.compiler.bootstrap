@@ -509,7 +509,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         Promise<BindingSymbol?> ReferencedSymbol { get; }
     }
 
-    public partial interface INameExpressionSyntax : IAssignableExpressionSyntax, IHasContainingScope, IHasContainingLexicalScope
+    public partial interface INameExpressionSyntax : IAssignableExpressionSyntax, IHasContainingLexicalScope
     {
         Name? Name { get; }
         SimpleName SimpleName { get; }
@@ -535,7 +535,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     {
     }
 
-    public partial interface ISelfExpressionSyntax : IExpressionSyntax, IHasContainingScope
+    public partial interface ISelfExpressionSyntax : IExpressionSyntax
     {
         bool IsImplicit { get; }
         Promise<SelfParameterSymbol?> ReferencedSymbol { get; }

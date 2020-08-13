@@ -985,28 +985,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     throw new InvalidOperationException("Invalid containing symbol for body");
             }
 
-            // TODO remove old metadata code
-            var metadatas = selfExpression.LookupMetadataInContainingScope();
-            switch (metadatas.Count)
-            {
-                case 0:
-                    selfExpression.ReferencedBinding = UnknownMetadata.Instance;
-                    break;
-                case 1:
-                {
-                    var metadata = metadatas.Single();
-                    selfExpression.ReferencedBinding = metadata switch
-                    {
-                        IBindingMetadata binding => binding,
-                        _ => UnknownMetadata.Instance
-                    };
-                    break;
-                }
-                default:
-                    selfExpression.ReferencedBinding = UnknownMetadata.Instance;
-                    break;
-            }
-
             return selfExpression.DataType = type;
         }
 
