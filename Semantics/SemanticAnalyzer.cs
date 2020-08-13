@@ -128,22 +128,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             // From this point forward, analysis focuses on callable bodies
             // TODO what about field initializers?
-            var callables = entities.OfType<IConcreteCallableDeclarationSyntax>().ToFixedList();
+            var invocables = entities.OfType<IConcreteInvocableDeclarationSyntax>().ToFixedList();
 
-            ShadowChecker.Check(callables, diagnostics);
+            ShadowChecker.Check(invocables, diagnostics);
 
-            DataFlowAnalysis.Check(DefiniteAssignmentAnalyzer.Instance, callables, diagnostics);
+            DataFlowAnalysis.Check(DefiniteAssignmentAnalyzer.Instance, invocables, symbolTree, diagnostics);
 
-            DataFlowAnalysis.Check(BindingMutabilityAnalyzer.Instance, callables, diagnostics);
+            DataFlowAnalysis.Check(BindingMutabilityAnalyzer.Instance, invocables, symbolTree, diagnostics);
 
-            DataFlowAnalysis.Check(UseOfMovedValueAnalyzer.Instance, callables, diagnostics);
+            DataFlowAnalysis.Check(UseOfMovedValueAnalyzer.Instance, invocables, symbolTree, diagnostics);
 
             // TODO use DataFlowAnalysis to check for unused variables and report use of variables starting with `_`
 
             // Compute variable liveness needed by reachability analyzer
-            DataFlowAnalysis.Check(LivenessAnalyzer.Instance, callables, diagnostics);
+            DataFlowAnalysis.Check(LivenessAnalyzer.Instance, invocables, symbolTree, diagnostics);
 
-            ReachabilityAnalyzer.Analyze(callables, diagnostics);
+            ReachabilityAnalyzer.Analyze(invocables, diagnostics);
 
             // TODO remove live variables if SaveLivenessAnalysis is false
         }

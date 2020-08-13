@@ -8,12 +8,12 @@ using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
-    public class FunctionDeclaration : Declaration, ICallableDeclaration, IFunctionMetadata
+    public class FunctionDeclaration : Declaration, IInvocableDeclaration, IFunctionMetadata
     {
         public bool IsExternal { get; }
 
         [SuppressMessage("Design", "CA1033:Interface methods should be callable by child types", Justification = "NA")]
-        bool ICallableDeclaration.IsConstructor => false;
+        bool IInvocableDeclaration.IsConstructor => false;
 
         public FixedList<Parameter> Parameters { get; }
         public int Arity => Parameters.Count;

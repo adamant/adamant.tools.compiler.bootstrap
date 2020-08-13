@@ -1,22 +1,24 @@
 using System;
 using Adamant.Tools.Compiler.Bootstrap.CST;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
+using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
 {
     public class LivenessAnalysis : IBackwardDataFlowAnalysis<VariableFlags>
     {
-        private readonly IConcreteCallableDeclarationSyntax callable;
+        private readonly IConcreteInvocableDeclarationSyntax invocable;
+        private readonly SymbolTree symbolTree;
 
-        public LivenessAnalysis(IConcreteCallableDeclarationSyntax callable)
+        public LivenessAnalysis(IConcreteInvocableDeclarationSyntax invocable, SymbolTree symbolTree)
         {
-            this.callable = callable;
+            this.invocable = invocable;
+            this.symbolTree = symbolTree;
         }
 
         public VariableFlags StartState()
         {
-            return new VariableFlags(callable, false);
+            return new VariableFlags(invocable, symbolTree, false);
         }
 
         public VariableFlags Assignment(
@@ -26,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
             switch (assignmentExpression.LeftOperand)
             {
                 case INameExpressionSyntax identifier:
-                    var symbol = identifier.ReferencedBinding.Assigned();
+                    var symbol = identifier.ReferencedSymbol.Result ?? throw new InvalidOperationException();
                     identifier.VariableIsLiveAfter = liveVariables[symbol]
                                              ?? throw new Exception($"No liveness data for variable {symbol}");
                     return liveVariables.Set(symbol, false);
@@ -41,9 +43,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
             INameExpressionSyntax nameExpression,
             VariableFlags liveVariables)
         {
-            var symbol = nameExpression.ReferencedBinding.Assigned();
+            var symbol = nameExpression.ReferencedSymbol.Result ?? throw new InvalidOperationException();
             nameExpression.VariableIsLiveAfter = liveVariables[symbol]
-                                         ?? throw new Exception($"No liveness data for variable {symbol.FullName}");
+                                         ?? throw new Exception($"No liveness data for variable {symbol}");
             return liveVariables.Set(symbol, true);
         }
 
@@ -51,18 +53,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
             IVariableDeclarationStatementSyntax variableDeclaration,
             VariableFlags liveVariables)
         {
-            variableDeclaration.VariableIsLiveAfter = liveVariables[variableDeclaration]
+            variableDeclaration.VariableIsLiveAfter = liveVariables[variableDeclaration.Symbol.Result]
                                               ?? throw new Exception($"No liveness data for variable {variableDeclaration.FullName}");
-            return liveVariables.Set(variableDeclaration, false);
+            return liveVariables.Set(variableDeclaration.Symbol.Result, false);
         }
 
         public VariableFlags VariableDeclaration(
             IForeachExpressionSyntax foreachExpression,
             VariableFlags liveVariables)
         {
-            foreachExpression.VariableIsLiveAfterAssignment = liveVariables[foreachExpression]
+            foreachExpression.VariableIsLiveAfterAssignment = liveVariables[foreachExpression.Symbol.Result]
                                             ?? throw new Exception($"No liveness data for variable {foreachExpression.FullName}");
-            return liveVariables.Set(foreachExpression, false);
+            return liveVariables.Set(foreachExpression.Symbol.Result, false);
         }
     }
 }

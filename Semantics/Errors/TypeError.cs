@@ -73,7 +73,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
                 $"Cannot convert expression `{file.Code[expression.Span]}` of type `{ofType}` to type `{toType}`");
         }
 
-        public static Diagnostic MustBeCallable(CodeFile file, IExpressionSyntax expression)
+        public static Diagnostic MustBeInvocable(CodeFile file, IExpressionSyntax expression)
         {
             return new Diagnostic(file, expression.Span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3008,
                 $"Expression must be of callable type to be invoked `{file.Code[expression.Span]}`");

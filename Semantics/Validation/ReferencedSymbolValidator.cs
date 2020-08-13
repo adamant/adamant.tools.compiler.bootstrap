@@ -29,17 +29,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                 case IClassDeclarationSyntax _:
                     // Don't recur into body, we will see those as separate members
                     return;
-                case IFieldAccessExpressionSyntax memberAccessExpression:
-                    WalkChildren(memberAccessExpression);
-                    AssertHasReferencedSymbol(memberAccessExpression, memberAccessExpression.ReferencedBinding);
+                case IFieldAccessExpressionSyntax syn:
+                    WalkChildren(syn);
+                    AssertHasReferencedSymbol(syn, syn.ReferencedBinding);
                     return;
-                case INameExpressionSyntax nameExpression:
-                    WalkChildren(nameExpression);
-                    AssertHasReferencedSymbol(nameExpression, nameExpression.ReferencedBinding);
+                case INameExpressionSyntax syn:
+                    WalkChildren(syn);
+                    AssertHasReferencedSymbol(syn, syn.ReferencedBinding);
                     return;
-                case ICallableNameSyntax callableName:
-                    WalkChildren(callableName);
-                    AssertHasReferencedSymbol(callableName, callableName.ReferencedFunctionMetadata);
+                case IInvocableNameSyntax syn:
+                    WalkChildren(syn);
+                    AssertHasReferencedSymbol(syn, syn.ReferencedFunctionMetadata);
                     return;
             }
 

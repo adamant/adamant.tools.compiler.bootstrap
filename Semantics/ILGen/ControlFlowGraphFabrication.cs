@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
     /// </remarks>
     public class ControlFlowGraphFabrication
     {
-        private readonly IConcreteCallableDeclarationSyntax callable;
+        private readonly IConcreteInvocableDeclarationSyntax invocable;
         private readonly DataType? selfType;
         private readonly DataType returnType;
         private readonly ControlFlowGraphBuilder graph;
@@ -55,18 +55,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         private readonly Stack<Scope> scopes = new Stack<Scope>();
         private Scope CurrentScope => scopes.Peek();
 
-        public ControlFlowGraphFabrication(IConcreteCallableDeclarationSyntax callable)
+        public ControlFlowGraphFabrication(IConcreteInvocableDeclarationSyntax invocable)
         {
-            this.callable = callable;
-            graph = new ControlFlowGraphBuilder(callable.File);
+            this.invocable = invocable;
+            graph = new ControlFlowGraphBuilder(invocable.File);
             // We start in the outer scope and need that on the stack
             var scope = Scope.Outer;
             scopes.Push(scope);
             //nextScope = scope.Next();
-            switch (callable)
+            switch (invocable)
             {
                 default:
-                    throw ExhaustiveMatch.Failed(callable);
+                    throw ExhaustiveMatch.Failed(invocable);
                 case IConcreteMethodDeclarationSyntax method:
                     returnType = method.ReturnDataType.Known();
                     break;
@@ -91,17 +91,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
             // Temp Variable for return
             if (selfType != null) graph.AddSelfParameter(selfType);
 
-            foreach (var parameter in callable.Parameters.Where(p => !p.Unused))
+            foreach (var parameter in invocable.Parameters.Where(p => !p.Unused))
                 graph.AddParameter(parameter.IsMutableBinding, parameter.DataType.Result, CurrentScope, parameter.FullName.UnqualifiedName);
 
             currentBlock = graph.NewBlock();
-            foreach (var statement in callable.Body.Statements)
+            foreach (var statement in invocable.Body.Statements)
                 Convert(statement);
 
             // Generate the implicit return statement
             if (currentBlock != null && !currentBlock.IsTerminated)
             {
-                var span = callable.Span.AtEnd();
+                var span = invocable.Span.AtEnd();
                 //EndScope(span);
                 currentBlock.End(new ReturnVoidInstruction(span, Scope.Outer));
             }

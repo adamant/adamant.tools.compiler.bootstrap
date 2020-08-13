@@ -743,7 +743,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 {
                     // It is a namespaced or associated function invocation, modify the tree
                     var nameSpan = TextSpan.Covering(methodInvocation.ContextExpression.Span, methodInvocation.MethodNameSyntax.Span);
-                    var nameSyntax = new CallableNameSyntax(nameSpan, functionName, scope);
+                    var nameSyntax = new InvocableNameSyntax(nameSpan, functionName, scope);
                     var functionInvocation = new FunctionInvocationExpressionSyntax(
                         methodInvocation.Span,
                         nameSyntax,

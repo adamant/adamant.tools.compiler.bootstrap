@@ -1,9 +1,9 @@
 using System;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
+using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Moves
@@ -18,21 +18,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Moves
     /// </summary>
     public class UseOfMovedValueAnalysis : IForwardDataFlowAnalysis<VariableFlags>
     {
-        private readonly IConcreteCallableDeclarationSyntax callable;
+        private readonly IConcreteInvocableDeclarationSyntax invocable;
+        private readonly SymbolTree symbolTree;
         private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
 
-        public UseOfMovedValueAnalysis(IConcreteCallableDeclarationSyntax callable, Diagnostics diagnostics)
+        public UseOfMovedValueAnalysis(IConcreteInvocableDeclarationSyntax invocable, SymbolTree symbolTree, Diagnostics diagnostics)
         {
-            this.callable = callable;
-            file = callable.File;
+            this.invocable = invocable;
+            this.symbolTree = symbolTree;
+            file = invocable.File;
             this.diagnostics = diagnostics;
         }
 
         public VariableFlags StartState()
         {
             // All variables start without possibly having their values moved out of them
-            return new VariableFlags(callable, false);
+            return new VariableFlags(invocable, symbolTree, false);
         }
 
         public VariableFlags Assignment(IAssignmentExpressionSyntax assignmentExpression, VariableFlags possiblyMoved)
@@ -41,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Moves
             {
                 case INameExpressionSyntax identifierName:
                     // We are assigning into this variable so it definitely has a value now
-                    var symbol = identifierName.ReferencedBinding.Assigned();
+                    var symbol = identifierName.ReferencedSymbol.Result ?? throw new InvalidOperationException();
                     return possiblyMoved.Set(symbol, false);
                 case IFieldAccessExpressionSyntax _:
                     return possiblyMoved;
@@ -52,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Moves
 
         public VariableFlags IdentifierName(INameExpressionSyntax nameExpression, VariableFlags possiblyMoved)
         {
-            var symbol = nameExpression.ReferencedBinding.Assigned();
+            var symbol = nameExpression.ReferencedSymbol.Result ?? throw new InvalidOperationException();
             if (possiblyMoved[symbol] == true)
                 diagnostics.Add(SemanticError.UseOfPossiblyMovedValue(file, nameExpression.Span));
 

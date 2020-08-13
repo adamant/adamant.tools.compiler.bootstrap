@@ -1,33 +1,39 @@
 using System;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
+using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.DefiniteAssignment
 {
     // TODO check definite assignment of fields in constructors
     internal class DefiniteAssignmentAnalysis : IForwardDataFlowAnalysis<VariableFlags>
     {
-        private readonly IConcreteCallableDeclarationSyntax callable;
+        private readonly IConcreteInvocableDeclarationSyntax invocable;
+        private readonly SymbolTree symbolTree;
         private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
 
         public DefiniteAssignmentAnalysis(
-            IConcreteCallableDeclarationSyntax callable,
+            IConcreteInvocableDeclarationSyntax invocable,
+            SymbolTree symbolTree,
             Diagnostics diagnostics)
         {
-            this.callable = callable;
-            this.file = callable.File;
+            this.invocable = invocable;
+            this.symbolTree = symbolTree;
+            this.file = invocable.File;
             this.diagnostics = diagnostics;
         }
 
         public VariableFlags StartState()
         {
-            var definitelyAssigned = new VariableFlags(callable, false);
+            var definitelyAssigned = new VariableFlags(invocable, symbolTree, false);
             // All parameters are assigned
-            definitelyAssigned = definitelyAssigned.Set(callable.Parameters, true);
+            var namedParameters = invocable.Parameters.OfType<INamedParameterSyntax>();
+            var parameterSymbols = namedParameters.Select(p => p.Symbol.Result);
+            definitelyAssigned = definitelyAssigned.Set(parameterSymbols, true);
             return definitelyAssigned;
         }
 
@@ -38,7 +44,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.DefiniteAssignmen
             return assignmentExpression.LeftOperand switch
             {
                 INameExpressionSyntax identifier =>
-                    definitelyAssigned.Set(identifier.ReferencedBinding.Assigned(), true),
+                    definitelyAssigned.Set(identifier.ReferencedSymbol.Result!, true),
                 IFieldAccessExpressionSyntax _ => definitelyAssigned,
                 _ => throw new NotImplementedException("Complex assignments not yet implemented")
             };
@@ -48,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.DefiniteAssignmen
             INameExpressionSyntax nameExpression,
             VariableFlags definitelyAssigned)
         {
-            if (definitelyAssigned[nameExpression.ReferencedBinding.Assigned()] == false)
+            if (definitelyAssigned[nameExpression.ReferencedSymbol.Result!] == false)
                 diagnostics.Add(SemanticError.VariableMayNotHaveBeenAssigned(file,
                     nameExpression.Span, nameExpression.SimpleName));
 
@@ -61,14 +67,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.DefiniteAssignmen
         {
             if (variableDeclaration.Initializer is null)
                 return definitelyAssigned;
-            return definitelyAssigned.Set(variableDeclaration, true);
+            return definitelyAssigned.Set(variableDeclaration.Symbol.Result, true);
         }
 
         public VariableFlags VariableDeclaration(
             IForeachExpressionSyntax foreachExpression,
             VariableFlags definitelyAssigned)
         {
-            return definitelyAssigned.Set(foreachExpression, true);
+            return definitelyAssigned.Set(foreachExpression.Symbol.Result, true);
         }
     }
 }

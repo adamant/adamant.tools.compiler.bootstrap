@@ -11,13 +11,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         private readonly NameMangler nameMangler;
         private readonly IConverter<Parameter> parameterConverter;
         private readonly IConverter<DataType> typeConverter;
-        private readonly IEmitter<ICallableDeclaration> controlFlowEmitter;
+        private readonly IEmitter<IInvocableDeclaration> controlFlowEmitter;
 
         public DeclarationEmitter(
             NameMangler nameMangler,
             IConverter<Parameter> parameterConverter,
             IConverter<DataType> typeConverter,
-            IEmitter<ICallableDeclaration> controlFlowEmitter)
+            IEmitter<IInvocableDeclaration> controlFlowEmitter)
         {
             this.nameMangler = nameMangler;
             this.parameterConverter = parameterConverter;

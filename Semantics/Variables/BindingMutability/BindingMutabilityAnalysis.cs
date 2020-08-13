@@ -1,8 +1,10 @@
 using System;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
+using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.BindingMutability
 {
@@ -12,23 +14,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.BindingMutability
     /// </summary>
     public class BindingMutabilityAnalysis : IForwardDataFlowAnalysis<VariableFlags>
     {
-        private readonly IConcreteCallableDeclarationSyntax callable;
+        private readonly IConcreteInvocableDeclarationSyntax invocable;
+        private readonly SymbolTree symbolTree;
         private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
 
-        public BindingMutabilityAnalysis(IConcreteCallableDeclarationSyntax callable, Diagnostics diagnostics)
+        public BindingMutabilityAnalysis(IConcreteInvocableDeclarationSyntax invocable, SymbolTree symbolTree, Diagnostics diagnostics)
         {
-            this.callable = callable;
-            file = callable.File;
+            this.invocable = invocable;
+            this.symbolTree = symbolTree;
+            file = invocable.File;
             this.diagnostics = diagnostics;
         }
 
         public VariableFlags StartState()
         {
             // All variables start definitely unassigned
-            var definitelyUnassigned = new VariableFlags(callable, true);
+            var definitelyUnassigned = new VariableFlags(invocable, symbolTree, true);
             // All parameters are assigned
-            definitelyUnassigned = definitelyUnassigned.Set(callable.Parameters, false);
+            var namedParameters = invocable.Parameters.OfType<INamedParameterSyntax>();
+            var parameterSymbols = namedParameters.Select(p => p.Symbol.Result);
+            definitelyUnassigned = definitelyUnassigned.Set(parameterSymbols, false);
             return definitelyUnassigned;
         }
 
@@ -39,7 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.BindingMutability
             switch (assignmentExpression.LeftOperand)
             {
                 case INameExpressionSyntax identifier:
-                    var symbol = identifier.ReferencedBinding ?? throw new InvalidOperationException("Identifier doesn't have referenced symbol");
+                    var symbol = identifier.ReferencedSymbol.Result ?? throw new InvalidOperationException("Identifier doesn't have referenced symbol");
                     if (!symbol.IsMutableBinding && definitelyUnassigned[symbol] == false)
                         diagnostics.Add(SemanticError.VariableMayAlreadyBeAssigned(file, identifier.Span, identifier.SimpleName));
                     return definitelyUnassigned.Set(symbol, false);
@@ -63,14 +69,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.BindingMutability
         {
             if (variableDeclaration.Initializer is null)
                 return definitelyUnassigned;
-            return definitelyUnassigned.Set(variableDeclaration, false);
+            return definitelyUnassigned.Set(variableDeclaration.Symbol.Result, false);
         }
 
         public VariableFlags VariableDeclaration(
             IForeachExpressionSyntax foreachExpression,
             VariableFlags definitelyUnassigned)
         {
-            return definitelyUnassigned.Set(foreachExpression, false);
+            return definitelyUnassigned.Set(foreachExpression.Symbol.Result, false);
         }
     }
 }

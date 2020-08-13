@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         typeof(FunctionDeclaration),
         typeof(MethodDeclaration),
         typeof(ConstructorDeclaration))]
-    public interface ICallableDeclaration
+    public interface IInvocableDeclaration
     {
         bool IsExternal { get; }
         bool IsConstructor { get; }

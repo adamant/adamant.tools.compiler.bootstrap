@@ -8,7 +8,7 @@ using Adamant.Tools.Compiler.Bootstrap.Scopes;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    internal class CallableNameSyntax : Syntax, ICallableNameSyntax
+    internal class InvocableNameSyntax : Syntax, IInvocableNameSyntax
     {
         public MaybeQualifiedName Name { get; }
 
@@ -40,7 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             }
         }
 
-        public CallableNameSyntax(TextSpan span, SimpleName name)
+        public InvocableNameSyntax(TextSpan span, SimpleName name)
             : base(span)
         {
             Name = name;

@@ -11,7 +11,7 @@ using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    internal abstract class CallableDeclarationSyntax : DeclarationSyntax, ICallableDeclarationSyntax
+    internal abstract class InvocableDeclarationSyntax : DeclarationSyntax, IInvocableDeclarationSyntax
     {
         public IAccessModifierToken? AccessModifier { get; }
         public Name? Name { get; }
@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public MetadataSet ChildMetadata { get; protected set; }
 
-        protected CallableDeclarationSyntax(
+        protected InvocableDeclarationSyntax(
             TextSpan span,
             CodeFile file,
             IAccessModifierToken? accessModifier,

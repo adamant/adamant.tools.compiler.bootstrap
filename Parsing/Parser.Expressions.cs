@@ -155,7 +155,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                                 var arguments = ParseArguments();
                                 var closeParenSpan = Tokens.Expect<ICloseParenToken>();
                                 var invocationSpan = TextSpan.Covering(expression.Span, closeParenSpan);
-                                expression = new MethodInvocationExpressionSyntax(invocationSpan, expression, member.ToCallable(), arguments);
+                                expression = new MethodInvocationExpressionSyntax(invocationSpan, expression, member.ToInvocable(), arguments);
                             }
                             continue;
                         }
@@ -297,7 +297,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var arguments = ParseArguments();
                     var closeParenSpan = Tokens.Expect<ICloseParenToken>();
                     var span = TextSpan.Covering(name.Span, closeParenSpan);
-                    return new FunctionInvocationExpressionSyntax(span, name.ToCallable(), arguments);
+                    return new FunctionInvocationExpressionSyntax(span, name.ToInvocable(), arguments);
                 }
                 case IForeachKeywordToken _:
                     return ParseForeach();

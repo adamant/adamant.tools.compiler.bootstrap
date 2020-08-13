@@ -8,7 +8,7 @@ using Adamant.Tools.Compiler.Bootstrap.Scopes;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax
 {
-    internal class CallableNameSyntax : ICallableNameSyntax
+    internal class InvocableNameSyntax : IInvocableNameSyntax
     {
         public TextSpan Span { get; }
         public MaybeQualifiedName Name { get; }
@@ -36,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax
             set => throw new InvalidOperationException("Can't set containing scope repeatedly");
         }
 
-        public CallableNameSyntax(TextSpan span, MaybeQualifiedName name, Scope containingScope)
+        public InvocableNameSyntax(TextSpan span, MaybeQualifiedName name, Scope containingScope)
         {
             Span = span;
             Name = name;

@@ -183,7 +183,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Walkers
                 case ITypeNameSyntax _:
                 case INameExpressionSyntax _:
                 case ISelfParameterSyntax _:
-                case ICallableNameSyntax _:
+                case IInvocableNameSyntax _:
                 case IUsingDirectiveSyntax _:
                     // No Children
                     break;

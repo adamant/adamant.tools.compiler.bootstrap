@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     [Closed(
         typeof(ICompilationUnitSyntax),
         typeof(IUsingDirectiveSyntax),
-        typeof(ICallableNameSyntax),
+        typeof(IInvocableNameSyntax),
         typeof(IArgumentSyntax),
         typeof(IBodyOrBlockSyntax),
         typeof(IElseClauseSyntax),
@@ -45,7 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         NamespaceName Name { get; }
     }
 
-    public partial interface ICallableNameSyntax : ISyntax
+    public partial interface IInvocableNameSyntax : ISyntax
     {
         MaybeQualifiedName Name { get; }
     }
@@ -109,7 +109,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     }
 
     [Closed(
-        typeof(ICallableDeclarationSyntax),
+        typeof(IInvocableDeclarationSyntax),
         typeof(INonMemberEntityDeclarationSyntax),
         typeof(IMemberDeclarationSyntax))]
     public partial interface IEntityDeclarationSyntax : IDeclarationSyntax
@@ -120,9 +120,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     }
 
     [Closed(
-        typeof(IConcreteCallableDeclarationSyntax),
+        typeof(IConcreteInvocableDeclarationSyntax),
         typeof(IMethodDeclarationSyntax))]
-    public partial interface ICallableDeclarationSyntax : IEntityDeclarationSyntax, IFunctionMetadata
+    public partial interface IInvocableDeclarationSyntax : IEntityDeclarationSyntax, IFunctionMetadata
     {
         FixedList<IReachabilityAnnotationSyntax> ReachabilityAnnotations { get; }
     }
@@ -132,7 +132,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(IAssociatedFunctionDeclarationSyntax),
         typeof(IConcreteMethodDeclarationSyntax),
         typeof(IConstructorDeclarationSyntax))]
-    public partial interface IConcreteCallableDeclarationSyntax : ICallableDeclarationSyntax
+    public partial interface IConcreteInvocableDeclarationSyntax : IInvocableDeclarationSyntax
     {
         IBodySyntax Body { get; }
     }
@@ -171,7 +171,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         FixedList<IMemberDeclarationSyntax> Members { get; }
     }
 
-    public partial interface IFunctionDeclarationSyntax : INonMemberEntityDeclarationSyntax, IConcreteCallableDeclarationSyntax
+    public partial interface IFunctionDeclarationSyntax : INonMemberEntityDeclarationSyntax, IConcreteInvocableDeclarationSyntax
     {
         bool IsExternalFunction { get; }
         new Name Name { get; }
@@ -180,7 +180,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         Promise<DataType> ReturnDataType { get; }
     }
 
-    public partial interface IAssociatedFunctionDeclarationSyntax : IMemberDeclarationSyntax, IConcreteCallableDeclarationSyntax
+    public partial interface IAssociatedFunctionDeclarationSyntax : IMemberDeclarationSyntax, IConcreteInvocableDeclarationSyntax
     {
         new Name Name { get; }
         new Promise<FunctionSymbol> Symbol { get; }
@@ -201,7 +201,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     [Closed(
         typeof(IAbstractMethodDeclarationSyntax),
         typeof(IConcreteMethodDeclarationSyntax))]
-    public partial interface IMethodDeclarationSyntax : IMemberDeclarationSyntax, ICallableDeclarationSyntax
+    public partial interface IMethodDeclarationSyntax : IMemberDeclarationSyntax, IInvocableDeclarationSyntax
     {
         new Name Name { get; }
         new Promise<MethodSymbol> Symbol { get; }
@@ -214,11 +214,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     {
     }
 
-    public partial interface IConcreteMethodDeclarationSyntax : IMethodDeclarationSyntax, IConcreteCallableDeclarationSyntax
+    public partial interface IConcreteMethodDeclarationSyntax : IMethodDeclarationSyntax, IConcreteInvocableDeclarationSyntax
     {
     }
 
-    public partial interface IConstructorDeclarationSyntax : IMemberDeclarationSyntax, IConcreteCallableDeclarationSyntax
+    public partial interface IConstructorDeclarationSyntax : IMemberDeclarationSyntax, IConcreteInvocableDeclarationSyntax
     {
         new Promise<ConstructorSymbol> Symbol { get; }
         ISelfParameterSyntax ImplicitSelfParameter { get; }
@@ -432,7 +432,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface IFunctionInvocationExpressionSyntax : IInvocationExpressionSyntax
     {
-        ICallableNameSyntax FunctionNameSyntax { get; }
+        IInvocableNameSyntax FunctionNameSyntax { get; }
     }
 
     public partial interface IIfExpressionSyntax : IExpressionSyntax, IElseClauseSyntax
@@ -501,7 +501,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface IMethodInvocationExpressionSyntax : IInvocationExpressionSyntax
     {
-        ICallableNameSyntax MethodNameSyntax { get; }
+        IInvocableNameSyntax MethodNameSyntax { get; }
     }
 
     public partial interface IMoveExpressionSyntax : IExpressionSyntax
@@ -519,7 +519,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface INewObjectExpressionSyntax : IExpressionSyntax
     {
         ITypeNameSyntax Type { get; }
-        ICallableNameSyntax? ConstructorName { get; }
+        IInvocableNameSyntax? ConstructorName { get; }
         FixedList<IArgumentSyntax> Arguments { get; }
     }
 

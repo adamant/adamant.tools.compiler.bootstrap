@@ -23,9 +23,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             return new NameExpressionSyntax(Span, Name);
         }
 
-        public CallableNameSyntax ToCallable()
+        public InvocableNameSyntax ToInvocable()
         {
-            return new CallableNameSyntax(Span, Name.ToSimpleName());
+            return new InvocableNameSyntax(Span, Name.ToSimpleName());
         }
     }
 }

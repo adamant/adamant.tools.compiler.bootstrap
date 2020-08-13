@@ -5,7 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     /// <summary>
     /// Base type for any declaration that declares a callable thing
     /// </summary>
-    public partial interface ICallableDeclarationSyntax
+    public partial interface IInvocableDeclarationSyntax
     {
         new FixedList<IConstructorParameterSyntax> Parameters { get; }
     }

@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax
     {
         public TextSpan Span { get; }
 
-        public ICallableNameSyntax FunctionNameSyntax { get; }
+        public IInvocableNameSyntax FunctionNameSyntax { get; }
         public MaybeQualifiedName FullName { get; }
         public FixedList<IArgumentSyntax> Arguments { get; }
 
@@ -48,7 +48,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax
 
         public FunctionInvocationExpressionSyntax(
             TextSpan span,
-            ICallableNameSyntax functionNameSyntax,
+            IInvocableNameSyntax functionNameSyntax,
             MaybeQualifiedName fullName,
             FixedList<IArgumentSyntax> arguments)
         {

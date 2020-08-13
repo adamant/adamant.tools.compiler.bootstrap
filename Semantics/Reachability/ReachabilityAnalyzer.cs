@@ -23,30 +23,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
     /// types.</remarks>
     public class ReachabilityAnalyzer
     {
-        private readonly IConcreteCallableDeclarationSyntax callableDeclaration;
+        private readonly IConcreteInvocableDeclarationSyntax invocableDeclaration;
         private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
 
-        private ReachabilityAnalyzer(IConcreteCallableDeclarationSyntax callableDeclaration, Diagnostics diagnostics)
+        private ReachabilityAnalyzer(IConcreteInvocableDeclarationSyntax invocableDeclaration, Diagnostics diagnostics)
         {
-            this.callableDeclaration = callableDeclaration;
-            file = callableDeclaration.File;
+            this.invocableDeclaration = invocableDeclaration;
+            file = invocableDeclaration.File;
             this.diagnostics = diagnostics;
         }
 
         public static void Analyze(
-            FixedList<IConcreteCallableDeclarationSyntax> callableDeclarations,
+            FixedList<IConcreteInvocableDeclarationSyntax> invocableDeclarations,
             Diagnostics diagnostics)
         {
-            foreach (var callableDeclaration in callableDeclarations)
-                new ReachabilityAnalyzer(callableDeclaration, diagnostics).Analyze();
+            foreach (var invocableDeclaration in invocableDeclarations)
+                new ReachabilityAnalyzer(invocableDeclaration, diagnostics).Analyze();
         }
 
         private void Analyze()
         {
             var graph = new ReachabilityGraph();
             var scope = CreateParameterScope(graph);
-            foreach (var statement in callableDeclaration.Body.Statements)
+            foreach (var statement in invocableDeclaration.Body.Statements)
                 Analyze(statement, graph, scope);
 
             // TODO handle implicit return at end
@@ -238,7 +238,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     {
                         // TODO make a deep copy of the graph so the existing graph is intact
                         // create a new temp with the correct reference capabilities to the value
-                        var returnValue = graph.AddReturnValue(exp, callableDeclaration.ReturnDataType)!;
+                        var returnValue = graph.AddReturnValue(exp, invocableDeclaration.ReturnDataType)!;
                         returnValue.AssignFrom(temp, returnValue.ReferenceType.ReferenceCapability);
                         // Exit the function, releasing all temps and variables except the returned value
                         graph.ExitFunction(returnValue);
@@ -504,7 +504,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             var parameterScope = new VariableScope();
 
             CreateSelfParameter(graph, parameterScope);
-            foreach (var parameter in callableDeclaration.Parameters.OfType<INamedParameterSyntax>())
+            foreach (var parameter in invocableDeclaration.Parameters.OfType<INamedParameterSyntax>())
                 CreateParameter(parameter, graph, parameterScope);
 
             return parameterScope;
@@ -524,10 +524,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
         {
             IClassDeclarationSyntax declaringClass;
             ISelfParameterSyntax selfParameter;
-            switch (callableDeclaration)
+            switch (invocableDeclaration)
             {
                 default:
-                    throw ExhaustiveMatch.Failed(callableDeclaration);
+                    throw ExhaustiveMatch.Failed(invocableDeclaration);
                 case IFunctionDeclarationSyntax _:
                 case IAssociatedFunctionDeclarationSyntax _:
                     return;

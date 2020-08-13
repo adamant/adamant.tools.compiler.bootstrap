@@ -2,6 +2,7 @@ using System;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.CST.Walkers;
+using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
 {
@@ -9,11 +10,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
         where TState : class
     {
         private readonly IBackwardDataFlowAnalyzer<TState> strategy;
+        private readonly SymbolTree symbolTree;
         private readonly Diagnostics diagnostics;
 
-        public BackwardDataFlowAnalyzer(IBackwardDataFlowAnalyzer<TState> strategy, Diagnostics diagnostics)
+        public BackwardDataFlowAnalyzer(
+            IBackwardDataFlowAnalyzer<TState> strategy,
+            SymbolTree symbolTree,
+            Diagnostics diagnostics)
         {
             this.strategy = strategy;
+            this.symbolTree = symbolTree;
             this.diagnostics = diagnostics;
         }
 
@@ -25,8 +31,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
             // TODO this doesn't handle loops correctly
             switch (syntax)
             {
-                case IConcreteCallableDeclarationSyntax exp:
-                    checker = strategy.BeginAnalysis(exp, diagnostics);
+                case IConcreteInvocableDeclarationSyntax exp:
+                    checker = strategy.BeginAnalysis(exp, symbolTree, diagnostics);
                     currentState = checker.StartState();
                     break;
                 case IAssignmentExpressionSyntax exp:

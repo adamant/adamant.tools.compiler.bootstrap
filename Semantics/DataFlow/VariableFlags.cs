@@ -1,25 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
+using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
 {
     public class VariableFlags
     {
-        private readonly FixedDictionary<IMetadata, int> symbolMap;
+        private readonly FixedDictionary<BindingSymbol, int> symbolMap;
         private readonly BitArray flags;
 
-        public VariableFlags(IConcreteCallableDeclarationSyntax callable, bool defaultValue)
+        public VariableFlags(IConcreteInvocableDeclarationSyntax invocable, SymbolTree symbolTree, bool defaultValue)
         {
-            symbolMap = callable.ChildMetadata.Enumerate<IMetadata>().ToFixedDictionary();
+            var invocableSymbol = invocable.Symbol.Result;
+            symbolMap = symbolTree.Children(invocableSymbol).Cast<BindingSymbol>().Enumerate().ToFixedDictionary();
             flags = new BitArray(symbolMap.Count, defaultValue);
         }
 
         public VariableFlags(
-            FixedDictionary<IMetadata, int> symbolMap,
+            FixedDictionary<BindingSymbol, int> symbolMap,
             BitArray flags)
         {
             this.symbolMap = symbolMap;
@@ -31,9 +34,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
         /// variable.
         /// </summary>
         [SuppressMessage("Design", "CA1043:Use Integral Or String Argument For Indexers", Justification = "Symbols are like immutable strings")]
-        public bool? this[IMetadata symbol] => symbolMap.TryGetValue(symbol, out var i) ? (bool?)flags[i] : null;
+        public bool? this[BindingSymbol symbol] => symbolMap.TryGetValue(symbol, out var i) ? (bool?)flags[i] : null;
 
-        public VariableFlags Set(IMetadata symbol, bool value)
+        public VariableFlags Set(BindingSymbol symbol, bool value)
         {
             // TODO if setting to the current value, don't need to clone
             var newFlags = Clone();
@@ -41,7 +44,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
             return newFlags;
         }
 
-        public VariableFlags Set(IEnumerable<IMetadata> symbols, bool value)
+        public VariableFlags Set(IEnumerable<BindingSymbol> symbols, bool value)
         {
             // TODO if setting to the current value, don't need to clone
             var newFlags = Clone();

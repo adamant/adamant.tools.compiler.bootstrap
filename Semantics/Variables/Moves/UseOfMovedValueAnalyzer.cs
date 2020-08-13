@@ -1,6 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
+using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Moves
 {
@@ -12,9 +13,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Moves
         private UseOfMovedValueAnalyzer() { }
         #endregion
 
-        public IForwardDataFlowAnalysis<VariableFlags> BeginAnalysis(IConcreteCallableDeclarationSyntax callable, Diagnostics diagnostics)
+        public IForwardDataFlowAnalysis<VariableFlags> BeginAnalysis(
+            IConcreteInvocableDeclarationSyntax invocable,
+            SymbolTree symbolTree,
+            Diagnostics diagnostics)
         {
-            return new UseOfMovedValueAnalysis(callable, diagnostics);
+            return new UseOfMovedValueAnalysis(invocable, symbolTree, diagnostics);
         }
     }
 }

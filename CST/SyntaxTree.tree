@@ -18,7 +18,7 @@ CompilationUnit = CodeFile ImplicitNamespaceName:NamespaceName UsingDirectives:U
 UsingDirective = Name:NamespaceName;
 
 // Function Parts
-CallableName = Name:MaybeQualifiedName;
+InvocableName = Name:MaybeQualifiedName;
 Argument;
 Body: BodyOrBlock = Statements:BodyStatement*;
 
@@ -32,8 +32,8 @@ LocalBinding: Binding;
 // Declarations
 Declaration: 'ISyntax', IHasContainingLexicalScope = File:CodeFile NameSpan:TextSpan;
 EntityDeclaration: Declaration = AccessModifier:IAccessModifierToken? Name? Symbol:IPromise<Symbol>;
-CallableDeclaration: EntityDeclaration, IFunctionMetadata = ReachabilityAnnotations:ReachabilityAnnotation*;
-ConcreteCallableDeclaration: CallableDeclaration = Body;
+InvocableDeclaration: EntityDeclaration, IFunctionMetadata = ReachabilityAnnotations:ReachabilityAnnotation*;
+ConcreteInvocableDeclaration: InvocableDeclaration = Body;
 
 // Non-Member Declarations
 NonMemberDeclaration: Declaration = ContainingNamespaceName:NamespaceName;
@@ -42,15 +42,15 @@ NamespaceDeclaration: NonMemberDeclaration, Declaration = IsGlobalQualified:bool
 // Non-Member Entity Declarations
 NonMemberEntityDeclaration: EntityDeclaration, NonMemberDeclaration = Name;
 ClassDeclaration: NonMemberEntityDeclaration = MutableModifier:IMutableKeywordToken? Name Symbol:Promise<ObjectTypeSymbol> Members:MemberDeclaration*;
-FunctionDeclaration: NonMemberEntityDeclaration, ConcreteCallableDeclaration = IsExternalFunction:bool Name Symbol:Promise<FunctionSymbol> ReturnType:Type? ReturnDataType:Promise<DataType>;
-AssociatedFunctionDeclaration: MemberDeclaration, ConcreteCallableDeclaration = Name Symbol:Promise<FunctionSymbol> ReturnType:Type? ReturnDataType:Promise<DataType>;
+FunctionDeclaration: NonMemberEntityDeclaration, ConcreteInvocableDeclaration = IsExternalFunction:bool Name Symbol:Promise<FunctionSymbol> ReturnType:Type? ReturnDataType:Promise<DataType>;
+AssociatedFunctionDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = Name Symbol:Promise<FunctionSymbol> ReturnType:Type? ReturnDataType:Promise<DataType>;
 
 // Member Declarations
 MemberDeclaration: EntityDeclaration = DeclaringClass:ClassDeclaration;
-MethodDeclaration: MemberDeclaration, CallableDeclaration = Name Symbol:Promise<MethodSymbol> SelfParameter ReturnType:Type? ReturnDataType:Promise<DataType>;
+MethodDeclaration: MemberDeclaration, InvocableDeclaration = Name Symbol:Promise<MethodSymbol> SelfParameter ReturnType:Type? ReturnDataType:Promise<DataType>;
 AbstractMethodDeclaration: MethodDeclaration;
-ConcreteMethodDeclaration: MethodDeclaration, ConcreteCallableDeclaration;
-ConstructorDeclaration: MemberDeclaration, ConcreteCallableDeclaration = Symbol:Promise<ConstructorSymbol> ImplicitSelfParameter:SelfParameter;
+ConcreteMethodDeclaration: MethodDeclaration, ConcreteInvocableDeclaration;
+ConstructorDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = Symbol:Promise<ConstructorSymbol> ImplicitSelfParameter:SelfParameter;
 FieldDeclaration: MemberDeclaration, Binding = Name Symbol:Promise<FieldSymbol> Type;
 
 // ---------- Parameters --------------
@@ -92,7 +92,7 @@ BorrowExpression: Expression = ReferencedSymbol:Promise<BindingSymbol?>;
 BreakExpression: Expression;
 FieldAccessExpression: AssignableExpression = AccessOperator Field:NameExpression ReferencedSymbol:IPromise<FieldSymbol?>;
 ForeachExpression: Expression, LocalBinding = VariableName:Name DeclarationNumber:Promise<int?> Symbol:Promise<VariableSymbol> Type? Block:BlockExpression;
-FunctionInvocationExpression: InvocationExpression = FunctionNameSyntax:CallableName;
+FunctionInvocationExpression: InvocationExpression = FunctionNameSyntax:InvocableName;
 IfExpression: Expression, ElseClause = ThenBlock:BlockOrResult ElseClause?;
 ImplicitConversionExpression: Expression = Expression DataType;
 ImplicitImmutabilityConversionExpression: ImplicitConversionExpression;
@@ -103,10 +103,10 @@ IntegerLiteralExpression: LiteralExpression = Value:BigInteger;
 InvocationExpression: Expression = FullName:MaybeQualifiedName Arguments:Argument*;
 LiteralExpression: Expression;
 LoopExpression: Expression = Block:BlockExpression;
-MethodInvocationExpression: InvocationExpression = MethodNameSyntax:CallableName;
+MethodInvocationExpression: InvocationExpression = MethodNameSyntax:InvocableName;
 MoveExpression: Expression = ReferencedSymbol:Promise<BindingSymbol?>;
 NameExpression: AssignableExpression, IHasContainingScope, IHasContainingLexicalScope = Name? SimpleName ReferencedSymbol:Promise<BindingSymbol?>;
-NewObjectExpression: Expression = Type:TypeName ConstructorName:CallableName? Arguments:Argument*;
+NewObjectExpression: Expression = Type:TypeName ConstructorName:InvocableName? Arguments:Argument*;
 NextExpression: Expression;
 NoneLiteralExpression: LiteralExpression;
 ReturnExpression: Expression;

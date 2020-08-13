@@ -11,7 +11,7 @@ using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    internal class FunctionDeclarationSyntax : CallableDeclarationSyntax, IFunctionDeclarationSyntax
+    internal class FunctionDeclarationSyntax : InvocableDeclarationSyntax, IFunctionDeclarationSyntax
     {
         public NamespaceName ContainingNamespaceName { get; }
 

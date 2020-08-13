@@ -8,12 +8,12 @@ using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
-    public class MethodDeclaration : Declaration, ICallableDeclaration, IMethodMetadata
+    public class MethodDeclaration : Declaration, IInvocableDeclaration, IMethodMetadata
     {
         public bool IsExternal => false;
         [SuppressMessage("Design", "CA1033:Interface methods should be callable by child types",
             Justification = "NA")]
-        bool ICallableDeclaration.IsConstructor => false;
+        bool IInvocableDeclaration.IsConstructor => false;
         public Parameter SelfParameter { get; }
 
         [SuppressMessage("Design", "CA1033:Interface methods should be callable by child types",

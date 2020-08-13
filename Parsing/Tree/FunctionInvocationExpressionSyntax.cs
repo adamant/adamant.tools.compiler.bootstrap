@@ -7,11 +7,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class FunctionInvocationExpressionSyntax : InvocationExpressionSyntax, IFunctionInvocationExpressionSyntax
     {
-        public ICallableNameSyntax FunctionNameSyntax { get; }
+        public IInvocableNameSyntax FunctionNameSyntax { get; }
 
         public FunctionInvocationExpressionSyntax(
             TextSpan span,
-            ICallableNameSyntax functionNameSyntax,
+            IInvocableNameSyntax functionNameSyntax,
             FixedList<IArgumentSyntax> arguments)
             : base(span, functionNameSyntax.Name, arguments)
         {

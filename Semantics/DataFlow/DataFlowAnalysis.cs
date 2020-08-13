@@ -1,6 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
 {
@@ -30,24 +31,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
     {
         public static void Check<TState>(
             IForwardDataFlowAnalyzer<TState> strategy,
-            FixedList<IConcreteCallableDeclarationSyntax> callableDeclarations,
+            FixedList<IConcreteInvocableDeclarationSyntax> invocableDeclarations,
+            SymbolTree symbolTree,
             Diagnostics diagnostics)
             where TState : class
         {
-            var dataFlowAnalyzer = new ForwardDataFlowAnalyzer<TState>(strategy, diagnostics);
-            foreach (var callableDeclaration in callableDeclarations)
-                dataFlowAnalyzer.Walk(callableDeclaration, false);
+            var dataFlowAnalyzer = new ForwardDataFlowAnalyzer<TState>(strategy, symbolTree, diagnostics);
+            foreach (var invocableDeclaration in invocableDeclarations)
+                dataFlowAnalyzer.Walk(invocableDeclaration, false);
         }
 
         public static void Check<TState>(
             IBackwardDataFlowAnalyzer<TState> strategy,
-            FixedList<IConcreteCallableDeclarationSyntax> callableDeclarations,
+            FixedList<IConcreteInvocableDeclarationSyntax> invocableDeclarations,
+            SymbolTree symbolTree,
             Diagnostics diagnostics)
             where TState : class
         {
-            var dataFlowAnalyzer = new BackwardDataFlowAnalyzer<TState>(strategy, diagnostics);
-            foreach (var callableDeclaration in callableDeclarations)
-                dataFlowAnalyzer.Walk(callableDeclaration, false);
+            var dataFlowAnalyzer = new BackwardDataFlowAnalyzer<TState>(strategy, symbolTree, diagnostics);
+            foreach (var invocableDeclaration in invocableDeclarations)
+                dataFlowAnalyzer.Walk(invocableDeclaration, false);
         }
     }
 }

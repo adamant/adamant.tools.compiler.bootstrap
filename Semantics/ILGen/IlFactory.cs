@@ -7,11 +7,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
     public class ILFactory
     {
         [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "OO")]
-        public ControlFlowGraph CreateGraph(IConcreteCallableDeclarationSyntax callableDeclaration)
+        public ControlFlowGraph CreateGraph(IConcreteInvocableDeclarationSyntax invocableDeclaration)
         {
             // TODO build control flow graphs for field initializers
 
-            var fabrication = new ControlFlowGraphFabrication(callableDeclaration);
+            var fabrication = new ControlFlowGraphFabrication(invocableDeclaration);
             return fabrication.CreateGraph();
         }
     }
