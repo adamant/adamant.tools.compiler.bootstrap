@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
 
@@ -16,8 +17,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     {
         private bool isDirty = false;
         private bool recomputingCurrentAccess = false;
-        private readonly Dictionary<IBindingSyntax, CallerVariable> callerVariables = new Dictionary<IBindingSyntax, CallerVariable>();
-        private readonly Dictionary<IBindingSyntax, Variable> variables = new Dictionary<IBindingSyntax, Variable>();
+        private readonly Dictionary<BindingSymbol, CallerVariable> callerVariables = new Dictionary<BindingSymbol, CallerVariable>();
+        private readonly Dictionary<BindingSymbol, Variable> variables = new Dictionary<BindingSymbol, Variable>();
         private readonly Dictionary<ISyntax, Object> objects = new Dictionary<ISyntax, Object>();
         private readonly HashSet<TempValue> tempValues = new HashSet<TempValue>();
 
@@ -59,7 +60,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 return null;
 
             CallerVariable? callerVariable = null;
-            var localVariable = new Variable(this, parameter);
+            var localVariable = new Variable(this, parameter.Symbol.Result);
 
             var capability = referenceType.ReferenceCapability;
             switch (capability)
@@ -111,7 +112,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
             if (!(callerVariable is null))
             {
-                callerVariables.Add(callerVariable.Syntax, callerVariable);
+                callerVariables.Add(callerVariable.Symbol, callerVariable);
                 AddReferences(callerVariable);
             }
 
@@ -130,9 +131,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return variable;
         }
 
-        public Variable? AddVariable(ILocalBindingSyntax bindingSymbol)
+        public Variable? AddVariable(BindingSymbol bindingSymbol)
         {
-            var referenceType = bindingSymbol.BindingDataType.Known().UnderlyingReferenceType();
+            var referenceType = bindingSymbol.DataType.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
 
             var variable = Variable.Declared(this, bindingSymbol);
@@ -190,7 +191,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         private void Add(Variable? variable)
         {
             if (variable is null) return; // for convenience
-            variables.Add(variable.Syntax, variable);
+            variables.Add(variable.Symbol, variable);
             AddReferences(variable);
             Dirty();
         }
@@ -201,10 +202,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 Add(reference.Referent);
         }
 
-        public void EndVariableScope(IBindingSyntax variable)
+        public void EndVariableScope(BindingSymbol variable)
         {
             if (!variables.Remove(variable, out var place))
-                throw new Exception($"Variable '{variable.Symbol.Result.Name}' does not exist in the graph.");
+                throw new Exception($"Variable '{variable.Name}' does not exist in the graph.");
 
             place.Freed();
             Dirty();
@@ -223,7 +224,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         public void ExitFunction(TempValue? returnValue)
         {
             foreach (var tempValue in TempValues.Except(returnValue).ToList()) Drop(tempValue);
-            foreach (var variable in Variables.ToList()) EndVariableScope(variable.Syntax);
+            foreach (var variable in Variables.ToList()) EndVariableScope(variable.Symbol);
         }
 
         public void Drop(IEnumerable<TempValue?> temps)
@@ -264,12 +265,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             Drop(value);
         }
 
-        public Variable GetVariableFor(IBindingSyntax variableSymbol)
+        public Variable GetVariableFor(BindingSymbol variableSymbol)
         {
             // Variable needs to have already been declared
             return variables[variableSymbol];
         }
-        public Variable? TryGetVariableFor(IBindingSyntax variableSymbol)
+        public Variable? TryGetVariableFor(BindingSymbol variableSymbol)
         {
             return variables.TryGetValue(variableSymbol, out var variable)
                 ? variable : null;

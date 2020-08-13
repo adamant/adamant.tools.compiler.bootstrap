@@ -1,5 +1,6 @@
 using System;
 using Adamant.Tools.Compiler.Bootstrap.CST;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
@@ -9,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     /// </summary>
     public class Variable : StackPlace
     {
-        public IBindingSyntax Syntax { get; }
+        public BindingSymbol Symbol { get; }
 
         /// <summary>
         /// The type of this variable or field. If the original type was optional
@@ -17,12 +18,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         /// </summary>
         public ReferenceType Type { get; }
 
-        internal Variable(ReachabilityGraph graph, IBindingSyntax syntax)
+        internal Variable(ReachabilityGraph graph, BindingSymbol symbol)
             : base(graph)
         {
-            Syntax = syntax;
-            Type = syntax.BindingDataType.UnderlyingReferenceType()
-                   ?? throw new ArgumentException("Must be a reference type", nameof(syntax));
+            Symbol = symbol;
+            Type = symbol.DataType.UnderlyingReferenceType()
+                   ?? throw new ArgumentException("Must be a reference type", nameof(symbol));
         }
 
         internal static Variable? ForField(ReachabilityGraph graph, IFieldDeclarationSyntax field)
@@ -31,15 +32,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             var referenceType = field.DataType.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
 
-            var variable = new Variable(graph, field);
+            var variable = new Variable(graph, field.Symbol.Result);
             variable.AddReference(Reference.ToNewFieldObject(graph, field));
 
             return variable;
         }
 
-        internal static Variable? Declared(ReachabilityGraph graph, ILocalBindingSyntax syntax)
+        internal static Variable? Declared(ReachabilityGraph graph, BindingSymbol syntax)
         {
-            var referenceType = syntax.BindingDataType.Known().UnderlyingReferenceType();
+            var referenceType = syntax.DataType.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
 
             return new Variable(graph, syntax);
@@ -57,7 +58,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         public override string ToString()
         {
-            return $"{Syntax.Symbol.Result.Name}: {Syntax.BindingDataType}";
+            return $"{Symbol.Name}: {Symbol.DataType}";
         }
     }
 }

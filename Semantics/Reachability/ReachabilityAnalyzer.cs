@@ -108,7 +108,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     _ = referenceType ?? throw new InvalidOperationException("Can't move value type");
 
                     // The referent should be a name or `self` so we don't need to evaluate it
-                    var variable = graph.GetVariableFor((IBindingSyntax)exp.MovedSymbol.Assigned());
+                    var variable = graph.GetVariableFor(exp.ReferencedSymbol.Result!);
                     var temp = TempValue.For(graph, exp);
                     temp?.MoveFrom(variable);
                     graph.Add(temp);
@@ -119,7 +119,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     _ = referenceType ?? throw new InvalidOperationException("Can't borrow value type");
 
                     // If there is a variable, it is a simple borrow expression
-                    var variable = graph.TryGetVariableFor((IBindingSyntax)exp.BorrowedFromBinding.Assigned());
+                    var variable = graph.TryGetVariableFor(exp.ReferencedSymbol.Result!);
                     if (!(variable is null))
                     {
                         var temp = TempValue.For(graph, exp);
@@ -140,7 +140,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     _ = referenceType ?? throw new InvalidOperationException("Can't share value type");
 
                     // The referent should be a name or `self` so we don't need to evaluate it
-                    var variable = graph.TryGetVariableFor((IBindingSyntax)exp.SharedMetadata.Assigned());
+                    var variable = graph.TryGetVariableFor(exp.ReferencedSymbol.Result!);
                     if (!(variable is null))
                     {
                         var temp = TempValue.For(graph, exp);
@@ -448,7 +448,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     throw ExhaustiveMatch.Failed(expression);
                 case IFieldAccessExpressionSyntax exp:
                 {
-                    var variable = graph.TryGetVariableFor((IBindingSyntax)exp.ReferencedBinding.Assigned());
+                    var variable = graph.TryGetVariableFor(exp.ReferencedSymbol.Result!);
                     if (!(variable is null)) return variable;
 
                     if (!isReferenceType && exp.ContextExpression is ISelfExpressionSyntax) return null;
@@ -465,7 +465,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 }
                 case INameExpressionSyntax exp:
                 {
-                    return isReferenceType ? graph.GetVariableFor((IBindingSyntax)exp.ReferencedBinding.Assigned()) : null;
+                    return isReferenceType ? graph.GetVariableFor(exp.ReferencedSymbol.Result!) : null;
                 }
             }
         }
@@ -517,7 +517,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
         {
             var localVariable = graph.AddParameter(parameter);
             if (!(localVariable is null))
-                parameterScope.VariableDeclared(localVariable.Syntax);
+                parameterScope.VariableDeclared(localVariable.Symbol);
         }
 
         private void CreateSelfParameter(ReachabilityGraph graph, VariableScope parameterScope)
@@ -557,9 +557,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             ReachabilityGraph graph,
             VariableScope scope)
         {
-            var variable = graph.AddVariable(variableSyntax);
+            var variable = graph.AddVariable(variableSyntax.Symbol.Result);
             if (!(variable is null))
-                scope.VariableDeclared(variable.Syntax);
+                scope.VariableDeclared(variable.Symbol);
             return variable;
         }
     }

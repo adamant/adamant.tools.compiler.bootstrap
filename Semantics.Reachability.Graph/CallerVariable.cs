@@ -1,5 +1,6 @@
 using System;
 using Adamant.Tools.Compiler.Bootstrap.CST;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
@@ -11,27 +12,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     /// </summary>
     public class CallerVariable : StackPlace
     {
-        public ILocalBindingSyntax Syntax { get; }
+        public BindingSymbol Symbol { get; }
 
-        private CallerVariable(ReachabilityGraph graph, ILocalBindingSyntax syntax)
+        private CallerVariable(ReachabilityGraph graph, BindingSymbol symbol)
             : base(graph)
         {
-            _ = syntax.BindingDataType.UnderlyingReferenceType()
-                ?? throw new ArgumentException("Must be a reference type", nameof(syntax));
-            Syntax = syntax;
+            _ = symbol.DataType.UnderlyingReferenceType()
+                ?? throw new ArgumentException("Must be a reference type", nameof(symbol));
+            Symbol = symbol;
         }
 
         internal static CallerVariable CreateForParameterWithObject(ReachabilityGraph graph, IBindingParameterSyntax parameter)
         {
             var reference = Reference.ToNewParameterContextObject(graph, parameter);
-            var callerVariable = new CallerVariable(graph, parameter);
+            var callerVariable = new CallerVariable(graph, parameter.Symbol.Result);
             callerVariable.AddReference(reference);
             return callerVariable;
         }
 
         public override string ToString()
         {
-            return $"⟦{Syntax.Symbol.Result.Name}⟧: {Syntax.BindingDataType}";
+            return $"⟦{Symbol.Name}⟧: {Symbol.DataType}";
         }
     }
 }

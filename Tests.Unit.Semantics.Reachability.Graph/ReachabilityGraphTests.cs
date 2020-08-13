@@ -1,6 +1,8 @@
 using Adamant.Tools.Compiler.Bootstrap.CST;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using Moq;
 using Xunit;
@@ -75,9 +77,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Reachability.Gra
             var fakeReferenceType = new ObjectType(NamespaceName.Global, "Fake", false, ReferenceCapability.Shared);
             mockExpression.Setup(e => e.DataType).Returns(fakeReferenceType);
             var temp = graph.AddObject(mockExpression.Object);
-            var mockVariableBinding = new Mock<ILocalBindingSyntax>();
-            mockVariableBinding.Setup(v => v.BindingDataType).Returns(fakeReferenceType);
-            var variable = graph.AddVariable(mockVariableBinding.Object);
+            var funcSymbol = new FunctionSymbol(new PackageSymbol("my.package"), "func", FixedList<DataType>.Empty, DataType.Void);
+            var fakeVariableSymbol = new VariableSymbol(funcSymbol, "var_name", null, false, fakeReferenceType);
+            var variable = graph.AddVariable(fakeVariableSymbol);
 
             graph.Assign(variable, temp);
 
