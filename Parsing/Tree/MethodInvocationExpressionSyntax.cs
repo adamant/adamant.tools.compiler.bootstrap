@@ -1,6 +1,8 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
@@ -11,13 +13,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public ref IExpressionSyntax ContextExpression => ref contextExpression;
 
         public IInvocableNameSyntax MethodNameSyntax { get; }
+        public Promise<MethodSymbol?> ReferencedSymbol { get; } = new Promise<MethodSymbol?>();
 
         public MethodInvocationExpressionSyntax(
             TextSpan span,
             IExpressionSyntax contextExpression,
+            Name name,
             IInvocableNameSyntax methodNameSyntax,
             FixedList<IArgumentSyntax> arguments)
-            : base(span, methodNameSyntax.Name, arguments)
+            : base(span, name, methodNameSyntax.Name, arguments)
         {
             this.contextExpression = contextExpression;
             MethodNameSyntax = methodNameSyntax;

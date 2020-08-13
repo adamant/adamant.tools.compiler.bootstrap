@@ -9,12 +9,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
     /// </summary>
     public sealed class VariableSymbol : BindingSymbol
     {
-        public new InvokableSymbol ContainingSymbol { get; }
+        public new InvocableSymbol ContainingSymbol { get; }
         public new Name Name { get; }
         public int? DeclarationNumber { get; }
 
         public VariableSymbol(
-            InvokableSymbol containingSymbol,
+            InvocableSymbol containingSymbol,
             Name name,
             int? declarationNumber,
             bool isMutableBinding,

@@ -6,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Symbols
 {
-    public sealed class ConstructorSymbol : InvokableSymbol
+    public sealed class ConstructorSymbol : InvocableSymbol
     {
         public new ObjectTypeSymbol ContainingSymbol { get; }
 

@@ -113,7 +113,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
 
         protected VariableSymbol Variable(
             string? name = null,
-            InvokableSymbol? containing = null,
+            InvocableSymbol? containing = null,
             int? declaration = null,
             bool? mut = null,
             DataType? type = null)
@@ -129,7 +129,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
         protected static VariableSymbol Variable(
             VariableSymbol mother,
             string? name = null,
-            InvokableSymbol? containing = null,
+            InvocableSymbol? containing = null,
             int? declaration = null,
             bool? mut = null,
             DataType? type = null)

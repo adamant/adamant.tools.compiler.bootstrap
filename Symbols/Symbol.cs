@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
     [Closed(
         typeof(NamespaceOrPackageSymbol),
         typeof(TypeSymbol),
-        typeof(InvokableSymbol),
+        typeof(InvocableSymbol),
         typeof(BindingSymbol))]
     public abstract class Symbol : IEquatable<Symbol>
     {

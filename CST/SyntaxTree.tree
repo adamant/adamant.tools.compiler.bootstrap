@@ -90,9 +90,10 @@ BlockExpression: Expression, BlockOrResult, BodyOrBlock;
 BoolLiteralExpression: LiteralExpression = Value:bool;
 BorrowExpression: Expression = ReferencedSymbol:Promise<BindingSymbol?>;
 BreakExpression: Expression;
+// TODO in the CST, we don't know that this is a field access, it is just a qualified access (not even member because namespaces don't have members)
 FieldAccessExpression: AssignableExpression = AccessOperator Field:NameExpression ReferencedSymbol:IPromise<FieldSymbol?>;
 ForeachExpression: Expression, LocalBinding = VariableName:Name DeclarationNumber:Promise<int?> Symbol:Promise<VariableSymbol> Type? Block:BlockExpression;
-FunctionInvocationExpression: InvocationExpression = FunctionNameSyntax:InvocableName;
+FunctionInvocationExpression: InvocationExpression = FunctionNameSyntax:InvocableName ReferencedSymbol:Promise<FunctionSymbol?>;
 IfExpression: Expression, ElseClause = ThenBlock:BlockOrResult ElseClause?;
 ImplicitConversionExpression: Expression = Expression DataType;
 ImplicitImmutabilityConversionExpression: ImplicitConversionExpression;
@@ -100,13 +101,14 @@ ImplicitNoneConversionExpression: ImplicitConversionExpression = ConvertToType:'
 ImplicitNumericConversionExpression: ImplicitConversionExpression = ConvertToType:NumericType;
 ImplicitOptionalConversionExpression: ImplicitConversionExpression = ConvertToType:'OptionalType';
 IntegerLiteralExpression: LiteralExpression = Value:BigInteger;
-InvocationExpression: Expression = FullName:MaybeQualifiedName Arguments:Argument*;
+InvocationExpression: Expression = Name FullName:MaybeQualifiedName  Arguments:Argument*;
 LiteralExpression: Expression;
 LoopExpression: Expression = Block:BlockExpression;
-MethodInvocationExpression: InvocationExpression = MethodNameSyntax:InvocableName;
+// TODO in the CST, we don't know that this is a method invocation, it is just a qualified invocation (not even member because namespaces don't have members)
+MethodInvocationExpression: InvocationExpression = MethodNameSyntax:InvocableName ReferencedSymbol:Promise<MethodSymbol?>;
 MoveExpression: Expression = ReferencedSymbol:Promise<BindingSymbol?>;
 NameExpression: AssignableExpression, IHasContainingLexicalScope = Name? SimpleName ReferencedSymbol:Promise<BindingSymbol?>;
-NewObjectExpression: Expression = Type:TypeName ConstructorName:InvocableName? Arguments:Argument*;
+NewObjectExpression: Expression = Type:TypeName ConstructorName:InvocableName? Arguments:Argument* ReferencedSymbol:Promise<ConstructorSymbol?>;
 NextExpression: Expression;
 NoneLiteralExpression: LiteralExpression;
 ReturnExpression: Expression;

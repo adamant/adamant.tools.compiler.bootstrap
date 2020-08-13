@@ -200,7 +200,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
         }
 
         private void BuildParameterSymbols(
-            InvokableSymbol containingSymbol,
+            InvocableSymbol containingSymbol,
             IEnumerable<IConstructorParameterSyntax> parameters,
             IEnumerable<DataType> types)
         {
@@ -237,7 +237,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
         }
 
         private void BuildSelParameterSymbol(
-            InvokableSymbol containingSymbol,
+            InvocableSymbol containingSymbol,
             ISelfParameterSyntax param,
             DataType type)
         {

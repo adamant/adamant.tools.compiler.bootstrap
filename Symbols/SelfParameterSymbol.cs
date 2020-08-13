@@ -5,9 +5,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
 {
     public class SelfParameterSymbol : BindingSymbol
     {
-        public new InvokableSymbol ContainingSymbol { get; }
+        public new InvocableSymbol ContainingSymbol { get; }
 
-        public SelfParameterSymbol(InvokableSymbol containingSymbol, bool isMutableBinding, DataType dataType)
+        public SelfParameterSymbol(InvocableSymbol containingSymbol, bool isMutableBinding, DataType dataType)
             : base(containingSymbol, null, isMutableBinding, dataType)
         {
             ContainingSymbol = containingSymbol;

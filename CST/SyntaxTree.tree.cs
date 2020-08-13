@@ -433,6 +433,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IFunctionInvocationExpressionSyntax : IInvocationExpressionSyntax
     {
         IInvocableNameSyntax FunctionNameSyntax { get; }
+        Promise<FunctionSymbol?> ReferencedSymbol { get; }
     }
 
     public partial interface IIfExpressionSyntax : IExpressionSyntax, IElseClauseSyntax
@@ -481,6 +482,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(IMethodInvocationExpressionSyntax))]
     public partial interface IInvocationExpressionSyntax : IExpressionSyntax
     {
+        Name Name { get; }
         MaybeQualifiedName FullName { get; }
         FixedList<IArgumentSyntax> Arguments { get; }
     }
@@ -502,6 +504,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IMethodInvocationExpressionSyntax : IInvocationExpressionSyntax
     {
         IInvocableNameSyntax MethodNameSyntax { get; }
+        Promise<MethodSymbol?> ReferencedSymbol { get; }
     }
 
     public partial interface IMoveExpressionSyntax : IExpressionSyntax
@@ -521,6 +524,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         ITypeNameSyntax Type { get; }
         IInvocableNameSyntax? ConstructorName { get; }
         FixedList<IArgumentSyntax> Arguments { get; }
+        Promise<ConstructorSymbol?> ReferencedSymbol { get; }
     }
 
     public partial interface INextExpressionSyntax : IExpressionSyntax

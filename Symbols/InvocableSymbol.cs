@@ -8,13 +8,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
     [Closed(
         typeof(FunctionOrMethodSymbol),
         typeof(ConstructorSymbol))]
-    public abstract class InvokableSymbol : Symbol
+    public abstract class InvocableSymbol : Symbol
     {
         public new Name? Name { get; }
         public FixedList<DataType> ParameterDataTypes { get; }
         public int Arity => ParameterDataTypes.Count;
 
-        protected InvokableSymbol(Symbol containingSymbol, Name? name, FixedList<DataType> parameterDataTypes)
+        protected InvocableSymbol(Symbol containingSymbol, Name? name, FixedList<DataType> parameterDataTypes)
             : base(containingSymbol, name)
         {
             Name = name;

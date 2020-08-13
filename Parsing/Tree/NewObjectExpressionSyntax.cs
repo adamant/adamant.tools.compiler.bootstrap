@@ -4,6 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
@@ -17,12 +18,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         /// this expression's type could be either an object type, or member type.
         /// </summary>
         public ITypeNameSyntax Type { get; }
-
         public IInvocableNameSyntax? ConstructorName { get; }
-
         public FixedList<IArgumentSyntax> Arguments { get; }
-        private IFunctionMetadata? constructorSymbol;
+        public Promise<ConstructorSymbol?> ReferencedSymbol { get; } = new Promise<ConstructorSymbol?>();
 
+        private IFunctionMetadata? constructorSymbol;
         [DisallowNull]
         public IFunctionMetadata? ReferencedConstructor
         {

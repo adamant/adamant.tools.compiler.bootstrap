@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
     [Closed(
         typeof(FunctionSymbol),
         typeof(MethodSymbol))]
-    public abstract class FunctionOrMethodSymbol : InvokableSymbol
+    public abstract class FunctionOrMethodSymbol : InvocableSymbol
     {
         public new Symbol ContainingSymbol { get; }
         public new Name Name { get; }
