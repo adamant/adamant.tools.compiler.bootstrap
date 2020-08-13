@@ -81,7 +81,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
         }
 
         /// <summary>
-        /// Analyze an expression to apply its effects reachability graph.
+        /// Analyze an expression to apply its effects to the reachability graph.
         /// </summary>
         /// <returns>The place of the object resulting from evaluating this expression or null
         /// if the there is no result or the result is not an object reference.</returns>
@@ -200,9 +200,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     var arguments = exp.Arguments
                                        .Select(a => Analyze(a.Expression, graph, scope))
                                        .ToFixedList();
-                    var function = exp.FunctionNameSyntax.ReferencedFunctionMetadata.Assigned();
-                    var parameters = function.Parameters;
-                    UseArguments(arguments, exp.Arguments, parameters, graph);
+                    var function = exp.ReferencedSymbol.Result ?? throw new InvalidOperationException();
+                    var parameterDataTypes = function.ParameterDataTypes;
+                    UseArguments(arguments, exp.Arguments, parameterDataTypes, graph);
                     if (!(referenceType is null))
                         return CaptureArguments(exp, arguments, graph);
 
@@ -214,11 +214,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 {
                     var selfArgument = Analyze(exp.ContextExpression, graph, scope);
                     var arguments = exp.Arguments.Select(a => Analyze(a.Expression, graph, scope)).ToFixedList();
-                    var method = exp.MethodNameSyntax.ReferencedFunctionMetadata.Assigned();
-                    var parameters = method.Parameters;
+                    var method = exp.ReferencedSymbol.Result ?? throw new InvalidOperationException();
+                    var parameterDataTypes = method.ParameterDataTypes;
                     if (!(selfArgument is null))
                         UseArgument(selfArgument, exp.ContextExpression.Span, graph);
-                    UseArguments(arguments, exp.Arguments, parameters, graph);
+                    UseArguments(arguments, exp.Arguments, parameterDataTypes, graph);
                     if (!(referenceType is null))
                         return CaptureArguments(exp, arguments.Prepend(selfArgument), graph);
 
@@ -251,9 +251,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 {
                     var arguments = exp.Arguments.Select(a => Analyze(a.Expression, graph, scope)).ToFixedList();
 
-                    var constructor = exp.ReferencedConstructor.Assigned();
-                    var parameters = constructor.Parameters;
-                    UseArguments(arguments, exp.Arguments, parameters, graph);
+                    var constructor = exp.ReferencedSymbol.Result ?? throw new InvalidOperationException();
+                    var parameterDataTypes = constructor.ParameterDataTypes;
+                    UseArguments(arguments, exp.Arguments, parameterDataTypes, graph);
                     if (referenceType is null) return null;
                     var obj = graph.AddObject(exp)!;
                     CaptureArguments(arguments, obj);
@@ -322,14 +322,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
         private void UseArguments(
             FixedList<TempValue?> arguments,
             FixedList<IArgumentSyntax> argumentSyntaxes,
-            IEnumerable<IBindingMetadata> parameters,
+            IEnumerable<DataType> parameterDataTypes,
             ReachabilityGraph graph)
         {
-            foreach (var ((argument, argumentSyntax), parameter) in arguments.Zip(argumentSyntaxes).Zip(parameters))
+            foreach (var ((argument, argumentSyntax), parameterDataType) in arguments.Zip(argumentSyntaxes).Zip(parameterDataTypes))
             {
                 if (argument is null) continue;
-                if (!(parameter.DataType is ReferenceType))
-                    throw new InvalidOperationException($"Expected parameter {parameter} to be a reference type");
+                if (!(parameterDataType is ReferenceType))
+                    // TODO this used to give the parameter name, would be nice to do so again
+                    throw new InvalidOperationException($"Expected parameter of type {parameterDataType} to be a reference type");
 
                 UseArgument(argument, argumentSyntax.Span, graph);
             }
