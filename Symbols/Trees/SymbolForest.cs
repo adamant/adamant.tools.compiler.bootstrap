@@ -10,6 +10,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols.Trees
         public PrimitiveSymbolTree PrimitiveSymbolTree { get; }
         private readonly FixedDictionary<PackageSymbol, ISymbolTree> packageTrees;
         public IEnumerable<PackageSymbol> Packages => packageTrees.Keys;
+
+        public IEnumerable<Symbol> GlobalSymbols => PrimitiveSymbolTree.GlobalSymbols
+                                                    .Concat(Packages.SelectMany(Children));
         public IEnumerable<Symbol> Symbols => packageTrees.Values.SelectMany(t => t.Symbols);
 
         public SymbolForest(PrimitiveSymbolTree primitiveSymbolTree, SymbolTreeBuilder symbolTreeBuilder, IEnumerable<FixedSymbolTree> packageTrees)

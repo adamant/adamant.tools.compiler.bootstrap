@@ -7,7 +7,6 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using Adamant.Tools.Compiler.Bootstrap.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
@@ -32,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         private readonly Symbol containingSymbol;
         private readonly SymbolTreeBuilder symbolTreeBuilder;
         private readonly SymbolForest symbolTrees;
-        private readonly ITypeMetadata? stringMetadata;
+        private readonly ObjectTypeSymbol? stringSymbol;
         private readonly Diagnostics diagnostics;
         private readonly DataType? returnType;
         private readonly TypeResolver typeResolver;
@@ -41,14 +40,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             IEntityDeclarationSyntax containingDeclaration,
             SymbolTreeBuilder symbolTreeBuilder,
             SymbolForest symbolTrees,
-            ITypeMetadata? stringMetadata,
+            ObjectTypeSymbol? stringSymbol,
             Diagnostics diagnostics,
             DataType? returnType = null)
         {
             file = containingDeclaration.File;
             containingSymbol = containingDeclaration.Symbol.Result;
             this.symbolTreeBuilder = symbolTreeBuilder;
-            this.stringMetadata = stringMetadata;
+            this.stringSymbol = stringSymbol;
             this.diagnostics = diagnostics;
             this.symbolTrees = symbolTrees;
             this.returnType = returnType;
@@ -324,7 +323,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IIntegerLiteralExpressionSyntax exp:
                     return exp.DataType = new IntegerConstantType(exp.Value);
                 case IStringLiteralExpressionSyntax exp:
-                    return exp.DataType = stringMetadata?.DeclaresDataType ?? DataType.Unknown;
+                    return exp.DataType = stringSymbol?.DeclaresDataType ?? (DataType)DataType.Unknown;
                 case IBoolLiteralExpressionSyntax exp:
                     return exp.DataType = exp.Value ? DataType.True : DataType.False;
                 case IBinaryOperatorExpressionSyntax binaryOperatorExpression:
@@ -746,12 +745,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                                       .ToFixedSet();
                 if (functionSymbols.Any())
                 {
-                    var scope = methodInvocation.MethodNameSyntax.ContainingScope.Assigned();
-
                     // It is a namespaced or associated function invocation, modify the tree
                     var nameSpan = TextSpan.Covering(methodInvocation.ContextExpression.Span, methodInvocation.MethodNameSyntax.Span);
                     var functionName = contextName.ToRootName().Qualify(methodInvocation.FullName);
-                    var nameSyntax = new InvocableNameSyntax(nameSpan, functionName, scope);
+                    var nameSyntax = new InvocableNameSyntax(nameSpan, functionName);
                     var functionInvocation = new FunctionInvocationExpressionSyntax(
                         methodInvocation.Span,
                         nameSyntax,

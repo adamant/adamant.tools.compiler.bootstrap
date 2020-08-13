@@ -61,8 +61,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CST", "CST\CST.csproj", "{9
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Primitives", "Primitives\Primitives.csproj", "{847178B8-0137-48B3-8B05-B3EFDA1C90D8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scopes", "Scopes\Scopes.csproj", "{BC8CB599-72D7-4494-8CD7-F6661599AEBD}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntermediateLanguage", "IntermediateLanguage\IntermediateLanguage.csproj", "{C8CA4E6C-305E-406A-8BED-2B8605F1867C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Metadata", "Metadata\Metadata.csproj", "{CBBD6937-5DC4-497E-B616-1905096E8E36}"
@@ -92,7 +90,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AST", "AST\AST.csproj", "{4
 		{4D709360-03ED-4A76-8EBB-18B89462A9DB} = {4D709360-03ED-4A76-8EBB-18B89462A9DB}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexicalScopes", "LexicalScopes\LexicalScopes.csproj", "{C78245F3-71A5-4628-8796-79B8FC3C7690}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LexicalScopes", "LexicalScopes\LexicalScopes.csproj", "{C78245F3-71A5-4628-8796-79B8FC3C7690}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -180,10 +178,6 @@ Global
 		{847178B8-0137-48B3-8B05-B3EFDA1C90D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{847178B8-0137-48B3-8B05-B3EFDA1C90D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{847178B8-0137-48B3-8B05-B3EFDA1C90D8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BC8CB599-72D7-4494-8CD7-F6661599AEBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BC8CB599-72D7-4494-8CD7-F6661599AEBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BC8CB599-72D7-4494-8CD7-F6661599AEBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BC8CB599-72D7-4494-8CD7-F6661599AEBD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C8CA4E6C-305E-406A-8BED-2B8605F1867C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C8CA4E6C-305E-406A-8BED-2B8605F1867C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8CA4E6C-305E-406A-8BED-2B8605F1867C}.Release|Any CPU.ActiveCfg = Release|Any CPU

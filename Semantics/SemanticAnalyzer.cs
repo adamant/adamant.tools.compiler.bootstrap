@@ -4,18 +4,14 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
-using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Primitives;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DeclarationNumbers;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Namespaces;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Validation;
@@ -23,6 +19,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.BindingMutability;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.DefiniteAssignment;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Moves;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Shadowing;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics
@@ -58,13 +55,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // Build up lexical scopes down to the declaration level
             new LexicalScopesBuilder().BuildFor(package);
 
-            // TODO remove old scopes builder
-            var stringMetadata = BuildScopes(package, diagnostics);
-
             // Make a list of all the entity declarations (i.e. not namespaces)
             var entities = GetEntityDeclarations(package);
 
-            CheckSemantics(entities, stringMetadata, diagnostics, package.SymbolTreeBuilder, symbolTrees);
+            CheckSemantics(entities, diagnostics, package.SymbolTreeBuilder, symbolTrees);
 
             // If there are errors from the semantics phase, don't continue on
             diagnostics.ThrowIfFatalErrors();
@@ -84,20 +78,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             return new Package(package.SymbolTreeBuilder.Build(), diagnostics.Build(), references, declarations, entryPoint);
         }
 
-        private static ITypeMetadata? BuildScopes(
-            PackageSyntax package,
-            Diagnostics diagnostics)
-        {
-            var scopesBuilder = new PackageScopesBuilder(package, diagnostics);
-            scopesBuilder.BuildScopesFor(package);
-            var stringMetadata = scopesBuilder.GlobalScope.LookupMetadataInGlobalScope(new SimpleName("String"))
-                                            .OfType<ITypeMetadata>().FirstOrDefault();
-            if (stringMetadata is null)
-                // TODO we are assuming there is a compilation unit. This should be generated against the package itself
-                diagnostics.Add(SemanticError.NoStringTypeDefined(package.CompilationUnits[0].CodeFile));
-            return stringMetadata;
-        }
-
         private static FixedList<IEntityDeclarationSyntax> GetEntityDeclarations(
             PackageSyntax packageSyntax)
         {
@@ -108,7 +88,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
         private static void CheckSemantics(
             FixedList<IEntityDeclarationSyntax> entities,
-            ITypeMetadata? stringMetadata,
             Diagnostics diagnostics,
             SymbolTreeBuilder symbolTreeBuilder,
             SymbolForest symbolTrees)
@@ -118,8 +97,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // Resolve symbols for the entities
             new EntitySymbolBuilder(diagnostics, symbolTreeBuilder).Build(entities);
 
+            var stringSymbol = symbolTrees.GlobalSymbols.OfType<ObjectTypeSymbol>().SingleOrDefault(s => s.Name == "String");
+
             // Basic Analysis includes: Name Binding, Type Checking, Constant Folding
-            new BasicAnalyzer(symbolTreeBuilder, symbolTrees, stringMetadata, diagnostics).Check(entities);
+            new BasicAnalyzer(symbolTreeBuilder, symbolTrees, stringSymbol, diagnostics).Check(entities);
 
             // If there are errors from the basic analysis phase, don't continue on
             diagnostics.ThrowIfFatalErrors();

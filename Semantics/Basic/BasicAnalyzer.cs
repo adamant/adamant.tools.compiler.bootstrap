@@ -1,7 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
 using ExhaustiveMatching;
 
@@ -27,18 +27,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
     {
         private readonly SymbolTreeBuilder symbolTreeBuilder;
         private readonly SymbolForest symbolTrees;
-        private readonly ITypeMetadata? stringMetadata;
+        private readonly ObjectTypeSymbol? stringSymbol;
         private readonly Diagnostics diagnostics;
 
         public BasicAnalyzer(
             SymbolTreeBuilder symbolTreeBuilder,
             SymbolForest symbolTrees,
-            ITypeMetadata? stringMetadata,
+            ObjectTypeSymbol? stringSymbol,
             Diagnostics diagnostics)
         {
             this.symbolTreeBuilder = symbolTreeBuilder;
             this.symbolTrees = symbolTrees;
-            this.stringMetadata = stringMetadata;
+            this.stringSymbol = stringSymbol;
             this.diagnostics = diagnostics;
         }
 
@@ -56,7 +56,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     throw ExhaustiveMatch.Failed(declaration);
                 case IFunctionDeclarationSyntax function:
                 {
-                    var resolver = new BasicBodyAnalyzer(function, symbolTreeBuilder, symbolTrees, stringMetadata, diagnostics,
+                    var resolver = new BasicBodyAnalyzer(function, symbolTreeBuilder, symbolTrees, stringSymbol, diagnostics,
                         function.ReturnDataType.Result);
                     resolver.ResolveTypes(function.Body);
                     break;
@@ -64,14 +64,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IAssociatedFunctionDeclarationSyntax associatedFunction:
                 {
                     var resolver = new BasicBodyAnalyzer(associatedFunction, symbolTreeBuilder, symbolTrees,
-                        stringMetadata, diagnostics,
+                        stringSymbol, diagnostics,
                         associatedFunction.ReturnDataType.Result);
                     resolver.ResolveTypes(associatedFunction.Body);
                     break;
                 }
                 case IConcreteMethodDeclarationSyntax method:
                 {
-                    var resolver = new BasicBodyAnalyzer(method, symbolTreeBuilder, symbolTrees, stringMetadata, diagnostics, method.ReturnDataType.Result);
+                    var resolver = new BasicBodyAnalyzer(method, symbolTreeBuilder, symbolTrees, stringSymbol, diagnostics, method.ReturnDataType.Result);
                     resolver.ResolveTypes(method.Body);
                     break;
                 }
@@ -81,13 +81,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IFieldDeclarationSyntax field:
                     if (field.Initializer != null)
                     {
-                        var resolver = new BasicBodyAnalyzer(field, symbolTreeBuilder, symbolTrees, stringMetadata, diagnostics);
+                        var resolver = new BasicBodyAnalyzer(field, symbolTreeBuilder, symbolTrees, stringSymbol, diagnostics);
                         resolver.CheckType(ref field.Initializer, field.Symbol.Result.DataType);
                     }
                     break;
                 case IConstructorDeclarationSyntax constructor:
                 {
-                    var resolver = new BasicBodyAnalyzer(constructor, symbolTreeBuilder, symbolTrees, stringMetadata, diagnostics, constructor.ImplicitSelfParameter.Symbol.Result.DataType);
+                    var resolver = new BasicBodyAnalyzer(constructor, symbolTreeBuilder, symbolTrees, stringSymbol, diagnostics, constructor.ImplicitSelfParameter.Symbol.Result.DataType);
                     resolver.ResolveTypes(constructor.Body);
                     break;
                 }

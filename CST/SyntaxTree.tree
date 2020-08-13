@@ -71,7 +71,7 @@ CanReachAnnotation: ReachabilityAnnotation = CanReach:NameExpression*;
 
 // Types
 Type;
-TypeName: Type, IHasContainingScope, IHasContainingLexicalScope = Name:'TypeName' ReferencedSymbol:Promise<TypeSymbol?>;
+TypeName: Type, IHasContainingLexicalScope = Name:'TypeName' ReferencedSymbol:Promise<TypeSymbol?>;
 OptionalType: Type = Referent:Type;
 CapabilityType: Type = ReferentType:Type Capability:ReferenceCapability;
 

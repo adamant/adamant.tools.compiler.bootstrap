@@ -304,7 +304,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     {
     }
 
-    public partial interface ITypeNameSyntax : ITypeSyntax, IHasContainingScope, IHasContainingLexicalScope
+    public partial interface ITypeNameSyntax : ITypeSyntax, IHasContainingLexicalScope
     {
         TypeName Name { get; }
         Promise<TypeSymbol?> ReferencedSymbol { get; }
