@@ -40,20 +40,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public SimpleName SimpleName { [DebuggerStepThrough] get; }
         public Promise<BindingSymbol?> ReferencedSymbol { get; } = new Promise<BindingSymbol?>();
 
-        private IBindingMetadata? referencedBinding;
-        [DisallowNull]
-        public IBindingMetadata? ReferencedBinding
-        {
-            [DebuggerStepThrough]
-            get => referencedBinding;
-            set
-            {
-                if (referencedBinding != null)
-                    throw new InvalidOperationException($"Can't set {nameof(ReferencedBinding)} repeatedly");
-                referencedBinding = value ?? throw new ArgumentNullException(nameof(value));
-            }
-        }
-
         private Scope? containingScope;
         [DisallowNull]
         public Scope? ContainingScope

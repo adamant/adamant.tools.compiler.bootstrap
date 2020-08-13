@@ -546,12 +546,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     var contextType = InferType(ref exp.ContextExpression, !isSelfField);
                     var member = exp.Field;
                     var contextSymbol = LookupSymbolForContextType(member.ContainingLexicalScope, contextType);
-                    var contextMetadata = member.ContainingScope.Assigned().GetMetadataForType(contextType);
                     // TODO Deal with no context symbol
                     var memberSymbols = symbolTree.Children(contextSymbol!).OfType<FieldSymbol>()
                                                   .Where(s => s.Name == member.Name).ToFixedList();
-                    var memberMetadata = contextMetadata.Lookup(member.SimpleName).OfType<IBindingMetadata>().ToFixedList();
-                    var type = AssignReferencedSymbolAndType(member, memberMetadata, memberSymbols);
+                    var type = AssignReferencedSymbolAndType(member, memberSymbols);
                     // In many contexts, variable names are implicitly shared
                     if (implicitShare) type = InsertImplicitShareIfNeeded(ref expression, type);
 
@@ -709,11 +707,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     var contextType = InferType(ref exp.ContextExpression, !isSelfField);
                     var member = exp.Field;
                     var contextSymbol = LookupSymbolForContextType(member.ContainingLexicalScope, contextType);
-                    var contextMetadata = exp.Field.ContainingScope.Assigned().GetMetadataForType(contextType);
                     // TODO Deal with no context symbol
                     var memberSymbols = symbolTree.Children(contextSymbol!).OfType<FieldSymbol>().Where(s => s.Name == member.Name).ToFixedList();
-                    var memberMetadata = contextMetadata.Lookup(member.SimpleName).OfType<IBindingMetadata>().ToFixedList();
-                    var type = AssignReferencedSymbolAndType(member, memberMetadata, memberSymbols);
+                    var type = AssignReferencedSymbolAndType(member, memberSymbols);
                     exp.Field.Semantics ??= ExpressionSemantics.CreateReference;
                     exp.Semantics = exp.Field.Semantics.Assigned();
                     return exp.DataType = type;
@@ -917,7 +913,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             if (nameExpression.Name is null)
             {
                 // Name unknown, no error
-                nameExpression.ReferencedBinding = UnknownMetadata.Instance;
                 nameExpression.ReferencedSymbol.Fulfill(null);
                 return nameExpression.DataType = DataType.Unknown;
             }
@@ -941,30 +936,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     diagnostics.Add(NameBindingError.AmbiguousName(file, nameExpression.Span));
                     nameExpression.ReferencedSymbol.Fulfill(null);
                     type = DataType.Unknown;
-                    break;
-            }
-
-            // TODO remove old metadata code
-            var metadatas = nameExpression.LookupMetadataInContainingScope();
-            switch (metadatas.Count)
-            {
-                case 0:
-                    nameExpression.ReferencedBinding = UnknownMetadata.Instance;
-                    break;
-                case 1:
-                {
-                    var metadata = metadatas.Single();
-                    nameExpression.ReferencedBinding = metadata switch
-                    {
-                        IBindingMetadata binding => binding,
-                        _ => UnknownMetadata.Instance
-                    };
-                    // TODO remove once symbol determines this
-                    type = nameExpression.ReferencedBinding.DataType;
-                    break;
-                }
-                default:
-                    nameExpression.ReferencedBinding = UnknownMetadata.Instance;
                     break;
             }
 
@@ -1078,16 +1049,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private DataType AssignReferencedSymbolAndType(
             INameExpressionSyntax exp,
-            FixedList<IBindingMetadata> matchingMetadata,
             FixedList<FieldSymbol> matchingSymbols)
         {
-            exp.ReferencedBinding = matchingMetadata.Count switch
-            {
-                0 => UnknownMetadata.Instance,
-                1 => matchingMetadata.Single(),
-                _ => UnknownMetadata.Instance
-            };
-
             exp.ReferencedSymbol.BeginFulfilling();
             switch (matchingSymbols.Count)
             {

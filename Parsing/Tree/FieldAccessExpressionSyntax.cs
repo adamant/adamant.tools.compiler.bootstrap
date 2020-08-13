@@ -1,8 +1,5 @@
-using System;
-using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
@@ -16,17 +13,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public AccessOperator AccessOperator { get; }
         public INameExpressionSyntax Field { get; }
         public IPromise<FieldSymbol?> ReferencedSymbol => Field.ReferencedSymbol.Select(s => (FieldSymbol?)s);
-        [DisallowNull]
-        public IBindingMetadata? ReferencedBinding
-        {
-            get => Field.ReferencedBinding;
-            set
-            {
-                if (Field.ReferencedBinding != null)
-                    throw new InvalidOperationException("Can't set ReferencedSymbol repeatedly");
-                Field.ReferencedBinding = value ?? throw new ArgumentNullException(nameof(value));
-            }
-        }
 
         public FieldAccessExpressionSyntax(
             TextSpan span,

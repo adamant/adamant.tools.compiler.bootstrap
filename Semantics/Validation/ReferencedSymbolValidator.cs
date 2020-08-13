@@ -29,14 +29,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                 case IClassDeclarationSyntax _:
                     // Don't recur into body, we will see those as separate members
                     return;
-                case IFieldAccessExpressionSyntax syn:
-                    WalkChildren(syn);
-                    AssertHasReferencedSymbol(syn, syn.ReferencedBinding);
-                    return;
-                case INameExpressionSyntax syn:
-                    WalkChildren(syn);
-                    AssertHasReferencedSymbol(syn, syn.ReferencedBinding);
-                    return;
                 case IInvocableNameSyntax syn:
                     WalkChildren(syn);
                     AssertHasReferencedSymbol(syn, syn.ReferencedFunctionMetadata);
