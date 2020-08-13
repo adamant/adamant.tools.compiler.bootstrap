@@ -3,6 +3,8 @@ using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.LexicalScopes;
+using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
@@ -24,13 +26,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         }
 
         public CodeFile File { get; }
+        public Name? Name { get; }
         public TextSpan NameSpan { get; }
-
-        protected DeclarationSyntax(TextSpan span, CodeFile file, TextSpan nameSpan)
+        protected abstract IPromise<Symbol> SymbolPromise { get; }
+        IPromise<Symbol> IDeclarationSyntax.Symbol => SymbolPromise;
+        protected DeclarationSyntax(TextSpan span, CodeFile file, Name? name, TextSpan nameSpan)
             : base(span)
         {
             NameSpan = nameSpan;
             File = file;
+            Name = name;
         }
     }
 }

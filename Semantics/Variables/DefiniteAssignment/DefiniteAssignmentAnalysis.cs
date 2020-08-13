@@ -12,13 +12,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.DefiniteAssignmen
     internal class DefiniteAssignmentAnalysis : IForwardDataFlowAnalysis<VariableFlags>
     {
         private readonly IConcreteInvocableDeclarationSyntax invocable;
-        private readonly SymbolTree symbolTree;
+        private readonly ISymbolTree symbolTree;
         private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
 
         public DefiniteAssignmentAnalysis(
             IConcreteInvocableDeclarationSyntax invocable,
-            SymbolTree symbolTree,
+            ISymbolTree symbolTree,
             Diagnostics diagnostics)
         {
             this.invocable = invocable;

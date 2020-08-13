@@ -8,9 +8,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
     public class LivenessAnalysis : IBackwardDataFlowAnalysis<VariableFlags>
     {
         private readonly IConcreteInvocableDeclarationSyntax invocable;
-        private readonly SymbolTree symbolTree;
+        private readonly ISymbolTree symbolTree;
 
-        public LivenessAnalysis(IConcreteInvocableDeclarationSyntax invocable, SymbolTree symbolTree)
+        public LivenessAnalysis(IConcreteInvocableDeclarationSyntax invocable, ISymbolTree symbolTree)
         {
             this.invocable = invocable;
             this.symbolTree = symbolTree;

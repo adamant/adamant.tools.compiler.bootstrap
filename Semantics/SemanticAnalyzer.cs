@@ -6,6 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Primitives;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DeclarationNumbers;
@@ -43,6 +44,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "OO")]
         public Package Check(PackageSyntax package)
         {
+            var symbolTrees = new SymbolForest(Primitive.SymbolTree, package.SymbolTreeBuilder,
+                package.References.Values.Select(p => p.SymbolTree));
+
             // First pull over all the lexer and parser warnings
             var diagnostics = new Diagnostics(package.Diagnostics);
 
@@ -60,7 +64,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // Make a list of all the entity declarations (i.e. not namespaces)
             var entities = GetEntityDeclarations(package);
 
-            CheckSemantics(entities, stringMetadata, diagnostics, package.SymbolTreeBuilder);
+            CheckSemantics(entities, stringMetadata, diagnostics, package.SymbolTreeBuilder, symbolTrees);
 
             // If there are errors from the semantics phase, don't continue on
             diagnostics.ThrowIfFatalErrors();
@@ -106,21 +110,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             FixedList<IEntityDeclarationSyntax> entities,
             ITypeMetadata? stringMetadata,
             Diagnostics diagnostics,
-            SymbolTreeBuilder symbolTree)
+            SymbolTreeBuilder symbolTreeBuilder,
+            SymbolForest symbolTrees)
         {
             DeclarationNumberAssigner.AssignIn(entities);
 
             // Resolve symbols for the entities
-            new EntitySymbolBuilder(diagnostics, symbolTree).Build(entities);
+            new EntitySymbolBuilder(diagnostics, symbolTreeBuilder).Build(entities);
 
             // Basic Analysis includes: Name Binding, Type Checking, Constant Folding
-            new BasicAnalyzer(symbolTree, stringMetadata, diagnostics).Check(entities);
+            new BasicAnalyzer(symbolTreeBuilder, symbolTrees, stringMetadata, diagnostics).Check(entities);
 
             // If there are errors from the basic analysis phase, don't continue on
             diagnostics.ThrowIfFatalErrors();
 
 #if DEBUG
-            new SymbolValidator(symbolTree).Walk(entities);
+            new SymbolValidator(symbolTreeBuilder).Walk(entities);
             new TypeFulfillmentValidator().Walk(entities);
             new ReferencedSymbolValidator().Walk(entities);
             new TypeKnownValidator().Walk(entities);
@@ -133,16 +138,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             ShadowChecker.Check(invocables, diagnostics);
 
-            DataFlowAnalysis.Check(DefiniteAssignmentAnalyzer.Instance, invocables, symbolTree, diagnostics);
+            DataFlowAnalysis.Check(DefiniteAssignmentAnalyzer.Instance, invocables, symbolTreeBuilder, diagnostics);
 
-            DataFlowAnalysis.Check(BindingMutabilityAnalyzer.Instance, invocables, symbolTree, diagnostics);
+            DataFlowAnalysis.Check(BindingMutabilityAnalyzer.Instance, invocables, symbolTreeBuilder, diagnostics);
 
-            DataFlowAnalysis.Check(UseOfMovedValueAnalyzer.Instance, invocables, symbolTree, diagnostics);
+            DataFlowAnalysis.Check(UseOfMovedValueAnalyzer.Instance, invocables, symbolTreeBuilder, diagnostics);
 
             // TODO use DataFlowAnalysis to check for unused variables and report use of variables starting with `_`
 
             // Compute variable liveness needed by reachability analyzer
-            DataFlowAnalysis.Check(LivenessAnalyzer.Instance, invocables, symbolTree, diagnostics);
+            DataFlowAnalysis.Check(LivenessAnalyzer.Instance, invocables, symbolTreeBuilder, diagnostics);
 
             ReachabilityAnalyzer.Analyze(invocables, diagnostics);
 

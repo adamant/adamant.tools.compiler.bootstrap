@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
         public static void Check<TState>(
             IForwardDataFlowAnalyzer<TState> strategy,
             FixedList<IConcreteInvocableDeclarationSyntax> invocableDeclarations,
-            SymbolTree symbolTree,
+            ISymbolTree symbolTree,
             Diagnostics diagnostics)
             where TState : class
         {
@@ -44,7 +44,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
         public static void Check<TState>(
             IBackwardDataFlowAnalyzer<TState> strategy,
             FixedList<IConcreteInvocableDeclarationSyntax> invocableDeclarations,
-            SymbolTree symbolTree,
+            ISymbolTree symbolTree,
             Diagnostics diagnostics)
             where TState : class
         {

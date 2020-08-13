@@ -100,12 +100,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     [Closed(
         typeof(IEntityDeclarationSyntax),
-        typeof(INonMemberDeclarationSyntax),
-        typeof(INamespaceDeclarationSyntax))]
+        typeof(INonMemberDeclarationSyntax))]
     public partial interface IDeclarationSyntax : ISyntax, IHasContainingLexicalScope
     {
         CodeFile File { get; }
+        Name? Name { get; }
         TextSpan NameSpan { get; }
+        IPromise<Symbol> Symbol { get; }
     }
 
     [Closed(
@@ -115,8 +116,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IEntityDeclarationSyntax : IDeclarationSyntax
     {
         IAccessModifierToken? AccessModifier { get; }
-        Name? Name { get; }
-        IPromise<Symbol> Symbol { get; }
     }
 
     [Closed(
@@ -143,14 +142,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface INonMemberDeclarationSyntax : IDeclarationSyntax
     {
         NamespaceName ContainingNamespaceName { get; }
+        new Name Name { get; }
     }
 
-    public partial interface INamespaceDeclarationSyntax : INonMemberDeclarationSyntax, IDeclarationSyntax
+    public partial interface INamespaceDeclarationSyntax : INonMemberDeclarationSyntax
     {
         bool IsGlobalQualified { get; }
         NamespaceName DeclaredNames { get; }
         NamespaceName FullName { get; }
-        Promise<NamespaceOrPackageSymbol> Symbol { get; }
+        new Promise<NamespaceOrPackageSymbol> Symbol { get; }
         FixedList<IUsingDirectiveSyntax> UsingDirectives { get; }
         FixedList<INonMemberDeclarationSyntax> Declarations { get; }
     }
@@ -430,7 +430,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         IBlockExpressionSyntax Block { get; }
     }
 
-    public partial interface IFunctionInvocationExpressionSyntax : IInvocationExpressionSyntax
+    public partial interface IFunctionInvocationExpressionSyntax : IInvocationExpressionSyntax, IHasContainingLexicalScope
     {
         IInvocableNameSyntax FunctionNameSyntax { get; }
         Promise<FunctionSymbol?> ReferencedSymbol { get; }
@@ -501,7 +501,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         IBlockExpressionSyntax Block { get; }
     }
 
-    public partial interface IMethodInvocationExpressionSyntax : IInvocationExpressionSyntax
+    public partial interface IMethodInvocationExpressionSyntax : IInvocationExpressionSyntax, IHasContainingLexicalScope
     {
         IInvocableNameSyntax MethodNameSyntax { get; }
         Promise<MethodSymbol?> ReferencedSymbol { get; }

@@ -31,7 +31,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
     {
         private readonly CodeFile file;
         private readonly Symbol containingSymbol;
-        private readonly SymbolTreeBuilder symbolTree;
+        private readonly SymbolTreeBuilder symbolTreeBuilder;
+        private readonly SymbolForest symbolTrees;
         private readonly ITypeMetadata? stringMetadata;
         private readonly Diagnostics diagnostics;
         private readonly DataType? returnType;
@@ -39,16 +40,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         public BasicBodyAnalyzer(
             IEntityDeclarationSyntax containingDeclaration,
-            SymbolTreeBuilder symbolTree,
+            SymbolTreeBuilder symbolTreeBuilder,
+            SymbolForest symbolTrees,
             ITypeMetadata? stringMetadata,
             Diagnostics diagnostics,
             DataType? returnType = null)
         {
             file = containingDeclaration.File;
             containingSymbol = containingDeclaration.Symbol.Result;
-            this.symbolTree = symbolTree;
+            this.symbolTreeBuilder = symbolTreeBuilder;
             this.stringMetadata = stringMetadata;
             this.diagnostics = diagnostics;
+            this.symbolTrees = symbolTrees;
             this.returnType = returnType;
             typeAnalyzer = new TypeResolver(file, diagnostics);
         }
@@ -116,7 +119,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             var symbol = new VariableSymbol((InvocableSymbol)containingSymbol, variableDeclaration.Name,
                 variableDeclaration.DeclarationNumber.Result, variableDeclaration.IsMutableBinding, type);
             variableDeclaration.Symbol.Fulfill(symbol);
-            symbolTree.Add(symbol);
+            symbolTreeBuilder.Add(symbol);
         }
 
         /// <summary>
@@ -453,7 +456,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     // TODO handle null typesymbol
                     var typeSymbol = exp.Type.ReferencedSymbol.Result ?? throw new InvalidOperationException();
                     var typeMetadata = exp.Type.ContainingScope.Assigned().GetMetadataForType(constructedType);
-                    var constructorSymbols = symbolTree.Children(typeSymbol).OfType<ConstructorSymbol>().ToFixedList();
+                    var constructorSymbols = symbolTreeBuilder.Children(typeSymbol).OfType<ConstructorSymbol>().ToFixedList();
                     var constructorMetadatas = typeMetadata.ChildMetadata[SpecialNames.New].OfType<IFunctionMetadata>().ToFixedList();
                     (constructorSymbols, constructorMetadatas) = ResolveOverload(constructorSymbols, constructorMetadatas, argumentTypes);
                     exp.ReferencedConstructor =constructorMetadatas.Count switch
@@ -497,7 +500,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     var symbol = new VariableSymbol((InvocableSymbol)containingSymbol, exp.VariableName,
                         exp.DeclarationNumber.Result, exp.IsMutableBinding, variableType);
                     exp.Symbol.Fulfill(symbol);
-                    symbolTree.Add(symbol);
+                    symbolTreeBuilder.Add(symbol);
 
                     // TODO check the break types
                     InferBlockType(exp.Block);
@@ -558,7 +561,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     var member = exp.Field;
                     var contextSymbol = LookupSymbolForType(member.ContainingLexicalScope, contextType);
                     // TODO Deal with no context symbol
-                    var memberSymbols = symbolTree.Children(contextSymbol!).OfType<FieldSymbol>()
+                    var memberSymbols = symbolTreeBuilder.Children(contextSymbol!).OfType<FieldSymbol>()
                                                   .Where(s => s.Name == member.Name).ToFixedList();
                     var type = AssignReferencedSymbolAndType(member, memberSymbols);
                     // In many contexts, variable names are implicitly shared
@@ -719,7 +722,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     var member = exp.Field;
                     var contextSymbol = LookupSymbolForType(member.ContainingLexicalScope, contextType);
                     // TODO Deal with no context symbol
-                    var memberSymbols = symbolTree.Children(contextSymbol!).OfType<FieldSymbol>().Where(s => s.Name == member.Name).ToFixedList();
+                    var memberSymbols = symbolTreeBuilder.Children(contextSymbol!).OfType<FieldSymbol>().Where(s => s.Name == member.Name).ToFixedList();
                     var type = AssignReferencedSymbolAndType(member, memberSymbols);
                     exp.Field.Semantics ??= ExpressionSemantics.CreateReference;
                     exp.Semantics = exp.Field.Semantics.Assigned();
@@ -739,24 +742,33 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             // * Namespaced function invocation
             // * Method invocation
             // First we need to distinguish those.
-            var targetName = MethodContextAsName(methodInvocation.ContextExpression);
-            if (targetName != null)
+            var contextName = MethodContextAsName(methodInvocation.ContextExpression);
+            if (contextName != null)
             {
-                var scope = methodInvocation.MethodNameSyntax.ContainingScope.Assigned();
+                var contextSymbols = methodInvocation.ContainingLexicalScope.Lookup(contextName.Segments[0]).Select(p => p.Result);
+                foreach (var name in contextName.Segments.Skip(1))
+                    contextSymbols = contextSymbols.SelectMany(c => symbolTrees.Children(c).Where(s => s.Name == name));
 
-                var functionName = targetName.Qualify(methodInvocation.MethodNameSyntax.Name);
-                // This will find both namespaced function calls and associated function calls
-                if (scope.LookupMetadata(functionName).OfType<IFunctionMetadata>().Any())
+                var functionSymbols = contextSymbols
+                                      .SelectMany(c => symbolTrees
+                                                       .Children(c).OfType<FunctionSymbol>()
+                                                       .Where(s => s.Name == methodInvocation.Name))
+                                      .ToFixedSet();
+                if (functionSymbols.Any())
                 {
+                    var scope = methodInvocation.MethodNameSyntax.ContainingScope.Assigned();
+
                     // It is a namespaced or associated function invocation, modify the tree
                     var nameSpan = TextSpan.Covering(methodInvocation.ContextExpression.Span, methodInvocation.MethodNameSyntax.Span);
+                    var functionName = contextName.ToRootName().Qualify(methodInvocation.FullName);
                     var nameSyntax = new InvocableNameSyntax(nameSpan, functionName, scope);
                     var functionInvocation = new FunctionInvocationExpressionSyntax(
                         methodInvocation.Span,
                         nameSyntax,
                         methodInvocation.Name,
                         functionName,
-                        methodInvocation.Arguments);
+                        methodInvocation.Arguments,
+                        functionSymbols);
 
                     expression = functionInvocation;
                     return InferFunctionInvocationType(functionInvocation);
@@ -774,9 +786,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
             var contextTypeSymbol = methodInvocation.MethodNameSyntax.ContainingScope.Assigned().GetMetadataForType(contextType);
             contextTypeSymbol.ChildMetadata.TryGetValue((SimpleName)methodInvocation.MethodNameSyntax.Name, out var childSymbols);
-            var methodSymbols = (childSymbols ?? FixedList<IMetadata>.Empty).OfType<IMethodMetadata>().ToFixedList();
-            methodSymbols = ResolveOverload(contextType, methodSymbols, argumentTypes);
-            switch (methodSymbols.Count)
+            var methodMetadatas = (childSymbols ?? FixedList<IMetadata>.Empty).OfType<IMethodMetadata>().ToFixedList();
+            methodMetadatas = ResolveOverload(contextType, methodMetadatas, argumentTypes);
+            switch (methodMetadatas.Count)
             {
                 case 0:
                     diagnostics.Add(NameBindingError.CouldNotBindMethod(file, methodInvocation.Span));
@@ -784,24 +796,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     methodInvocation.DataType = DataType.Unknown;
                     break;
                 case 1:
-                    var methodSymbol = methodSymbols.Single();
-                    methodInvocation.MethodNameSyntax.ReferencedFunctionMetadata = methodSymbol;
+                    var methodMetadata = methodMetadatas.Single();
+                    methodInvocation.MethodNameSyntax.ReferencedFunctionMetadata = methodMetadata;
 
-                    var selfParamType = methodSymbol.SelfParameterMetadata.DataType;
+                    var selfParamType = methodMetadata.SelfParameterMetadata.DataType;
                     InsertImplicitActionIfNeeded(ref methodInvocation.ContextExpression, selfParamType, implicitBorrowAllowed: true);
 
                     InsertImplicitConversionIfNeeded(ref methodInvocation.ContextExpression, selfParamType);
                     CheckArgumentTypeCompatibility(selfParamType, methodInvocation.ContextExpression);
 
-                    foreach (var (arg, type) in methodInvocation.Arguments.Zip(methodSymbol
+                    foreach (var (arg, type) in methodInvocation.Arguments.Zip(methodMetadata
                                                                                .Parameters.Select(p => p.DataType)))
                     {
                         InsertImplicitConversionIfNeeded(ref arg.Expression, type);
                         CheckArgumentTypeCompatibility(type, arg.Expression);
                     }
 
-                    methodInvocation.DataType = methodSymbol.ReturnDataType;
-                    AssignInvocationSemantics(methodInvocation, methodSymbol.ReturnDataType);
+                    methodInvocation.DataType = methodMetadata.ReturnDataType;
+                    AssignInvocationSemantics(methodInvocation, methodMetadata.ReturnDataType);
                     break;
                 default:
                     diagnostics.Add(NameBindingError.AmbiguousMethodCall(file, methodInvocation.Span));
@@ -814,10 +826,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         }
 
         /// <summary>
-        /// Used on the target of a method invocation to see if it is really the name of a namespace or class
+        /// Used on the target of a method invocation to see if it is could be the name of a namespace or class
         /// </summary>
         /// <returns>A name if the expression is a qualified name, otherwise null</returns>
-        private static MaybeQualifiedName? MethodContextAsName(IExpressionSyntax expression)
+        private static NamespaceName? MethodContextAsName(IExpressionSyntax expression)
         {
             return expression switch
             {
@@ -825,50 +837,54 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 // if implicit self
                 memberAccess.ContextExpression is null
                     ? null
-                    : MethodContextAsName(memberAccess.ContextExpression)?.Qualify(memberAccess.Field.SimpleName),
-                INameExpressionSyntax nameExpression => nameExpression.SimpleName,
+                    : MethodContextAsName(memberAccess.ContextExpression)?.Qualify(memberAccess.Field.Name!),
+                INameExpressionSyntax nameExpression => nameExpression.Name!,
                 _ => null
             };
         }
 
-        private DataType InferFunctionInvocationType(IFunctionInvocationExpressionSyntax functionInvocationExpression)
+        private DataType InferFunctionInvocationType(
+            IFunctionInvocationExpressionSyntax functionInvocationExpression)
         {
             functionInvocationExpression.ReferencedSymbol.BeginFulfilling();
 
-            var functionName = functionInvocationExpression.FunctionNameSyntax;
             var argumentTypes = functionInvocationExpression.Arguments.Select(argument => InferType(ref argument.Expression)).ToFixedList();
-            //var containingScope = functionName.ContainingLexicalScope;
-            //containingScope.Lookup(functionInvocationExpression.)
-            var functionSymbols = FixedList<FunctionSymbol>.Empty;
+            var functionSymbols = functionInvocationExpression.LookupInContainingScope().Select(s => s.Result).ToFixedList();
 
-            var scope = functionInvocationExpression.FunctionNameSyntax.ContainingScope.Assigned();
+            var functionName = functionInvocationExpression.FunctionNameSyntax;
+            var scope = functionName.ContainingScope.Assigned();
             var functionMetadatas = scope.LookupMetadata(functionInvocationExpression.FullName)
                 .OfType<IFunctionMetadata>().ToFixedList();
             (functionSymbols, functionMetadatas) = ResolveOverload(functionSymbols, functionMetadatas, argumentTypes);
-            switch (functionMetadatas.Count)
+            functionName.ReferencedFunctionMetadata = functionMetadatas.Count switch
+            {
+                0 => UnknownMetadata.Instance,
+                1 => functionMetadatas.Single(),
+                _ => UnknownMetadata.Instance,
+            };
+            switch (functionSymbols.Count)
             {
                 case 0:
                     diagnostics.Add(NameBindingError.CouldNotBindFunction(file, functionInvocationExpression.Span));
-                    functionInvocationExpression.FunctionNameSyntax.ReferencedFunctionMetadata = UnknownMetadata.Instance;
+                    functionInvocationExpression.ReferencedSymbol.Fulfill(null);
                     functionInvocationExpression.DataType = DataType.Unknown;
                     functionInvocationExpression.Semantics = ExpressionSemantics.Never;
                     break;
                 case 1:
-                    var functionMetadata = functionMetadatas.Single();
-                    functionInvocationExpression.FunctionNameSyntax.ReferencedFunctionMetadata = functionMetadata;
-                    foreach (var (arg, parameter) in
-                        functionInvocationExpression.Arguments.Zip(functionMetadata.Parameters))
+                    var functionSymbol = functionSymbols.Single();
+                    functionInvocationExpression.ReferencedSymbol.Fulfill(functionSymbol);
+                    foreach (var (arg, parameterDataType) in functionInvocationExpression.Arguments.Zip(functionSymbol.ParameterDataTypes))
                     {
-                        InsertImplicitConversionIfNeeded(ref arg.Expression, parameter.DataType);
-                        CheckArgumentTypeCompatibility(parameter.DataType, arg.Expression);
+                        InsertImplicitConversionIfNeeded(ref arg.Expression, parameterDataType);
+                        CheckArgumentTypeCompatibility(parameterDataType, arg.Expression);
                     }
 
-                    functionInvocationExpression.DataType = functionMetadata.ReturnDataType;
-                    AssignInvocationSemantics(functionInvocationExpression, functionMetadata.ReturnDataType);
+                    functionInvocationExpression.DataType = functionSymbol.ReturnDataType;
+                    AssignInvocationSemantics(functionInvocationExpression, functionSymbol.ReturnDataType);
                     break;
                 default:
                     diagnostics.Add(NameBindingError.AmbiguousFunctionCall(file, functionInvocationExpression.Span));
-                    functionInvocationExpression.FunctionNameSyntax.ReferencedFunctionMetadata = UnknownMetadata.Instance;
+                    functionInvocationExpression.ReferencedSymbol.Fulfill(null);
                     functionInvocationExpression.DataType = DataType.Unknown;
                     functionInvocationExpression.Semantics = ExpressionSemantics.Never;
                     break;
@@ -971,7 +987,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     throw ExhaustiveMatch.Failed(containingSymbol);
                 case MethodSymbol _:
                 case ConstructorSymbol _:
-                    var symbols = symbolTree.Children(containingSymbol).OfType<SelfParameterSymbol>().ToList();
+                    var symbols = symbolTreeBuilder.Children(containingSymbol).OfType<SelfParameterSymbol>().ToList();
                     switch (symbols.Count)
                     {
                         case 0:

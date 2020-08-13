@@ -19,11 +19,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Moves
     public class UseOfMovedValueAnalysis : IForwardDataFlowAnalysis<VariableFlags>
     {
         private readonly IConcreteInvocableDeclarationSyntax invocable;
-        private readonly SymbolTree symbolTree;
+        private readonly ISymbolTree symbolTree;
         private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
 
-        public UseOfMovedValueAnalysis(IConcreteInvocableDeclarationSyntax invocable, SymbolTree symbolTree, Diagnostics diagnostics)
+        public UseOfMovedValueAnalysis(IConcreteInvocableDeclarationSyntax invocable, ISymbolTree symbolTree, Diagnostics diagnostics)
         {
             this.invocable = invocable;
             this.symbolTree = symbolTree;

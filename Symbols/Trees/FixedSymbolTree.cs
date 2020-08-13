@@ -8,11 +8,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols.Trees
     /// <summary>
     /// A symbol tree for a specific package
     /// </summary>
-    public class FixedSymbolTree : SymbolTree
+    public class FixedSymbolTree : ISymbolTree
     {
         public PackageSymbol Package { get; }
         private readonly FixedDictionary<Symbol, FixedSet<Symbol>> symbolChildren;
-        public override IEnumerable<Symbol> Symbols => symbolChildren.Keys;
+        public IEnumerable<Symbol> Symbols => symbolChildren.Keys;
 
         public FixedSymbolTree(PackageSymbol package, FixedDictionary<Symbol, FixedSet<Symbol>> symbolChildren)
         {
@@ -22,12 +22,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols.Trees
             this.symbolChildren = symbolChildren;
         }
 
-        public override bool Contains(Symbol symbol)
+        public bool Contains(Symbol symbol)
         {
             return symbolChildren.ContainsKey(symbol);
         }
 
-        public override IEnumerable<Symbol> Children(Symbol symbol)
+        public IEnumerable<Symbol> Children(Symbol symbol)
         {
             if (symbol.Package != Package)
                 throw new ArgumentException("Symbol must be for the package of this tree", nameof(symbol));

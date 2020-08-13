@@ -15,11 +15,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.BindingMutability
     public class BindingMutabilityAnalysis : IForwardDataFlowAnalysis<VariableFlags>
     {
         private readonly IConcreteInvocableDeclarationSyntax invocable;
-        private readonly SymbolTree symbolTree;
+        private readonly ISymbolTree symbolTree;
         private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
 
-        public BindingMutabilityAnalysis(IConcreteInvocableDeclarationSyntax invocable, SymbolTree symbolTree, Diagnostics diagnostics)
+        public BindingMutabilityAnalysis(IConcreteInvocableDeclarationSyntax invocable, ISymbolTree symbolTree, Diagnostics diagnostics)
         {
             this.invocable = invocable;
             this.symbolTree = symbolTree;

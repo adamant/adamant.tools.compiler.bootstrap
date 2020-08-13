@@ -5,7 +5,6 @@ using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 
@@ -14,9 +13,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal abstract class InvocableDeclarationSyntax : DeclarationSyntax, IInvocableDeclarationSyntax
     {
         public IAccessModifierToken? AccessModifier { get; }
-        public Name? Name { get; }
-        IPromise<Symbol> IEntityDeclarationSyntax.Symbol => SymbolPromise;
-        protected abstract IPromise<Symbol> SymbolPromise { get; }
         public MaybeQualifiedName FullName { get; }
         public FixedList<IConstructorParameterSyntax> Parameters { get; }
         IEnumerable<IBindingMetadata> IFunctionMetadata.Parameters => Parameters;
@@ -36,11 +32,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             IEnumerable<IConstructorParameterSyntax> parameters,
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
             MetadataSet childMetadata)
-            : base(span, file, nameSpan)
+            : base(span, file, name, nameSpan)
         {
             AccessModifier = accessModifier;
             FullName = fullName;
-            Name = name;
             Parameters = parameters.ToFixedList();
             ReachabilityAnnotations = reachabilityAnnotations;
             ChildMetadata = childMetadata;

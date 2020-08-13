@@ -33,7 +33,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
             return ((IEnumerable)items).GetEnumerator();
         }
 
-        public int Count => items.Count;
+        public int Count
+        {
+            [DebuggerStepThrough]
+            get => items.Count;
+        }
 
         [DebuggerStepThrough]
         public bool ContainsKey(TKey key)
@@ -47,10 +51,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
             return items.TryGetValue(key, out value);
         }
 
-        public TValue this[TKey key] => items[key];
+        public TValue this[TKey key]
+        {
+            [DebuggerStepThrough]
+            get => items[key];
+        }
 
-        public IEnumerable<TKey> Keys => items.Keys;
+        public IEnumerable<TKey> Keys
+        {
+            [DebuggerStepThrough]
+            get => items.Keys;
+        }
 
-        public IEnumerable<TValue> Values => items.Values;
+        public IEnumerable<TValue> Values
+        {
+            [DebuggerStepThrough]
+            get => items.Values;
+        }
     }
 }

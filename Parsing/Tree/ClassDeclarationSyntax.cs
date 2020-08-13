@@ -33,9 +33,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public IAccessModifierToken? AccessModifier { get; }
         public IMutableKeywordToken? MutableModifier { get; }
         public MaybeQualifiedName FullName { get; }
-        public Name Name { get; }
+        public new Name Name { get; }
         public Promise<ObjectTypeSymbol> Symbol { get; } = new Promise<ObjectTypeSymbol>();
-        IPromise<Symbol> IEntityDeclarationSyntax.Symbol => Symbol;
+        protected override IPromise<Symbol> SymbolPromise => Symbol;
         public FixedList<IMemberDeclarationSyntax> Members { get; }
         public MetadataSet ChildMetadata { get; protected set; }
 
@@ -53,7 +53,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             TextSpan nameSpan,
             Name name,
             Func<IClassDeclarationSyntax, (FixedList<IMemberDeclarationSyntax>, TextSpan)> parseMembers)
-            : base(headerSpan, file, nameSpan)
+            : base(headerSpan, file, name, nameSpan)
         {
             ContainingNamespaceName = containingNamespaceName;
             AccessModifier = accessModifier;

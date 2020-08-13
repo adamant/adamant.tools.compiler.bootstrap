@@ -8,10 +8,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols.Trees
     ///
     /// Each symbol tree 
     /// </summary>
-    public abstract class SymbolTree
+    public interface ISymbolTree
     {
-        public abstract IEnumerable<Symbol> Symbols { get; }
-        public abstract bool Contains(Symbol symbol);
-        public abstract IEnumerable<Symbol> Children(Symbol symbol);
+        PackageSymbol? Package { get; }
+        IEnumerable<Symbol> Symbols { get; }
+        bool Contains(Symbol symbol);
+        IEnumerable<Symbol> Children(Symbol symbol);
     }
 }

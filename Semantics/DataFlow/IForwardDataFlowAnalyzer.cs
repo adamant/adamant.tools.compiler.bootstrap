@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
     {
         IForwardDataFlowAnalysis<TState> BeginAnalysis(
             IConcreteInvocableDeclarationSyntax invocable,
-            SymbolTree symbolTree,
+            ISymbolTree symbolTree,
             Diagnostics diagnostics);
     }
 }

@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             Justification = "OO")]
         public void BuildFor(PackageSyntax package)
         {
-            var declarationSymbols = GetAllDeclarationSymbols(package);
+            var declarationSymbols = GetAllNonMemberDeclarationSymbols(package);
             var namespaces = BuildNamespaces(declarationSymbols);
             var packagesScope = BuildPackagesScope(package);
             var globalScope = BuildGlobalScope(packagesScope, namespaces[NamespaceName.Global]);
@@ -29,27 +29,35 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             }
         }
 
-        private static FixedList<NonMemberEntitySymbol> GetAllDeclarationSymbols(PackageSyntax package)
+        private static FixedList<NonMemberSymbol> GetAllNonMemberDeclarationSymbols(PackageSyntax package)
         {
             var primitiveSymbols = Primitive.SymbolTree.Symbols
                                             .Where(s => s.ContainingSymbol is null)
-                                            .Select(s => new NonMemberEntitySymbol(s));
+                                            .Select(s => new NonMemberSymbol(s));
 
-            var packageSymbols = package.CompilationUnits
-                                        .SelectMany(cu => cu.AllEntityDeclarations)
+            var packageNamespaces = package.SymbolTreeBuilder.Symbols
+                                           .OfType<NamespaceSymbol>()
+                                           .Select(s => new NonMemberSymbol(s));
+
+            var packageSymbols = package.GetDeclarations()
                                         .OfType<INonMemberEntityDeclarationSyntax>()
-                                        .Select(d => new NonMemberEntitySymbol(d));
+                                        .Select(d => new NonMemberSymbol(d));
 
             // TODO it might be better to go to the declarations and get their symbols (once that is implemented)
             var referencedSymbols = package.References.Values
                                            .SelectMany(p => p.SymbolTree.Symbols)
+                                           .Concat(Intrinsic.SymbolTree.Symbols)
                                            .Where(s => s.ContainingSymbol is NamespaceOrPackageSymbol)
-                                           .Select(s => new NonMemberEntitySymbol(s));
-            return primitiveSymbols.Concat(packageSymbols).Concat(referencedSymbols).ToFixedList();
+                                           .Select(s => new NonMemberSymbol(s));
+            return primitiveSymbols
+                   .Concat(packageNamespaces)
+                   .Concat(packageSymbols)
+                   .Concat(referencedSymbols)
+                   .ToFixedList();
         }
 
         private static FixedDictionary<NamespaceName, Namespace> BuildNamespaces(
-            FixedList<NonMemberEntitySymbol> declarationSymbols)
+            FixedList<NonMemberSymbol> declarationSymbols)
         {
             var namespaces = declarationSymbols.SelectMany(s => s.ContainingNamespace.NamespaceNames()).Distinct();
             var nsSymbols = new List<Namespace>();
@@ -86,7 +94,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         }
 
         private static FixedDictionary<TypeName, FixedSet<IPromise<Symbol>>> ToDictionary(
-            IEnumerable<NonMemberEntitySymbol> symbols)
+            IEnumerable<NonMemberSymbol> symbols)
         {
             return symbols.GroupBy(s => s.Name, s => s.Symbol)
                           .ToFixedDictionary(e => e.Key, e => e.ToFixedSet());

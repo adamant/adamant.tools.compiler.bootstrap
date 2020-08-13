@@ -17,8 +17,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
             Symbol containingSymbol,
             Name name,
             FixedList<DataType> parameterDataTypes,
-            DataType returnDataType)
-            : base(containingSymbol, name, parameterDataTypes, returnDataType)
+            DataType? returnDataType = null)
+            : base(containingSymbol, name, parameterDataTypes, returnDataType ?? DataType.Void)
         {
             Name = name;
         }

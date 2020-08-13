@@ -10,9 +10,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
 {
     public class SymbolValidator : SyntaxWalker
     {
-        private readonly SymbolTree symbolTree;
+        private readonly ISymbolTree symbolTree;
 
-        public SymbolValidator(SymbolTree symbolTree)
+        public SymbolValidator(ISymbolTree symbolTree)
         {
             this.symbolTree = symbolTree;
         }

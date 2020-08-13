@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
 
         public IBackwardDataFlowAnalysis<VariableFlags> BeginAnalysis(
             IConcreteInvocableDeclarationSyntax invocable,
-            SymbolTree symbolTree,
+            ISymbolTree symbolTree,
             Diagnostics _)
         {
             return new LivenessAnalysis(invocable, symbolTree);

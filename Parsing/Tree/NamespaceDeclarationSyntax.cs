@@ -32,8 +32,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         /// </summary>
         public bool IsGlobalQualified { get; }
         public NamespaceName DeclaredNames { get; }
+        public new Name Name { get; }
         public NamespaceName FullName { get; }
         public Promise<NamespaceOrPackageSymbol> Symbol { get; } = new Promise<NamespaceOrPackageSymbol>();
+        protected override IPromise<Symbol> SymbolPromise => Symbol;
         public FixedList<IUsingDirectiveSyntax> UsingDirectives { get; }
         public FixedList<INonMemberDeclarationSyntax> Declarations { get; }
 
@@ -46,11 +48,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             TextSpan nameSpan,
             FixedList<IUsingDirectiveSyntax> usingDirectives,
             FixedList<INonMemberDeclarationSyntax> declarations)
-            : base(span, file, nameSpan)
+            : base(span, file, declaredNames.Segments[^1], nameSpan)
         {
             ContainingNamespaceName = containingNamespaceName;
             DeclaredNames = declaredNames;
             FullName = containingNamespaceName.Qualify(declaredNames);
+            Name = declaredNames.Segments[^1];
             UsingDirectives = usingDirectives;
             Declarations = declarations;
             IsGlobalQualified = isGlobalQualified;

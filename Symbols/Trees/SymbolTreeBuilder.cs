@@ -6,13 +6,13 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 namespace Adamant.Tools.Compiler.Bootstrap.Symbols.Trees
 {
     /// <summary>
-    /// Builder for a <see cref="SymbolTree"/>
+    /// Builder for a <see cref="ISymbolTree"/>
     /// </summary>
-    public class SymbolTreeBuilder : SymbolTree
+    public class SymbolTreeBuilder : ISymbolTree
     {
         public PackageSymbol? Package { get; }
         private readonly IDictionary<Symbol, ISet<Symbol>> symbolChildren = new Dictionary<Symbol, ISet<Symbol>>();
-        public override IEnumerable<Symbol> Symbols => symbolChildren.Keys;
+        public IEnumerable<Symbol> Symbols => symbolChildren.Keys;
 
         public SymbolTreeBuilder()
         {
@@ -25,12 +25,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols.Trees
             symbolChildren.Add(package, new HashSet<Symbol>());
         }
 
-        public override bool Contains(Symbol symbol)
+        public bool Contains(Symbol symbol)
         {
             return symbolChildren.ContainsKey(symbol);
         }
 
-        public override IEnumerable<Symbol> Children(Symbol symbol)
+        public IEnumerable<Symbol> Children(Symbol symbol)
         {
             if (symbol.Package != Package)
                 throw new ArgumentException("Symbol must be for the package of this tree", nameof(symbol));

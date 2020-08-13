@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Moves
 
         public IForwardDataFlowAnalysis<VariableFlags> BeginAnalysis(
             IConcreteInvocableDeclarationSyntax invocable,
-            SymbolTree symbolTree,
+            ISymbolTree symbolTree,
             Diagnostics diagnostics)
         {
             return new UseOfMovedValueAnalysis(invocable, symbolTree, diagnostics);

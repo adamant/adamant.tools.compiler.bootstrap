@@ -33,9 +33,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
             return ((IEnumerable)items).GetEnumerator();
         }
 
-        public int Count => items.Count;
+        public int Count
+        {
+            [DebuggerStepThrough] get => items.Count;
+        }
 
-        public T this[int index] => items[index];
+        public T this[int index]
+        {
+            [DebuggerStepThrough] get => items[index];
+        }
 
         #region Equality
         public override bool Equals(object? obj)

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -11,7 +12,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
     {
         public static readonly NamespaceName Global = new NamespaceName(FixedList<Name>.Empty);
 
-        public FixedList<Name> Segments { get; }
+        [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "WTF")]
+        public FixedList<Name> Segments { [DebuggerHidden] get; }
 
         public NamespaceName(FixedList<Name> segments)
         {

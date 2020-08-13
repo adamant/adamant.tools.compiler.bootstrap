@@ -10,12 +10,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
         where TState : class
     {
         private readonly IBackwardDataFlowAnalyzer<TState> strategy;
-        private readonly SymbolTree symbolTree;
+        private readonly ISymbolTree symbolTree;
         private readonly Diagnostics diagnostics;
 
         public BackwardDataFlowAnalyzer(
             IBackwardDataFlowAnalyzer<TState> strategy,
-            SymbolTree symbolTree,
+            ISymbolTree symbolTree,
             Diagnostics diagnostics)
         {
             this.strategy = strategy;

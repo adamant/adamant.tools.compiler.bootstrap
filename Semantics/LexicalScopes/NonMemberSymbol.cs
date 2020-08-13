@@ -6,14 +6,14 @@ using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 {
-    internal class NonMemberEntitySymbol
+    internal class NonMemberSymbol
     {
         public bool InCurrentPackage { get; }
         public NamespaceName ContainingNamespace { get; }
         public TypeName Name { get; }
         public IPromise<Symbol> Symbol { get; }
 
-        public NonMemberEntitySymbol(INonMemberEntityDeclarationSyntax declaration)
+        public NonMemberSymbol(INonMemberEntityDeclarationSyntax declaration)
         {
             InCurrentPackage = true;
             ContainingNamespace = declaration.ContainingNamespaceName;
@@ -21,11 +21,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             Symbol = declaration.Symbol;
         }
 
-        public NonMemberEntitySymbol(Symbol symbol)
+        public NonMemberSymbol(Symbol symbol)
         {
             if (!(symbol.ContainingSymbol is NamespaceOrPackageSymbol
                   || symbol.ContainingSymbol is null))
-                throw new ArgumentException("Symbol must be for a non-member entity", nameof(symbol));
+                throw new ArgumentException("Symbol must be for a non-member declaration", nameof(symbol));
             var containingSymbol = symbol.ContainingSymbol as NamespaceOrPackageSymbol;
             InCurrentPackage = false;
             ContainingNamespace = containingSymbol?.NamespaceName ?? NamespaceName.Global;

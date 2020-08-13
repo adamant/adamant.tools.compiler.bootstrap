@@ -47,15 +47,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public IEnumerable<IPromise<BindingSymbol>> LookupInContainingScope()
         {
-            if (containingLexicalScope != null)
-            {
-                // If name is unknown, no symbols
-                if (Name is null) return Enumerable.Empty<IPromise<BindingSymbol>>();
+            if (containingLexicalScope == null)
+                throw new InvalidOperationException($"Can't lookup type name without {nameof(ContainingLexicalScope)}");
 
-                return containingLexicalScope.Lookup(Name).Select(p => p.As<BindingSymbol>()).NotNull();
-            }
+            // If name is unknown, no symbols
+            if (Name is null) return Enumerable.Empty<IPromise<BindingSymbol>>();
 
-            throw new InvalidOperationException($"Can't lookup type name without {nameof(ContainingLexicalScope)}");
+            return containingLexicalScope.Lookup(Name).Select(p => p.As<BindingSymbol>()).NotNull();
         }
 
         protected override OperatorPrecedence ExpressionPrecedence => OperatorPrecedence.Primary;
