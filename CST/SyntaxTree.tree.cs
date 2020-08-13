@@ -407,6 +407,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface IBorrowExpressionSyntax : IExpressionSyntax
     {
+        Promise<BindingSymbol?> ReferencedSymbol { get; }
     }
 
     public partial interface IBreakExpressionSyntax : IExpressionSyntax

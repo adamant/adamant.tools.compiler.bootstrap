@@ -117,7 +117,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         public static Reference ToNewFieldObject(ReachabilityGraph graph, IFieldDeclarationSyntax field)
         {
-            var referenceType = field.DataType.Known().UnderlyingReferenceType()
+            var referenceType = field.Symbol.Result.DataType.Known().UnderlyingReferenceType()
                                 ?? throw new ArgumentException("Must be a parameter with a reference type",
                                     nameof(field));
 

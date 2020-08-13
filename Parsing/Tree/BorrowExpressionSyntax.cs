@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Metadata;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
@@ -13,9 +14,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Justification = "Can't be readonly because a reference to it is exposed")]
         private IExpressionSyntax referent;
         public ref IExpressionSyntax Referent => ref referent;
+        public Promise<BindingSymbol?> ReferencedSymbol { get; } = new Promise<BindingSymbol?>();
 
         private IBindingMetadata? borrowedFromBinding;
-
         [DisallowNull]
         public IBindingMetadata? BorrowedFromBinding
         {

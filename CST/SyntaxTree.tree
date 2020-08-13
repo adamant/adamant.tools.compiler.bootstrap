@@ -88,7 +88,7 @@ AssignmentExpression: Expression = Operator:AssignmentOperator;
 BinaryOperatorExpression: Expression = Operator:BinaryOperator;
 BlockExpression: Expression, BlockOrResult, BodyOrBlock;
 BoolLiteralExpression: LiteralExpression = Value:bool;
-BorrowExpression: Expression;
+BorrowExpression: Expression = ReferencedSymbol:Promise<BindingSymbol?>;
 BreakExpression: Expression;
 FieldAccessExpression: AssignableExpression = AccessOperator Field:NameExpression ReferencedSymbol:IPromise<FieldSymbol?>;
 ForeachExpression: Expression, LocalBinding = VariableName:Name DeclarationNumber:Promise<int?> Symbol:Promise<VariableSymbol> Type? Block:BlockExpression;

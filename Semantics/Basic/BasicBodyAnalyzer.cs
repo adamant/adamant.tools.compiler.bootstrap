@@ -269,6 +269,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     {
                         case INameExpressionSyntax nameExpression:
                         {
+                            exp.ReferencedSymbol.BeginFulfilling();
                             nameExpression.Semantics = ExpressionSemantics.Borrow;
                             var type = InferType(ref exp.Referent, false);
                             switch (type)
@@ -276,8 +277,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                                 case ReferenceType referenceType:
                                     if (!referenceType.IsMutable)
                                     {
-                                        diagnostics.Add(
-                                            TypeError.ExpressionCantBeMutable(file, exp.Referent));
+                                        diagnostics.Add(TypeError.ExpressionCantBeMutable(file, exp.Referent));
                                         type = DataType.Unknown;
                                     }
                                     else
@@ -289,6 +289,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             }
 
                             exp.BorrowedFromBinding = nameExpression.ReferencedBinding!;
+                            exp.ReferencedSymbol.Fulfill(nameExpression.ReferencedSymbol.Result);
                             return exp.DataType = type;
                         }
                         case IBorrowExpressionSyntax _:
@@ -646,14 +647,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             if (!(type is ReferenceType referenceType)) return;
 
             IBindingMetadata referencedMetadata;
+            BindingSymbol? referencedSymbol;
             switch (expression)
             {
                 case INameExpressionSyntax exp:
                     exp.Semantics = ExpressionSemantics.Borrow;
                     referencedMetadata = exp.ReferencedBinding.Assigned();
+                    referencedSymbol = exp.ReferencedSymbol.Result;
                     break;
                 case ISelfExpressionSyntax exp:
                     referencedMetadata = exp.ReferencedBinding.Assigned();
+                    referencedSymbol = exp.ReferencedSymbol.Result;
                     break;
                 default:
                     // implicit borrow isn't needed around other expressions
@@ -662,7 +666,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
             type = referenceType.To(ReferenceCapability.Borrowed);
 
-            expression = new ImplicitBorrowExpressionSyntax(expression, type, referencedMetadata);
+            expression = new ImplicitBorrowExpressionSyntax(expression, type, referencedSymbol, referencedMetadata);
         }
 
         private static void InsertImplicitMoveIfNeeded([NotNull] ref IExpressionSyntax expression, DataType type)
@@ -921,7 +925,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 return nameExpression.DataType = DataType.Unknown;
             }
 
-            DataType? type = null;
+            DataType? type;
             var symbols = nameExpression.LookupInContainingScope().ToFixedList();
             switch (symbols.Count)
             {
