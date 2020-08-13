@@ -615,19 +615,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             if (!(type is ReferenceType referenceType)) return type;
 
             IBindingMetadata referencedMetadata;
+            BindingSymbol? referencedSymbol;
             switch (expression)
             {
                 case INameExpressionSyntax exp:
                     exp.Semantics = ExpressionSemantics.Share;
                     referencedMetadata = exp.ReferencedBinding.Assigned();
+                    referencedSymbol = exp.ReferencedSymbol.Result;
                     break;
                 case ISelfExpressionSyntax exp:
                     referencedMetadata = exp.ReferencedBinding.Assigned();
+                    referencedSymbol = exp.ReferencedSymbol.Result;
                     break;
                 case IFieldAccessExpressionSyntax exp:
                     exp.Field.Semantics = ExpressionSemantics.Share;
                     exp.Semantics = ExpressionSemantics.Share;
                     referencedMetadata = exp.ReferencedBinding.Assigned();
+                    referencedSymbol = exp.ReferencedSymbol.Result;
                     break;
                 default:
                     // implicit share isn't needed around other expressions
@@ -636,7 +640,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
             type = referenceType.To(ReferenceCapability.Shared);
 
-            expression = new ImplicitShareExpressionSyntax(expression, type, referencedMetadata);
+            expression = new ImplicitShareExpressionSyntax(expression, type, referencedSymbol, referencedMetadata);
 
             return type;
         }

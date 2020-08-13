@@ -542,6 +542,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface IShareExpressionSyntax : IExpressionSyntax
     {
+        Promise<BindingSymbol?> ReferencedSymbol { get; }
         IBindingMetadata SharedMetadata { get; }
     }
 

@@ -111,7 +111,7 @@ NextExpression: Expression;
 NoneLiteralExpression: LiteralExpression;
 ReturnExpression: Expression;
 SelfExpression: Expression, IHasContainingScope = IsImplicit:bool ReferencedSymbol:Promise<SelfParameterSymbol?>;
-ShareExpression: Expression = SharedMetadata:IBindingMetadata;
+ShareExpression: Expression = ReferencedSymbol:Promise<BindingSymbol?> SharedMetadata:IBindingMetadata;
 StringLiteralExpression: LiteralExpression = Value:string;
 UnaryOperatorExpression: Expression = Fixity:UnaryOperatorFixity Operator:UnaryOperator;
 UnsafeExpression: Expression;

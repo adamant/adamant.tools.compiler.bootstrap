@@ -55,6 +55,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                 case IBorrowExpressionSyntax syn:
                     CheckReferencedSymbol(syn, syn.ReferencedSymbol);
                     break;
+                case IShareExpressionSyntax syn:
+                    CheckReferencedSymbol(syn, syn.ReferencedSymbol);
+                    break;
             }
 
             WalkChildren(syntax);
