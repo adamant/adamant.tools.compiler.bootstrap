@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
+using Adamant.Tools.Compiler.Bootstrap.CST;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
 {
@@ -10,8 +10,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
     internal class VariableScope
     {
         public VariableScope? ContainingScope { get; }
-        private readonly HashSet<IBindingMetadata> variables = new HashSet<IBindingMetadata>();
-        public IReadOnlyCollection<IBindingMetadata> Variables => variables;
+        private readonly HashSet<IBindingSyntax> variables = new HashSet<IBindingSyntax>();
+        public IReadOnlyCollection<IBindingSyntax> Variables => variables;
 
         public VariableScope(VariableScope? containingScope = null)
         {
@@ -21,9 +21,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
         /// <summary>
         /// Declare a variable in the current scope
         /// </summary>
-        public void VariableDeclared(IBindingMetadata symbol)
+        public void VariableDeclared(IBindingSyntax syntax)
         {
-            variables.Add(symbol);
+            variables.Add(syntax);
         }
     }
 }

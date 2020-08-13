@@ -15,6 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public bool IsMutableBinding { get; }
         public new Name Name { get; }
         public Promise<FieldSymbol> Symbol { get; } = new Promise<FieldSymbol>();
+        IPromise<BindingSymbol> IBindingSyntax.Symbol => Symbol;
         protected override IPromise<Symbol> SymbolPromise => Symbol;
         public ITypeSyntax Type { get; }
         private IExpressionSyntax? initializer;
@@ -22,6 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         DataType IBindingMetadata.DataType => Symbol.Result.DataType;
+        public DataType BindingDataType => Symbol.Result.DataType;
 
         public FieldDeclarationSyntax(
             IClassDeclarationSyntax declaringClass,

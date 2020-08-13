@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
@@ -20,21 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         IPromise<Symbol> IEntityDeclarationSyntax.Symbol => SymbolPromise;
         protected abstract IPromise<Symbol> SymbolPromise { get; }
         public MaybeQualifiedName FullName { get; }
-
-        private DataType? selfParameterType;
-        [DisallowNull]
-        public DataType? SelfParameterType
-        {
-            get => selfParameterType;
-            set
-            {
-                if (selfParameterType != null)
-                    throw new InvalidOperationException("Can't set SelfParameterType repeatedly");
-                selfParameterType = value ?? throw new ArgumentNullException(nameof(value));
-            }
-        }
-
-        public FixedList<IParameterSyntax> Parameters { get; }
+        public FixedList<IConstructorParameterSyntax> Parameters { get; }
         IEnumerable<IBindingMetadata> IFunctionMetadata.Parameters => Parameters;
         public Promise<DataType> ReturnDataType { get; } = new Promise<DataType>();
         DataType IFunctionMetadata.ReturnDataType => ReturnDataType.Result;
@@ -49,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             MaybeQualifiedName fullName,
             TextSpan nameSpan,
             Name? name,
-            IEnumerable<IParameterSyntax> parameters,
+            IEnumerable<IConstructorParameterSyntax> parameters,
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
             MetadataSet childMetadata)
             : base(span, file, nameSpan)

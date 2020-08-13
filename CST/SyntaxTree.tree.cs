@@ -18,6 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(IArgumentSyntax),
         typeof(IBodyOrBlockSyntax),
         typeof(IElseClauseSyntax),
+        typeof(IBindingSyntax),
         typeof(IDeclarationSyntax),
         typeof(IParameterSyntax),
         typeof(IReachabilityAnnotationSyntax),
@@ -77,6 +78,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(IResultStatementSyntax),
         typeof(IBlockExpressionSyntax))]
     public partial interface IBlockOrResultSyntax : IElseClauseSyntax
+    {
+    }
+
+    [Closed(
+        typeof(ILocalBindingSyntax),
+        typeof(IFieldDeclarationSyntax))]
+    public partial interface IBindingSyntax : ISyntax
+    {
+        IPromise<BindingSymbol> Symbol { get; }
+        DataType BindingDataType { get; }
+    }
+
+    [Closed(
+        typeof(IBindingParameterSyntax),
+        typeof(IVariableDeclarationStatementSyntax),
+        typeof(IForeachExpressionSyntax))]
+    public partial interface ILocalBindingSyntax : IBindingSyntax
     {
     }
 
@@ -206,7 +224,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         ISelfParameterSyntax ImplicitSelfParameter { get; }
     }
 
-    public partial interface IFieldDeclarationSyntax : IMemberDeclarationSyntax
+    public partial interface IFieldDeclarationSyntax : IMemberDeclarationSyntax, IBindingSyntax
     {
         new Name Name { get; }
         new Promise<FieldSymbol> Symbol { get; }
@@ -215,6 +233,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     [Closed(
         typeof(IConstructorParameterSyntax),
+        typeof(IBindingParameterSyntax),
         typeof(INamedParameterSyntax),
         typeof(ISelfParameterSyntax),
         typeof(IFieldParameterSyntax))]
@@ -233,18 +252,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         new Name Name { get; }
     }
 
-    public partial interface INamedParameterSyntax : IParameterSyntax, IConstructorParameterSyntax
+    [Closed(
+        typeof(INamedParameterSyntax),
+        typeof(ISelfParameterSyntax))]
+    public partial interface IBindingParameterSyntax : IParameterSyntax, ILocalBindingSyntax
+    {
+    }
+
+    public partial interface INamedParameterSyntax : IParameterSyntax, IConstructorParameterSyntax, IBindingParameterSyntax
     {
         Promise<int?> DeclarationNumber { get; }
         ITypeSyntax Type { get; }
-        Promise<VariableSymbol> Symbol { get; }
+        new Promise<VariableSymbol> Symbol { get; }
         IExpressionSyntax? DefaultValue { get; }
     }
 
-    public partial interface ISelfParameterSyntax : IParameterSyntax
+    public partial interface ISelfParameterSyntax : IParameterSyntax, IBindingParameterSyntax
     {
         bool MutableSelf { get; }
-        Promise<SelfParameterSymbol> Symbol { get; }
+        new Promise<SelfParameterSymbol> Symbol { get; }
     }
 
     public partial interface IFieldParameterSyntax : IParameterSyntax, IConstructorParameterSyntax
@@ -313,12 +339,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     {
     }
 
-    public partial interface IVariableDeclarationStatementSyntax : IBodyStatementSyntax, IBindingMetadata
+    public partial interface IVariableDeclarationStatementSyntax : IBodyStatementSyntax, ILocalBindingSyntax, IBindingMetadata
     {
         TextSpan NameSpan { get; }
         Name Name { get; }
         Promise<int?> DeclarationNumber { get; }
-        Promise<VariableSymbol> Symbol { get; }
+        new Promise<VariableSymbol> Symbol { get; }
         ITypeSyntax? Type { get; }
         bool InferMutableType { get; }
     }
@@ -394,11 +420,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         IPromise<FieldSymbol?> ReferencedSymbol { get; }
     }
 
-    public partial interface IForeachExpressionSyntax : IExpressionSyntax
+    public partial interface IForeachExpressionSyntax : IExpressionSyntax, ILocalBindingSyntax
     {
         Name VariableName { get; }
         Promise<int?> DeclarationNumber { get; }
-        Promise<VariableSymbol> Symbol { get; }
+        new Promise<VariableSymbol> Symbol { get; }
         ITypeSyntax? Type { get; }
         IBlockExpressionSyntax Block { get; }
     }

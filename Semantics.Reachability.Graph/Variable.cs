@@ -1,6 +1,5 @@
 using System;
 using Adamant.Tools.Compiler.Bootstrap.CST;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
@@ -10,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     /// </summary>
     public class Variable : StackPlace
     {
-        public IBindingMetadata Symbol { get; }
+        public IBindingSyntax Syntax { get; }
 
         /// <summary>
         /// The type of this variable or field. If the original type was optional
@@ -18,12 +17,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         /// </summary>
         public ReferenceType Type { get; }
 
-        internal Variable(ReachabilityGraph graph, IBindingMetadata symbol)
+        internal Variable(ReachabilityGraph graph, IBindingSyntax syntax)
             : base(graph)
         {
-            Symbol = symbol;
-            Type = symbol.DataType.UnderlyingReferenceType()
-                   ?? throw new ArgumentException("Must be a reference type", nameof(symbol));
+            Syntax = syntax;
+            Type = syntax.BindingDataType.UnderlyingReferenceType()
+                   ?? throw new ArgumentException("Must be a reference type", nameof(syntax));
         }
 
         internal static Variable? ForField(ReachabilityGraph graph, IFieldDeclarationSyntax field)
@@ -38,12 +37,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return variable;
         }
 
-        internal static Variable? Declared(ReachabilityGraph graph, IBindingMetadata symbol)
+        internal static Variable? Declared(ReachabilityGraph graph, ILocalBindingSyntax syntax)
         {
-            var referenceType = symbol.DataType.Known().UnderlyingReferenceType();
+            var referenceType = syntax.BindingDataType.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
 
-            return new Variable(graph, symbol);
+            return new Variable(graph, syntax);
         }
 
         internal void Assign(TempValue temp)
@@ -58,7 +57,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         public override string ToString()
         {
-            return $"{Symbol.FullName.UnqualifiedName}: {Symbol.DataType}";
+            return $"{Syntax.Symbol.Result.Name}: {Syntax.BindingDataType}";
         }
     }
 }

@@ -16,9 +16,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public Name Name { get; }
         public Promise<int?> DeclarationNumber { get; } = new Promise<int?>();
         public Promise<VariableSymbol> Symbol { get; } = new Promise<VariableSymbol>();
+        IPromise<BindingSymbol> IBindingSyntax.Symbol => Symbol;
         public TextSpan NameSpan { [DebuggerStepThrough] get; }
         public ITypeSyntax? Type { [DebuggerStepThrough] get; }
         public bool InferMutableType { [DebuggerStepThrough] get; }
+        DataType IBindingSyntax.BindingDataType => Symbol.Result.DataType;
         DataType IBindingMetadata.DataType => Symbol.Result.DataType;
         [SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification =
             "Can't be readonly because a reference to it is exposed")]

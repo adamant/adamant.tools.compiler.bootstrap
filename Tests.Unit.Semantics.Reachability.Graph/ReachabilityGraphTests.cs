@@ -1,5 +1,4 @@
 using Adamant.Tools.Compiler.Bootstrap.CST;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph;
 using Adamant.Tools.Compiler.Bootstrap.Types;
@@ -16,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Reachability.Gra
         public void AddParameterWithValueType()
         {
             var graph = new ReachabilityGraph();
-            var mockParameter = new Mock<IParameterSyntax>();
+            var mockParameter = new Mock<IBindingParameterSyntax>();
             mockParameter.Setup(p => p.DataType).Returns(DataType.Bool);
 
             var localVariable = graph.AddParameter(mockParameter.Object);
@@ -76,8 +75,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Reachability.Gra
             var fakeReferenceType = new ObjectType(NamespaceName.Global, "Fake", false, ReferenceCapability.Shared);
             mockExpression.Setup(e => e.DataType).Returns(fakeReferenceType);
             var temp = graph.AddObject(mockExpression.Object);
-            var mockVariableBinding = new Mock<IBindingMetadata>();
-            mockVariableBinding.Setup(v => v.DataType).Returns(fakeReferenceType);
+            var mockVariableBinding = new Mock<ILocalBindingSyntax>();
+            mockVariableBinding.Setup(v => v.BindingDataType).Returns(fakeReferenceType);
             var variable = graph.AddVariable(mockVariableBinding.Object);
 
             graph.Assign(variable, temp);

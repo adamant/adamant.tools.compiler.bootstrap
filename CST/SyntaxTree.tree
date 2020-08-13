@@ -26,6 +26,8 @@ Body: BodyOrBlock = Statements:BodyStatement*;
 BodyOrBlock = Statements:Statement*;
 ElseClause;
 BlockOrResult: ElseClause;
+Binding = Symbol:IPromise<BindingSymbol> BindingDataType:DataType;
+LocalBinding: Binding;
 
 // Declarations
 Declaration: 'ISyntax', IHasContainingLexicalScope = File:CodeFile NameSpan:TextSpan;
@@ -49,13 +51,16 @@ MethodDeclaration: MemberDeclaration, CallableDeclaration = Name Symbol:Promise<
 AbstractMethodDeclaration: MethodDeclaration;
 ConcreteMethodDeclaration: MethodDeclaration, ConcreteCallableDeclaration;
 ConstructorDeclaration: MemberDeclaration, ConcreteCallableDeclaration = Symbol:Promise<ConstructorSymbol> ImplicitSelfParameter:SelfParameter;
-FieldDeclaration: MemberDeclaration = Name Symbol:Promise<FieldSymbol> Type;
+FieldDeclaration: MemberDeclaration, Binding = Name Symbol:Promise<FieldSymbol> Type;
 
-// Parameters
+// ---------- Parameters --------------
 Parameter: 'ISyntax', IBindingMetadata = Name? DataType:IPromise<DataType> Unused:bool;
+/// A parameter that can be declared in a constructor
 ConstructorParameter: Parameter = Name;
-NamedParameter: Parameter, ConstructorParameter = DeclarationNumber:Promise<int?> Type Symbol:Promise<VariableSymbol> DefaultValue:Expression?;
-SelfParameter: Parameter = MutableSelf:bool Symbol:Promise<SelfParameterSymbol>;
+/// A parameter that creates a binding, i.e. a named or self parameter
+BindingParameter: Parameter, LocalBinding;
+NamedParameter: Parameter, ConstructorParameter, BindingParameter = DeclarationNumber:Promise<int?> Type Symbol:Promise<VariableSymbol> DefaultValue:Expression?;
+SelfParameter: Parameter, BindingParameter = MutableSelf:bool Symbol:Promise<SelfParameterSymbol>;
 FieldParameter: Parameter, ConstructorParameter = ReferencedSymbol:Promise<FieldSymbol?> DefaultValue:Expression?;
 
 // Annotations
@@ -73,7 +78,7 @@ CapabilityType: Type = ReferentType:Type Capability:ReferenceCapability;
 Statement;
 ResultStatement: Statement, BlockOrResult;
 BodyStatement: Statement;
-VariableDeclarationStatement: BodyStatement, IBindingMetadata = NameSpan:TextSpan Name DeclarationNumber:Promise<int?> Symbol:Promise<VariableSymbol> Type? InferMutableType:bool;
+VariableDeclarationStatement: BodyStatement, LocalBinding, IBindingMetadata = NameSpan:TextSpan Name DeclarationNumber:Promise<int?> Symbol:Promise<VariableSymbol> Type? InferMutableType:bool;
 ExpressionStatement: BodyStatement;
 
 // Expressions
@@ -86,7 +91,7 @@ BoolLiteralExpression: LiteralExpression = Value:bool;
 BorrowExpression: Expression;
 BreakExpression: Expression;
 FieldAccessExpression: AssignableExpression = AccessOperator Field:NameExpression ReferencedSymbol:IPromise<FieldSymbol?>;
-ForeachExpression: Expression = VariableName:Name DeclarationNumber:Promise<int?> Symbol:Promise<VariableSymbol> Type? Block:BlockExpression;
+ForeachExpression: Expression, LocalBinding = VariableName:Name DeclarationNumber:Promise<int?> Symbol:Promise<VariableSymbol> Type? Block:BlockExpression;
 FunctionInvocationExpression: InvocationExpression = FunctionNameSyntax:CallableName;
 IfExpression: Expression, ElseClause = ThenBlock:BlockOrResult ElseClause?;
 ImplicitConversionExpression: Expression = Expression DataType;

@@ -11,8 +11,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public override bool IsMutableBinding => MutableSelf;
         public bool MutableSelf { get; }
         public Promise<SelfParameterSymbol> Symbol { get; } = new Promise<SelfParameterSymbol>();
+        IPromise<BindingSymbol> IBindingSyntax.Symbol => Symbol;
         public override IPromise<DataType> DataType { get; }
-
+        DataType IBindingSyntax.BindingDataType => DataType.Result;
         public SelfParameterSyntax(TextSpan span, MaybeQualifiedName fullName, bool mutableSelf)
             : base(span, fullName, null)
         {

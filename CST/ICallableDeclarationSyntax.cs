@@ -7,6 +7,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     /// </summary>
     public partial interface ICallableDeclarationSyntax
     {
-        new FixedList<IParameterSyntax> Parameters { get; }
+        new FixedList<IConstructorParameterSyntax> Parameters { get; }
     }
 }

@@ -17,7 +17,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public Name? Name { get; }
         public abstract IPromise<DataType> DataType { get; }
         public bool Unused { get; }
-
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         DataType IBindingMetadata.DataType => DataType.Result;
