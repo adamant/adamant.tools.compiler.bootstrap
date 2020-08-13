@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Metadata;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
@@ -33,6 +34,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
                 movedSymbol = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
+
+        public Promise<BindingSymbol?> ReferencedSymbol { get; } = new Promise<BindingSymbol?>();
 
         public MoveExpressionSyntax(TextSpan span, INameExpressionSyntax referent)
             : base(span) // TODO this could be a move or acquire?

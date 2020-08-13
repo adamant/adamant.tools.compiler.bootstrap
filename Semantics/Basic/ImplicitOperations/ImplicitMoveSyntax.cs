@@ -1,8 +1,10 @@
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Metadata;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 
@@ -13,7 +15,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
         [SuppressMessage("Style", "IDE0044:Add readonly modifier",
             Justification = "Can't be readonly because a reference to it is exposed")]
         private IExpressionSyntax referent;
-
         public ref IExpressionSyntax Referent
         {
             [DebuggerStepThrough]
@@ -29,10 +30,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
             set => throw new InvalidOperationException("Can't set referenced symbol repeatedly");
         }
 
-        public ImplicitMoveSyntax(IExpressionSyntax referent, DataType type, IBindingMetadata movedSymbol)
+        public Promise<BindingSymbol?> ReferencedSymbol { get; }
+
+        public ImplicitMoveSyntax(IExpressionSyntax referent, DataType type, BindingSymbol? referencedSymbol, IBindingMetadata movedSymbol)
             : base(type, referent.Span)
         {
             this.referent = referent;
+            ReferencedSymbol = Promise.ForValue(referencedSymbol);
             this.movedSymbol = movedSymbol ?? throw new ArgumentNullException(nameof(movedSymbol));
         }
 

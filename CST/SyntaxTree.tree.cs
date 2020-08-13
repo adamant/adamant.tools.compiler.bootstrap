@@ -506,6 +506,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface IMoveExpressionSyntax : IExpressionSyntax
     {
+        Promise<BindingSymbol?> ReferencedSymbol { get; }
     }
 
     public partial interface INameExpressionSyntax : IAssignableExpressionSyntax, IHasContainingScope, IHasContainingLexicalScope

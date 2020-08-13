@@ -104,7 +104,7 @@ InvocationExpression: Expression = FullName:MaybeQualifiedName Arguments:Argumen
 LiteralExpression: Expression;
 LoopExpression: Expression = Block:BlockExpression;
 MethodInvocationExpression: InvocationExpression = MethodNameSyntax:CallableName;
-MoveExpression: Expression;
+MoveExpression: Expression = ReferencedSymbol:Promise<BindingSymbol?>;
 NameExpression: AssignableExpression, IHasContainingScope, IHasContainingLexicalScope = Name? SimpleName ReferencedSymbol:Promise<BindingSymbol?>;
 NewObjectExpression: Expression = Type:TypeName ConstructorName:CallableName? Arguments:Argument*;
 NextExpression: Expression;

@@ -239,6 +239,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     switch (exp.Referent)
                     {
                         case INameExpressionSyntax nameExpression:
+                            exp.ReferencedSymbol.BeginFulfilling();
                             nameExpression.Semantics = ExpressionSemantics.Acquire;
                             var type = InferType(ref exp.Referent, false);
                             switch (type)
@@ -255,6 +256,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             }
 
                             exp.MovedSymbol = nameExpression.ReferencedBinding!;
+                            exp.ReferencedSymbol.Fulfill(nameExpression.ReferencedSymbol.Result);
                             exp.Semantics = ExpressionSemantics.Acquire;
                             return exp.DataType = type;
                         case IBorrowExpressionSyntax _:
@@ -686,7 +688,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 return;
 
             var referencedMetadata = name.ReferencedBinding.Assigned();
-            expression = new ImplicitMoveSyntax(expression, type, referencedMetadata);
+            var referencedSymbol = name.ReferencedSymbol.Result;
+            expression = new ImplicitMoveSyntax(expression, type, referencedSymbol, referencedMetadata);
             name.Semantics = ExpressionSemantics.Acquire;
             expression.Semantics = ExpressionSemantics.Acquire;
         }
