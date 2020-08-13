@@ -32,6 +32,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         // a number because it will end up prefixed anyway.
         private static readonly Regex StandardIdentifierPattern = new Regex(@"^[_0-9a-zA-Z]+$", RegexOptions.Compiled);
 
+        public string SelfName { get; } = "_self";
+
         public string MangleName(FunctionDeclaration function)
         {
             // builder with room for the characters we are likely to add

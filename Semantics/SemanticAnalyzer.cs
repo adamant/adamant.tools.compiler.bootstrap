@@ -71,6 +71,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // --------------------------------------------------
 
             // If there are errors from the previous phase, don't continue on
+            // TODO can the BuildIL() step introduce errors?
             diagnostics.ThrowIfFatalErrors();
 
             var entryPoint = DetermineEntryPoint(declarations, diagnostics);

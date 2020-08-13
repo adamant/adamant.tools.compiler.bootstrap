@@ -6,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.TerminatorInstructions;
-using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
@@ -26,26 +26,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
             this.file = file;
         }
 
-        public VariableDeclaration AddVariable(bool mutableBinding, DataType type, Scope scope, SimpleName? name = null)
+        public VariableDeclaration AddVariable(bool mutableBinding, DataType type, Scope scope, BindingSymbol? symbol = null)
         {
             var variable = new VariableDeclaration(false, mutableBinding, type.ToNonConstantType(),
-                            new Variable(variables.Count), scope, name);
+                            new Variable(variables.Count), scope, symbol);
             variables.Add(variable);
             return variable;
         }
 
-        public VariableDeclaration AddParameter(bool mutableBinding, DataType type, Scope scope, SimpleName name)
+        public VariableDeclaration AddParameter(bool mutableBinding, DataType type, Scope scope, BindingSymbol symbol)
         {
             var variable = new VariableDeclaration(true, mutableBinding, type.ToNonConstantType(),
-                            new Variable(variables.Count), scope, name);
+                            new Variable(variables.Count), scope, symbol);
             variables.Add(variable);
             return variable;
         }
 
-        public VariableDeclaration AddSelfParameter(DataType type)
+        public VariableDeclaration AddSelfParameter(SelfParameterSymbol symbol)
         {
             Requires.That("variableNumber", variables.Count == 0, "Self parameter must have variable number 0");
-            var variable = new VariableDeclaration(true, false, type, Variable.Self, null, SpecialNames.Self);
+            var variable = new VariableDeclaration(true, false, symbol.DataType, Variable.Self, null, symbol);
             variables.Add(variable);
             return variable;
         }
@@ -60,9 +60,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
             return AddVariable(true, type, scope);
         }
 
-        public VariableDeclaration VariableFor(SimpleName name)
+        public VariableDeclaration VariableFor(BindingSymbol symbol)
         {
-            return variables.Single(v => v.Name == name);
+            return variables.Single(v => v.Symbol == symbol);
         }
 
         public BlockBuilder NewBlock()

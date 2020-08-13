@@ -145,8 +145,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
             var symbol = new ObjectTypeSymbol(@class.ContainingNamespaceSymbol!, classType);
             @class.Symbol.Fulfill(symbol);
             symbolTree.Add(symbol);
-            var defaultConstructorSymbol = @class.CreateDefaultConstructor();
-            if (!(defaultConstructorSymbol is null)) symbolTree.Add(defaultConstructorSymbol);
+            @class.CreateDefaultConstructor(symbolTree);
 
             void AddCircularDefinitionError()
             {

@@ -10,6 +10,7 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Operands;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Places;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.TerminatorInstructions;
 using Adamant.Tools.Compiler.Bootstrap.Metadata;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
 using static Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions.BooleanLogicOperator;
@@ -28,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
     public class ControlFlowGraphFabrication
     {
         private readonly IConcreteInvocableDeclarationSyntax invocable;
-        private readonly DataType? selfType;
+        private readonly SelfParameterSymbol? selfParameter;
         private readonly DataType returnType;
         private readonly ControlFlowGraphBuilder graph;
 
@@ -68,10 +69,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 default:
                     throw ExhaustiveMatch.Failed(invocable);
                 case IConcreteMethodDeclarationSyntax method:
+                    // TODO what about the self parameter of methods?
                     returnType = method.ReturnDataType.Known();
                     break;
                 case IConstructorDeclarationSyntax constructor:
-                    selfType = constructor.ImplicitSelfParameter.Symbol.Result.DataType.Known();
+                    selfParameter = constructor.ImplicitSelfParameter.Symbol.Result;
                     returnType = DataType.Void; // the body should `return;`
                     break;
                 case IAssociatedFunctionDeclarationSyntax associatedFunction:
@@ -89,10 +91,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         public ControlFlowGraph CreateGraph()
         {
             // Temp Variable for return
-            if (selfType != null) graph.AddSelfParameter(selfType);
+            if (selfParameter != null) graph.AddSelfParameter(selfParameter);
 
-            foreach (var parameter in invocable.Parameters.Where(p => !p.Unused))
-                graph.AddParameter(parameter.IsMutableBinding, parameter.DataType.Result, CurrentScope, parameter.FullName.UnqualifiedName);
+            foreach (var parameter in invocable.Parameters.Where(p => !p.Unused).OfType<INamedParameterSyntax>())
+                graph.AddParameter(parameter.IsMutableBinding, parameter.DataType.Result, CurrentScope, parameter.Symbol.Result);
 
             currentBlock = graph.NewBlock();
             foreach (var statement in invocable.Body.Statements)
@@ -120,7 +122,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 {
                     var variable = graph.AddVariable(variableDeclaration.IsMutableBinding,
                         variableDeclaration.Symbol.Result.DataType,
-                        CurrentScope, variableDeclaration.FullName.UnqualifiedName);
+                        CurrentScope, variableDeclaration.Symbol.Result);
                     if (variableDeclaration.Initializer != null)
                     {
                         ConvertIntoPlace(variableDeclaration.Initializer,
@@ -270,7 +272,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
 
                     var variableType = (IntegerType)exp.Symbol.Result.DataType;
                     var loopVariable = graph.AddVariable(exp.IsMutableBinding,
-                                            variableType, CurrentScope, exp.FullName.UnqualifiedName);
+                                            variableType, CurrentScope, exp.Symbol.Result);
                     var loopVariablePlace = loopVariable.Place(exp.Span);
                     var loopVariableReference = loopVariable.Reference(exp.Span);
 
@@ -496,8 +498,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case INameExpressionSyntax exp:
                 {
                     // This occurs when the source code contains a simple assignment like `x = y`
-                    var symbol = exp.ReferencedBinding.Assigned();
-                    var variable = graph.VariableFor(symbol.FullName.UnqualifiedName).Reference(exp.Span);
+                    var symbol = exp.ReferencedSymbol.Result ?? throw new InvalidOperationException();
+                    var variable = graph.VariableFor(symbol).Reference(exp.Span);
                     currentBlock!.Add(new AssignmentInstruction(resultPlace, variable, exp.Span, CurrentScope));
                 }
                 break;
@@ -670,13 +672,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
             {
                 default:
                     throw ExhaustiveMatch.Failed(expression);
-                //throw new NotImplementedException($"ConvertToOperand({expression.GetType().Name}) Not Implemented.");
                 case ISelfExpressionSyntax exp:
                     return graph.SelfVariable.Reference(exp.Span);
                 case INameExpressionSyntax exp:
                 {
-                    var symbol = exp.ReferencedBinding.Assigned();
-                    return graph.VariableFor(symbol.FullName.UnqualifiedName).Reference(exp.Span);
+                    var symbol = exp.ReferencedSymbol.Result ?? throw new InvalidOperationException();
+                    return graph.VariableFor(symbol).Reference(exp.Span);
                 }
                 case IAssignmentExpressionSyntax _:
                 case IBinaryOperatorExpressionSyntax _:
@@ -732,8 +733,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     return new VariablePlace(Variable.Self, exp.Span);
                 case INameExpressionSyntax exp:
                 {
-                    var symbol = exp.ReferencedBinding.Assigned();
-                    return graph.VariableFor(symbol.FullName.UnqualifiedName).Place(exp.Span);
+                    var symbol = exp.ReferencedSymbol.Result ?? throw new InvalidOperationException();
+                    return graph.VariableFor(symbol).Place(exp.Span);
                 }
             }
         }

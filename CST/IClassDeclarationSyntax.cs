@@ -1,10 +1,10 @@
 using Adamant.Tools.Compiler.Bootstrap.Metadata;
-using Adamant.Tools.Compiler.Bootstrap.Symbols;
+using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
 
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
     public partial interface IClassDeclarationSyntax : ITypeMetadata
     {
-        ConstructorSymbol? CreateDefaultConstructor();
+        void CreateDefaultConstructor(SymbolTreeBuilder symbolTree);
     }
 }

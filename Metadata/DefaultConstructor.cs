@@ -13,14 +13,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata
         public DataType ConstructedType { get; }
 
         MetadataSet IParentMetadata.ChildMetadata => MetadataSet.Empty;
-
+        public SelfParameterSymbol ImplicitSelfParameterSymbol { get; }
         IEnumerable<IBindingMetadata> IFunctionMetadata.Parameters => Enumerable.Empty<IBindingMetadata>();
         DataType IFunctionMetadata.ReturnDataType => ConstructedType;
 
-        public DefaultConstructor(ConstructorSymbol symbol, ObjectType constructedType)
+        public DefaultConstructor(ConstructorSymbol symbol, SelfParameterSymbol selfParameterSymbol)
         {
             Symbol = symbol;
+            var constructedType = symbol.ContainingSymbol.DeclaresDataType;
             ConstructedType = constructedType;
+            ImplicitSelfParameterSymbol = selfParameterSymbol;
             FullName = constructedType.ContainingNamespace.ToRootName().Qualify(constructedType.Name.ToSimpleName()).Qualify(SpecialNames.New);
         }
     }

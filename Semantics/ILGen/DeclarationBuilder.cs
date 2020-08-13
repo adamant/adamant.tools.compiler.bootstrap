@@ -107,9 +107,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
 
         private Declaration BuildDefaultConstructor(IClassDeclarationSyntax classDeclaration)
         {
-            var symbol = classDeclaration.ChildMetadata.SafeCast<IMetadata>()
+            var constructor = classDeclaration.ChildMetadata.SafeCast<IMetadata>()
                             .OfType<DefaultConstructor>().Single();
-            if (declarations.TryGetValue(symbol, out var declaration))
+            if (declarations.TryGetValue(constructor, out var declaration))
                 return declaration;
 
             var selfType = classDeclaration.Symbol.Result.DeclaresDataType;
@@ -117,7 +117,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
             var parameters = selfParameter.Yield().ToFixedList();
 
             var graph = new ControlFlowGraphBuilder(classDeclaration.File);
-            graph.AddSelfParameter(selfType);
+            graph.AddSelfParameter(constructor.ImplicitSelfParameterSymbol);
             var block = graph.NewBlock();
             block.End(new ReturnVoidInstruction(classDeclaration.NameSpan, Scope.Outer));
 
@@ -127,14 +127,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
             //block.End(classDeclaration.NameSpan, Scope.Outer);
 
             var defaultConstructor = new ConstructorDeclaration(
-                                            symbol.FullName,
+                                            constructor.FullName,
                                             parameters,
                                             selfType,
                                             FixedList<FieldInitialization>.Empty,
                                             graph.Build());
 
             //defaultConstructor.ControlFlowOld.InsertedDeletes = new InsertedDeletes();
-            declarations.Add(symbol, defaultConstructor);
+            declarations.Add(constructor, defaultConstructor);
             return defaultConstructor;
         }
 

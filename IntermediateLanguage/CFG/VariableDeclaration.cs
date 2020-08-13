@@ -1,7 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Operands;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Places;
-using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG
@@ -21,9 +21,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG
 
         /// <summary>
         /// If this declaration corresponds to an argument or local variable,
-        /// what it was named. Not guaranteed unique.
+        /// The symbol. (All temp variables don't have a symbol)
         /// </summary>
-        public SimpleName? Name { get; }
+        public BindingSymbol? Symbol { get; }
         public bool IsParameter { get; }
         public bool IsMutableBinding { get; }
         public DataType Type { get; }
@@ -35,12 +35,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG
             DataType type,
             Variable variable,
             Scope? scope,
-            SimpleName? name = null)
+            BindingSymbol? symbol = null)
         {
             IsParameter = isParameter;
             Variable = variable;
             Scope = scope;
-            Name = name;
+            Symbol = symbol;
             IsMutableBinding = isMutableBinding;
             Type = type;
         }
@@ -69,7 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG
         public string ToStatementString()
         {
             var binding = IsMutableBinding ? "var" : "let";
-            var name = Name is null ? "" : $"({Name})";
+            var name = Symbol is null ? "" : $"({Symbol})";
             return $"{binding} {Variable}{name}: {Type};";
         }
 

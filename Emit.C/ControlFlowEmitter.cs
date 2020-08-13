@@ -7,6 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Operands;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Places;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.TerminatorInstructions;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
 using static Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions.CompareInstructionOperator;
@@ -60,7 +61,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         private void EmitVariable(VariableDeclaration declaration, CCodeBuilder code)
         {
             Requires.That(nameof(declaration), declaration.TypeIsNotEmpty, "tried to look up variable that does not exist");
-            var initializer = declaration.IsParameter ? $" = {nameMangler.Mangle(declaration.Name!)}" : "";
+            var initializer = declaration.IsParameter ? $" = {(declaration.Symbol is SelfParameterSymbol ? nameMangler.SelfName : nameMangler.Mangle(declaration.Symbol!.Name!))}" : "";
             code.AppendLine($"{typeConverter.Convert(declaration.Type)} _{declaration.Variable.Name}{initializer}; // {declaration}");
         }
 

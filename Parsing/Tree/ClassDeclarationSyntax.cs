@@ -7,6 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
+using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 
@@ -65,17 +66,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Span = TextSpan.Covering(headerSpan, bodySpan);
         }
 
-        public ConstructorSymbol? CreateDefaultConstructor()
+        public void CreateDefaultConstructor(SymbolTreeBuilder symbolTree)
         {
             if (Members.Any(m => m is IConstructorDeclarationSyntax))
-                return null;
+                return;
 
-            var constructedType = (ObjectType)Symbol.Result.DeclaresDataType;
-            var symbol = new ConstructorSymbol(Symbol.Result, null, FixedList<DataType>.Empty);
+            var constructedType = Symbol.Result.DeclaresDataType;
+            var constructorSymbol = new ConstructorSymbol(Symbol.Result, null, FixedList<DataType>.Empty);
+            var selfParameterSymbol = new SelfParameterSymbol(constructorSymbol, false, constructedType);
 
-            var constructor = new DefaultConstructor(symbol, constructedType);
+            var constructor = new DefaultConstructor(constructorSymbol, selfParameterSymbol);
+            symbolTree.Add(constructorSymbol);
+            symbolTree.Add(selfParameterSymbol);
+
             ChildMetadata = new MetadataSet(ChildMetadata.Append<IMetadata>(constructor));
-            return symbol;
         }
 
         public override string ToString()
