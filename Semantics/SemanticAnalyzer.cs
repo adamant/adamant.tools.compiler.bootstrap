@@ -5,6 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Primitives;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.AST;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DeclarationNumbers;
@@ -112,7 +113,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             new ExpressionSemanticsValidator().Walk(entities);
 #endif
 
-            //var package = new ASTBuilder().BuildPackage(entities);
+            var package = new ASTBuilder().BuildPackage(entities);
 
             // From this point forward, analysis focuses on callable bodies
             // TODO what about field initializers?

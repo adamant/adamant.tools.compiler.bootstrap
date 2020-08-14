@@ -1,10 +1,9 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree;
 using ExhaustiveMatching;
 using Package = Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree.Package;
 
@@ -15,31 +14,46 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
         Justification = "In Progress")]
     internal class ASTBuilder
     {
+        // ReSharper disable once UnusedMember.Global
+        [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "OO")]
         public Package BuildPackage(FixedList<IEntityDeclarationSyntax> entities)
         {
-            var astEntities = new List<INonMemberDeclaration>();
-            foreach (var entity in entities.OfType<INonMemberEntityDeclarationSyntax>())
-            {
-                astEntities.Add(BuildNonMemberDeclaration(entity));
-            }
+            var nonMemberDeclarations = entities
+                                        .OfType<INonMemberEntityDeclarationSyntax>()
+                                        .Select(BuildNonMemberDeclaration).ToFixedSet();
 
-            return new Package();
+            return new Package(nonMemberDeclarations);
         }
 
-        private INonMemberDeclaration BuildNonMemberDeclaration(INonMemberEntityDeclarationSyntax entity)
+        private static INonMemberDeclaration BuildNonMemberDeclaration(INonMemberEntityDeclarationSyntax entity)
         {
             return entity switch
             {
-                IClassDeclarationSyntax _ => throw new NotImplementedException(),
+                IClassDeclarationSyntax syn => BuildClass(syn),
                 IFunctionDeclarationSyntax syn => BuildFunction(syn),
                 _ => throw ExhaustiveMatch.Failed(entity)
             };
         }
 
-        private INonMemberDeclaration BuildFunction(IFunctionDeclarationSyntax syn)
+        private static IClassDeclaration BuildClass(IClassDeclarationSyntax syn)
         {
-            throw new NotImplementedException();
-            //return new FunctionDeclaration();
+            var symbol = syn.Symbol.Result;
+
+            return new ClassDeclaration(syn.Span, symbol);
+        }
+
+        private static IFunctionDeclaration BuildFunction(IFunctionDeclarationSyntax syn)
+        {
+            var symbol = syn.Symbol.Result;
+            var parameters = syn.Parameters.Select(BuildParameter).ToFixedList();
+            return new FunctionDeclaration(syn.Span, symbol, parameters);
+        }
+
+        private static INamedParameter BuildParameter(INamedParameterSyntax syn)
+        {
+            var symbol = syn.Symbol.Result;
+            // TODO build default value expression
+            return new NamedParameter(syn.Span, symbol, syn.Unused, null);
         }
     }
 }

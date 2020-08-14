@@ -5,6 +5,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
 {
     internal abstract class AbstractSyntax : IAbstractSyntax
     {
-        public TextSpan TextSpan => throw new System.NotImplementedException();
+        public TextSpan TextSpan { get; }
+
+        protected AbstractSyntax(TextSpan span)
+        {
+            TextSpan = span;
+        }
     }
 }
