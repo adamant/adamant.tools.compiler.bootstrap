@@ -40,7 +40,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Tree\" />
+    <Folder Include="AST\Tree\" />
   </ItemGroup>
 
 </Project>

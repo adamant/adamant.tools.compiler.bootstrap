@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols.Trees
         {
             if (symbolTreeBuilder.Package is null)
                 throw new ArgumentException("Can't be builder for primitive symbols", nameof(symbolTreeBuilder));
-            this.PrimitiveSymbolTree = primitiveSymbolTree;
+            PrimitiveSymbolTree = primitiveSymbolTree;
             this.packageTrees = packageTrees.Append<ISymbolTree>(symbolTreeBuilder).ToFixedDictionary(t => t.Package!);
         }
 

@@ -1,35 +1,170 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     [Closed(
-        typeof(IDeclaration))]
+        typeof(IBinding),
+        typeof(IDeclaration),
+        typeof(IParameter),
+        typeof(IBody),
+        typeof(IExpression))]
     public partial interface IAbstractSyntax
     {
         TextSpan TextSpan { get; }
     }
 
     [Closed(
-        typeof(IMemberDeclaration),
-        typeof(INonMemberEntityDeclaration))]
+        typeof(ILocalBinding),
+        typeof(IFieldDeclaration))]
+    public partial interface IBinding : IAbstractSyntax
+    {
+        BindingSymbol Symbol { get; }
+    }
+
+    [Closed(
+        typeof(IBindingParameter))]
+    public partial interface ILocalBinding : IBinding
+    {
+    }
+
+    [Closed(
+        typeof(IInvocableDeclaration),
+        typeof(INonMemberDeclaration),
+        typeof(IMemberDeclaration))]
     public partial interface IDeclaration : IAbstractSyntax
     {
         Symbol Symbol { get; }
     }
 
+    [Closed(
+        typeof(IConcreteInvocableDeclaration))]
+    public partial interface IInvocableDeclaration : IDeclaration
+    {
+        FixedList<IConstructorParameter> Parameters { get; }
+    }
+
+    [Closed(
+        typeof(IConcreteMethodDeclaration),
+        typeof(IConstructorDeclaration),
+        typeof(IAssociatedFunctionDeclaration))]
+    public partial interface IConcreteInvocableDeclaration : IInvocableDeclaration
+    {
+        IBody Body { get; }
+    }
+
+    [Closed(
+        typeof(IClassDeclaration),
+        typeof(IFunctionDeclaration))]
+    public partial interface INonMemberDeclaration : IDeclaration
+    {
+    }
+
+    public partial interface IClassDeclaration : INonMemberDeclaration
+    {
+        new ObjectTypeSymbol Symbol { get; }
+    }
+
+    public partial interface IFunctionDeclaration : INonMemberDeclaration
+    {
+        new FunctionSymbol Symbol { get; }
+        FixedList<INamedParameter> Parameters { get; }
+    }
+
+    [Closed(
+        typeof(IMethodDeclaration),
+        typeof(IConstructorDeclaration),
+        typeof(IFieldDeclaration),
+        typeof(IAssociatedFunctionDeclaration))]
     public partial interface IMemberDeclaration : IDeclaration
     {
     }
 
     [Closed(
-        typeof(IClassDeclaration))]
-    public partial interface INonMemberEntityDeclaration : IDeclaration
+        typeof(IAbstractMethodDeclaration),
+        typeof(IConcreteMethodDeclaration))]
+    public partial interface IMethodDeclaration : IMemberDeclaration
+    {
+        new MethodSymbol Symbol { get; }
+        ISelfParameter SelfParameter { get; }
+        FixedList<INamedParameter> Parameters { get; }
+    }
+
+    public partial interface IAbstractMethodDeclaration : IMethodDeclaration
     {
     }
 
-    public partial interface IClassDeclaration : INonMemberEntityDeclaration
+    public partial interface IConcreteMethodDeclaration : IMethodDeclaration, IConcreteInvocableDeclaration
+    {
+    }
+
+    public partial interface IConstructorDeclaration : IMemberDeclaration, IConcreteInvocableDeclaration
+    {
+        ISelfParameter ImplicitSelfParameter { get; }
+        new FixedList<IConstructorParameter> Parameters { get; }
+        new ConstructorSymbol Symbol { get; }
+    }
+
+    public partial interface IFieldDeclaration : IMemberDeclaration, IBinding
+    {
+        FieldSymbol FieldSymbol { get; }
+    }
+
+    public partial interface IAssociatedFunctionDeclaration : IMemberDeclaration, IConcreteInvocableDeclaration
+    {
+        new FunctionSymbol Symbol { get; }
+        new FixedList<INamedParameter> Parameters { get; }
+    }
+
+    [Closed(
+        typeof(IConstructorParameter),
+        typeof(IBindingParameter),
+        typeof(INamedParameter),
+        typeof(ISelfParameter),
+        typeof(IFieldParameter))]
+    public partial interface IParameter : IAbstractSyntax
+    {
+        bool Unused { get; }
+    }
+
+    [Closed(
+        typeof(INamedParameter),
+        typeof(IFieldParameter))]
+    public partial interface IConstructorParameter : IParameter
+    {
+    }
+
+    [Closed(
+        typeof(INamedParameter),
+        typeof(ISelfParameter))]
+    public partial interface IBindingParameter : IParameter, ILocalBinding
+    {
+    }
+
+    public partial interface INamedParameter : IParameter, IConstructorParameter, IBindingParameter
+    {
+        new VariableSymbol Symbol { get; }
+        IExpression? DefaultValue { get; }
+    }
+
+    public partial interface ISelfParameter : IParameter, IBindingParameter
+    {
+        new SelfParameterSymbol Symbol { get; }
+    }
+
+    public partial interface IFieldParameter : IParameter, IConstructorParameter
+    {
+        FieldSymbol ReferencedSymbol { get; }
+        IExpression? DefaultValue { get; }
+    }
+
+    public partial interface IBody : IAbstractSyntax
+    {
+    }
+
+    public partial interface IExpression : IAbstractSyntax
     {
     }
 

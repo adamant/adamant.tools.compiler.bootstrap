@@ -13,14 +13,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     [Closed(
         typeof(ICompilationUnitSyntax),
         typeof(IUsingDirectiveSyntax),
-        typeof(IInvocableNameSyntax),
-        typeof(IArgumentSyntax),
         typeof(IBodyOrBlockSyntax),
         typeof(IElseClauseSyntax),
         typeof(IBindingSyntax),
         typeof(IDeclarationSyntax),
         typeof(IParameterSyntax),
         typeof(IReachabilityAnnotationSyntax),
+        typeof(IInvocableNameSyntax),
+        typeof(IArgumentSyntax),
         typeof(ITypeSyntax),
         typeof(IStatementSyntax),
         typeof(IExpressionSyntax))]
@@ -42,20 +42,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IUsingDirectiveSyntax : ISyntax
     {
         NamespaceName Name { get; }
-    }
-
-    public partial interface IInvocableNameSyntax : ISyntax
-    {
-        Name Name { get; }
-    }
-
-    public partial interface IArgumentSyntax : ISyntax
-    {
-    }
-
-    public partial interface IBodySyntax : IBodyOrBlockSyntax
-    {
-        new FixedList<IBodyStatementSyntax> Statements { get; }
     }
 
     [Closed(
@@ -298,6 +284,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface ICanReachAnnotationSyntax : IReachabilityAnnotationSyntax
     {
         FixedList<INameExpressionSyntax> CanReach { get; }
+    }
+
+    public partial interface IInvocableNameSyntax : ISyntax
+    {
+        Name Name { get; }
+    }
+
+    public partial interface IArgumentSyntax : ISyntax
+    {
+    }
+
+    public partial interface IBodySyntax : IBodyOrBlockSyntax
+    {
+        new FixedList<IBodyStatementSyntax> Statements { get; }
     }
 
     [Closed(

@@ -25,6 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             NestedSymbols = nestedSymbols;
             SymbolsInPackage = symbolsInPackage;
             NestedSymbolsInPackage = nestedSymbolsInPackage;
+            NamespaceName foo = new Name("bar");
         }
     }
 }

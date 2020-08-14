@@ -16,35 +16,30 @@
 CompilationUnit = CodeFile ImplicitNamespaceName:NamespaceName UsingDirectives:UsingDirective* Declarations:NonMemberDeclaration* AllEntityDeclarations:EntityDeclaration* Diagnostics:Diagnostic*;
 UsingDirective = Name:NamespaceName;
 
-// Function Parts
-InvocableName = Name;
-Argument;
-Body: BodyOrBlock = Statements:BodyStatement*;
-
-// Special Parts
+// ---------- Special Parts
 BodyOrBlock = Statements:Statement*;
 ElseClause;
 BlockOrResult: ElseClause;
 Binding = IsMutableBinding:bool BindingDataType:DataType Symbol:IPromise<BindingSymbol>;
 LocalBinding: Binding;
 
-// Declarations
+// ---------- Declarations
 Declaration: 'ISyntax', IHasContainingLexicalScope = File:CodeFile Name? NameSpan:TextSpan Symbol:IPromise<Symbol>;
 EntityDeclaration: Declaration = AccessModifier:IAccessModifierToken?;
 InvocableDeclaration: EntityDeclaration = Parameters:FixedList<IConstructorParameterSyntax> ReachabilityAnnotations:ReachabilityAnnotation* Symbol:IPromise<InvocableSymbol>;
 ConcreteInvocableDeclaration: InvocableDeclaration = Body;
 
-// Non-Member Declarations
+// ---------- Non-Member Declarations
 NonMemberDeclaration: Declaration = ContainingNamespaceName:NamespaceName Name;
 // TODO if a compound namespace declaration was actually mutiple declarations, it would simplify other things
 NamespaceDeclaration: NonMemberDeclaration = IsGlobalQualified:bool DeclaredNames:NamespaceName FullName:NamespaceName Symbol:Promise<NamespaceOrPackageSymbol> UsingDirectives:UsingDirective* Declarations:NonMemberDeclaration*;
 
-// Non-Member Entity Declarations
+// ---------- Non-Member Entity Declarations
 NonMemberEntityDeclaration: EntityDeclaration, NonMemberDeclaration = Name;
 ClassDeclaration: NonMemberEntityDeclaration = MutableModifier:IMutableKeywordToken? Name Symbol:Promise<ObjectTypeSymbol> Members:MemberDeclaration* DefaultConstructorSymbol:ConstructorSymbol?;
 FunctionDeclaration: NonMemberEntityDeclaration, ConcreteInvocableDeclaration = IsExternalFunction:bool Name Parameters:FixedList<INamedParameterSyntax> ReturnType:Type? Symbol:Promise<FunctionSymbol>;
 
-// Member Declarations
+// ---------- Member Declarations
 MemberDeclaration: EntityDeclaration = DeclaringClass:ClassDeclaration;
 MethodDeclaration: MemberDeclaration, InvocableDeclaration = Name SelfParameter Parameters:FixedList<INamedParameterSyntax> ReturnType:Type? Symbol:Promise<MethodSymbol>;
 AbstractMethodDeclaration: MethodDeclaration;
@@ -64,25 +59,31 @@ NamedParameter: Parameter, ConstructorParameter, BindingParameter = Name Declara
 SelfParameter: Parameter, BindingParameter = MutableSelf:bool Symbol:Promise<SelfParameterSymbol>;
 FieldParameter: Parameter, ConstructorParameter = ReferencedSymbol:Promise<FieldSymbol?> DefaultValue:Expression?;
 
-// Annotations
+// ---------- Annotations
 ReachabilityAnnotation;
 ReachableFromAnnotation: ReachabilityAnnotation = ReachableFrom:NameExpression*;
 CanReachAnnotation: ReachabilityAnnotation = CanReach:NameExpression*;
 
-// Types
+// ---------- Function Parts
+InvocableName = Name;
+Argument;
+Body: BodyOrBlock = Statements:BodyStatement*;
+
+
+// ---------- Types
 Type;
 TypeName: Type, IHasContainingLexicalScope = Name:'TypeName' ReferencedSymbol:Promise<TypeSymbol?>;
 OptionalType: Type = Referent:Type;
 CapabilityType: Type = ReferentType:Type Capability:ReferenceCapability;
 
-// Statements
+// ---------- Statements
 Statement;
 ResultStatement: Statement, BlockOrResult;
 BodyStatement: Statement;
 VariableDeclarationStatement: BodyStatement, LocalBinding = NameSpan:TextSpan Name DeclarationNumber:Promise<int?> Symbol:Promise<VariableSymbol> Type? InferMutableType:bool;
 ExpressionStatement: BodyStatement;
 
-// Expressions
+// ---------- Expressions
 Expression;
 AssignableExpression: Expression;
 AssignmentExpression: Expression = Operator:AssignmentOperator;

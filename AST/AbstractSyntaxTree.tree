@@ -3,11 +3,48 @@
 ◊prefix I;
 ◊list FixedList;
 ◊using Adamant.Tools.Compiler.Bootstrap.Core;
+◊using Adamant.Tools.Compiler.Bootstrap.Framework;
 ◊using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 'IAbstractSyntax' = TextSpan;
 
+// ---------- Bindings
+Binding = Symbol:BindingSymbol;
+LocalBinding: Binding;
+
+// ---------- Declarations
+// Note: in the AST all declarations are entities because there are no namespace declarations
 Declaration = Symbol;
+InvocableDeclaration: Declaration = Parameters:FixedList<IConstructorParameter>;
+ConcreteInvocableDeclaration: InvocableDeclaration = Body;
+
+// ---------- Non-Member Declarations
+NonMemberDeclaration: Declaration;
+ClassDeclaration: NonMemberDeclaration = Symbol:ObjectTypeSymbol;
+FunctionDeclaration: NonMemberDeclaration = Symbol:FunctionSymbol Parameters:FixedList<INamedParameter>;
+
+// ---------- Member Declarations
 MemberDeclaration: Declaration;
-NonMemberEntityDeclaration: Declaration;
-ClassDeclaration: NonMemberEntityDeclaration;
+MethodDeclaration: MemberDeclaration = Symbol:MethodSymbol SelfParameter Parameters:FixedList<INamedParameter>;
+AbstractMethodDeclaration: MethodDeclaration;
+ConcreteMethodDeclaration: MethodDeclaration, ConcreteInvocableDeclaration;
+ConstructorDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = ImplicitSelfParameter:SelfParameter Parameters:FixedList<IConstructorParameter> Symbol:ConstructorSymbol;
+FieldDeclaration: MemberDeclaration, Binding = FieldSymbol;
+AssociatedFunctionDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = Symbol:FunctionSymbol Parameters:FixedList<INamedParameter>;
+
+// ---------- Parameters --------------
+Parameter = Unused:bool;
+/// A parameter that can be declared in a constructor
+ConstructorParameter: Parameter;
+/// A parameter that creates a binding, i.e. a named or self parameter
+BindingParameter: Parameter, LocalBinding;
+NamedParameter: Parameter, ConstructorParameter, BindingParameter = Symbol:VariableSymbol DefaultValue:Expression?;
+SelfParameter: Parameter, BindingParameter = Symbol:SelfParameterSymbol;
+FieldParameter: Parameter, ConstructorParameter = ReferencedSymbol:FieldSymbol DefaultValue:Expression?;
+
+
+// ---------- Function Parts
+Body;
+
+// ---------- Expressions
+Expression;
