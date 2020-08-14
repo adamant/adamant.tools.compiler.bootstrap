@@ -39,8 +39,4 @@
     <ProjectReference Include="..\Semantics.Reachability.Graph\Semantics.Reachability.Graph.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="AST\Tree\" />
-  </ItemGroup>
-
 </Project>
