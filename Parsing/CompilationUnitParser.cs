@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public ICompilationUnitSyntax Parse(ITokenIterator<IEssentialToken> tokens)
         {
             var implicitNamespaceName = ParseImplicitNamespaceName(tokens);
-            var parser = new Parser(tokens, implicitNamespaceName.ToRootName(), implicitNamespaceName);
+            var parser = new Parser(tokens, implicitNamespaceName);
             var usingDirectives = parser.ParseUsingDirectives();
             var declarations = parser.ParseNonMemberDeclarations<IEndOfFileToken>();
             var eof = tokens.Required<IEndOfFileToken>();

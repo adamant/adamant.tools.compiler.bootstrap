@@ -29,6 +29,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
                 containingLexicalScope = value;
             }
         }
+
+        public NamespaceName Namespace { get; }
         public IInvocableNameSyntax FunctionNameSyntax { get; }
         public Promise<FunctionSymbol?> ReferencedSymbol { get; } = new Promise<FunctionSymbol?>();
 
@@ -37,8 +39,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name name,
             IInvocableNameSyntax functionNameSyntax,
             FixedList<IArgumentSyntax> arguments)
-            : base(span, name, functionNameSyntax.Name, arguments)
+            : base(span, name, arguments)
         {
+            Namespace = NamespaceName.Global;
             FunctionNameSyntax = functionNameSyntax;
         }
 
@@ -56,7 +59,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         protected override OperatorPrecedence ExpressionPrecedence => OperatorPrecedence.Primary;
         public override string ToString()
         {
-            return $"{FullName}({string.Join(", ", Arguments)})";
+            return $"{Name}({string.Join(", ", Arguments)})";
         }
     }
 }

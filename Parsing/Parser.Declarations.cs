@@ -93,14 +93,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var (name, nameSpan) = ParseNamespaceName();
             nameSpan = TextSpan.Covering(nameSpan, globalQualifier?.Span);
             Tokens.Expect<IOpenBraceToken>();
-            _ = containingNamespace
-                ?? throw new InvalidOperationException("Namespace not nested inside a containing namespace");
-            var bodyParser = NestedParser(nameContext.Qualify((MaybeQualifiedName)name.ToRootName()), containingNamespace.Qualify(name));
+            var bodyParser = NamespaceBodyParser(name);
             var usingDirectives = bodyParser.ParseUsingDirectives();
             var declarations = bodyParser.ParseNonMemberDeclarations<ICloseBraceToken>();
             var closeBrace = Tokens.Expect<ICloseBraceToken>();
             var span = TextSpan.Covering(ns, closeBrace);
-            return new NamespaceDeclarationSyntax(containingNamespace, span, File, globalQualifier != null, name, nameSpan, usingDirectives, declarations);
+            return new NamespaceDeclarationSyntax(ContainingNamespace, span, File, globalQualifier != null, name, nameSpan, usingDirectives, declarations);
         }
 
         private (NamespaceName, TextSpan) ParseNamespaceName()
@@ -131,16 +129,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var fn = Tokens.Expect<IFunctionKeywordToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             Name name = identifier.Value;
-            var qualifiedName = nameContext.Qualify(identifier.Value);
-            var bodyParser = NestedParser(qualifiedName, null);
+            var bodyParser = BodyParser();
             var parameters = bodyParser.ParseParameters(bodyParser.ParseFunctionParameter);
             var (returnType, reachabilityAnnotations) = ParseReturn();
             var body = bodyParser.ParseFunctionBody();
             var span = TextSpan.Covering(fn, body.Span);
-
-            _ = containingNamespace
-                ?? throw new InvalidOperationException("Function not nested inside a containing namespace");
-            return new FunctionDeclarationSyntax(containingNamespace, span, File, accessModifer, qualifiedName, identifier.Span,
+            return new FunctionDeclarationSyntax(ContainingNamespace, span, File, accessModifer, identifier.Span,
                 name, parameters, returnType, reachabilityAnnotations, body);
         }
 
@@ -183,12 +177,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var @class = Tokens.Expect<IClassKeywordToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             Name name = identifier.Value;
-            var qualifiedName = nameContext.Qualify(identifier.Value);
             var headerSpan = TextSpan.Covering(@class, identifier.Span);
-            var bodyParser = NestedParser(qualifiedName, null);
-            _ = containingNamespace
-                ?? throw new InvalidOperationException("Class not nested inside a containing namespace");
-            return new ClassDeclarationSyntax(containingNamespace, headerSpan, File, accessModifier, mutableModifier, qualifiedName, identifier.Span,
+            var bodyParser = BodyParser();
+            return new ClassDeclarationSyntax(ContainingNamespace, headerSpan, File, accessModifier, mutableModifier, identifier.Span,
                 name, bodyParser.ParseClassBody);
         }
 
@@ -220,7 +211,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var binding = Tokens.Required<IBindingToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             Name name = identifier.Value;
-            var qualifiedName = nameContext.Qualify(identifier.Value);
             Tokens.Expect<IColonToken>();
             var type = ParseType();
             IExpressionSyntax? initializer = null;
@@ -229,7 +219,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
             var semicolon = Tokens.Expect<ISemicolonToken>();
             var span = TextSpan.Covering(binding, semicolon);
-            return new FieldDeclarationSyntax(declaringType, span, File, accessModifer, mutableBinding, qualifiedName,
+            return new FieldDeclarationSyntax(declaringType, span, File, accessModifer, mutableBinding,
                 identifier.Span, name, type, initializer);
         }
 
@@ -242,8 +232,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var fn = Tokens.Expect<IFunctionKeywordToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             Name name = identifier.Value;
-            var qualifiedName = nameContext.Qualify(identifier.Value);
-            var bodyParser = NestedParser(qualifiedName, null);
+            var bodyParser = BodyParser();
             var parameters = bodyParser.ParseParameters(bodyParser.ParseMethodParameter);
             var (returnType, reachabilityAnnotations) = ParseReturn();
 
@@ -256,8 +245,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             {
                 var body = bodyParser.ParseFunctionBody();
                 var span = TextSpan.Covering(fn, body.Span);
-                return new AssociatedFunctionDeclarationSyntax(declaringType, span, File, accessModifer,
-                    qualifiedName, identifier.Span, name, namedParameters, returnType, reachabilityAnnotations, body);
+                return new AssociatedFunctionDeclarationSyntax(declaringType, span, File, accessModifer, identifier.Span, name, namedParameters, returnType, reachabilityAnnotations, body);
             }
 
             if (!(parameters[0] is ISelfParameterSyntax))
@@ -271,14 +259,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             {
                 var body = bodyParser.ParseFunctionBody();
                 var span = TextSpan.Covering(fn, body.Span);
-                return new ConcreteMethodDeclarationSyntax(declaringType, span, File, accessModifer, qualifiedName,
+                return new ConcreteMethodDeclarationSyntax(declaringType, span, File, accessModifer,
                     identifier.Span, name, selfParameter, namedParameters, returnType, reachabilityAnnotations, body);
             }
             else
             {
                 var semicolon = bodyParser.Tokens.Expect<ISemicolonToken>();
                 var span = TextSpan.Covering(fn, semicolon);
-                return new AbstractMethodDeclarationSyntax(declaringType, span, File, accessModifer, qualifiedName,
+                return new AbstractMethodDeclarationSyntax(declaringType, span, File, accessModifer,
                     identifier.Span, name, selfParameter, namedParameters, returnType, reachabilityAnnotations);
             }
         }
@@ -292,16 +280,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var newKeywordSpan = Tokens.Expect<INewKeywordToken>();
             var identifier = Tokens.AcceptToken<IIdentifierToken>();
             Name? name = identifier is null ? null : (Name)identifier.Value;
-            var qualifiedName = nameContext.Qualify(SpecialNames.Constructor(identifier?.Value));
-            var bodyParser = NestedParser(qualifiedName, null);
+            var bodyParser = BodyParser();
             // Implicit self parameter is taken to be after the current token which is expected to be `(`
-            var selfParameter = new SelfParameterSyntax(Tokens.Current.Span.AtEnd(), qualifiedName.Qualify(SpecialNames.Self), true);
+            var selfParameter = new SelfParameterSyntax(Tokens.Current.Span.AtEnd(), true);
             var parameters = bodyParser.ParseParameters(bodyParser.ParseConstructorParameter);
             var body = bodyParser.ParseFunctionBody();
             // For now, just say constructors have no annotations
             var reachabilityAnnotations = FixedList<IReachabilityAnnotationSyntax>.Empty;
             var span = TextSpan.Covering(newKeywordSpan, body.Span);
-            return new ConstructorDeclarationSyntax(declaringType, span, File, accessModifer, qualifiedName,
+            return new ConstructorDeclarationSyntax(declaringType, span, File, accessModifer,
                 TextSpan.Covering(newKeywordSpan, identifier?.Span), name, selfParameter, parameters, reachabilityAnnotations, body);
         }
         #endregion

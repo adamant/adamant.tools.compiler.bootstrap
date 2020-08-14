@@ -21,14 +21,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             TextSpan span,
             CodeFile file,
             IAccessModifierToken? accessModifier,
-            MaybeQualifiedName fullName,
             TextSpan nameSpan,
             Name name,
             ISelfParameterSyntax selfParameter,
             FixedList<INamedParameterSyntax> parameters,
             ITypeSyntax? returnType,
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations)
-            : base(span, file, accessModifier, fullName, nameSpan, name,
+            : base(span, file, accessModifier, nameSpan, name,
                 parameters, reachabilityAnnotations, new Promise<MethodSymbol>())
         {
             DeclaringClass = declaringClass;

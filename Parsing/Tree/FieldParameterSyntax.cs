@@ -11,17 +11,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public new Name Name { get; }
         public Promise<FieldSymbol?> ReferencedSymbol { get; } = new Promise<FieldSymbol?>();
         public override IPromise<DataType> DataType { get; }
-        public SimpleName FieldName { get; }
         public IExpressionSyntax? DefaultValue { get; }
 
-        public FieldParameterSyntax(
-            TextSpan span,
-            MaybeQualifiedName fullName,
-            Name name,
-            IExpressionSyntax? defaultValue)
-            : base(span, fullName, name)
+        public FieldParameterSyntax(TextSpan span, Name name, IExpressionSyntax? defaultValue)
+            : base(span, name)
         {
-            FieldName = fullName.UnqualifiedName;
             Name = name;
             DefaultValue = defaultValue;
             DataType = ReferencedSymbol.Select(s => s?.DataType ?? Types.DataType.Unknown);

@@ -21,13 +21,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public NamedParameterSyntax(
             TextSpan span,
             bool isMutableBinding,
-            MaybeQualifiedName fullName,
+            Name name,
             ITypeSyntax typeSyntax,
             IExpressionSyntax? defaultValue)
-            : base(span, fullName, fullName.UnqualifiedName.Text)
+            : base(span, name)
         {
             IsMutableBinding = isMutableBinding;
-            Name = fullName.UnqualifiedName.Text;
+            Name = name;
             Type = typeSyntax;
             DefaultValue = defaultValue;
             DataType = Symbol.Select(s => s.DataType);

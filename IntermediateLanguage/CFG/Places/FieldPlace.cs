@@ -1,16 +1,16 @@
 using System;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Operands;
-using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Places
 {
     public class FieldPlace : Place
     {
         public Operand Target { get; }
-        public MaybeQualifiedName Field { get; }
+        public FieldSymbol Field { get; }
 
-        public FieldPlace(Operand target, MaybeQualifiedName field, TextSpan span)
+        public FieldPlace(Operand target, FieldSymbol field, TextSpan span)
             : base(span)
         {
             Target = target;
@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Places
 
         public override string ToString()
         {
-            return $"({Target}).{Field.UnqualifiedName}";
+            return $"({Target}).{Field.Name}";
         }
     }
 }

@@ -14,14 +14,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             TextSpan span,
             CodeFile file,
             IAccessModifierToken? accessModifier,
-            MaybeQualifiedName fullName,
             TextSpan nameSpan,
             Name name,
             ISelfParameterSyntax selfParameter,
             FixedList<INamedParameterSyntax> parameters,
             ITypeSyntax? returnType,
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations)
-            : base(declaringClass, span, file, accessModifier, fullName, nameSpan, name,
+            : base(declaringClass, span, file, accessModifier, nameSpan, name,
                 selfParameter, parameters, returnType, reachabilityAnnotations)
         {
         }
@@ -29,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public override string ToString()
         {
             var returnType = ReturnType != null ? " -> " + ReturnType : "";
-            return $"fn {FullName}({string.Join(", ", Parameters.Prepend<IParameterSyntax>(SelfParameter))}){returnType};";
+            return $"fn {Name}({string.Join(", ", Parameters.Prepend<IParameterSyntax>(SelfParameter))}){returnType};";
         }
     }
 }

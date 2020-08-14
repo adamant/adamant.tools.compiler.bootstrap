@@ -25,12 +25,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             CodeFile file,
             IAccessModifierToken? accessModifier,
             bool mutableBinding,
-            MaybeQualifiedName fullName,
             TextSpan nameSpan,
             Name name,
             ITypeSyntax type,
             IExpressionSyntax? initializer)
-            : base(declaringClass, span, file, accessModifier, fullName, nameSpan, name, new Promise<FieldSymbol>())
+            : base(declaringClass, span, file, accessModifier, nameSpan, name, new Promise<FieldSymbol>())
         {
             IsMutableBinding = mutableBinding;
             Name = name;

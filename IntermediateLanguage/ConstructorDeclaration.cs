@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
-using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
@@ -17,12 +16,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         public new ConstructorSymbol Symbol { get; }
 
         public ConstructorDeclaration(
-            MaybeQualifiedName fullName,
+            ConstructorSymbol symbol,
             FixedList<Parameter> parameters,
             FixedList<FieldInitialization> fieldInitializations,
-            ConstructorSymbol symbol,
             ControlFlowGraph il)
-            : base(true, fullName, symbol)
+            : base(true, symbol)
         {
             IL = il;
             FieldInitializations = fieldInitializations;

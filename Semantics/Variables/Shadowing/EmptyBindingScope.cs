@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Shadowing
         private EmptyBindingScope() { }
         #endregion
 
-        protected override bool LookupWithoutNumber(SimpleName name, [NotNullWhen(true)] out VariableBinding? binding)
+        protected override bool LookupWithoutNumber(Name name, [NotNullWhen(true)] out VariableBinding? binding)
         {
             binding = null;
             return false;

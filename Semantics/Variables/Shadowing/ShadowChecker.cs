@@ -48,7 +48,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Shadowing
                 case IVariableDeclarationStatementSyntax syn:
                 {
                     WalkChildren(syn, bindingScope);
-                    if (bindingScope.Lookup(syn.FullName.UnqualifiedName, out var binding))
+                    if (bindingScope.Lookup(syn.Name, out var binding))
                     {
                         if (binding.MutableBinding)
                             diagnostics.Add(SemanticError.CantRebindMutableBinding(invocableDeclaration.File,
@@ -61,8 +61,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Shadowing
                 }
                 case INameExpressionSyntax syn:
                 {
+                    // If unknown, nothing to check
+                    if (syn.Name is null) return;
                     // This checks for cases where a variable was shadowed, but then used later
-                    if (!bindingScope.Lookup(syn.SimpleName, out var binding)) return;
+                    if (!bindingScope.Lookup(syn.Name, out var binding)) return;
                     if (binding.WasShadowedBy.Any())
                         diagnostics.Add(SemanticError.CantShadow(invocableDeclaration.File, binding.WasShadowedBy[^1].NameSpan, syn.Span));
                     return;

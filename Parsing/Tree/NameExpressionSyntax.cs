@@ -34,7 +34,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         }
         // A null name means this syntax was generated as an assumed missing name and the name is unknown
         public Name? Name { get; }
-        public SimpleName SimpleName { [DebuggerStepThrough] get; }
         public Promise<BindingSymbol?> ReferencedSymbol { get; } = new Promise<BindingSymbol?>();
         public bool VariableIsLiveAfter { get; set; } = true;
 
@@ -42,7 +41,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             : base(span)
         {
             Name = name;
-            SimpleName = name?.ToSimpleName() ?? SpecialNames.Unknown;
         }
 
         public IEnumerable<IPromise<BindingSymbol>> LookupInContainingScope()
@@ -59,7 +57,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         protected override OperatorPrecedence ExpressionPrecedence => OperatorPrecedence.Primary;
         public override string ToString()
         {
-            return SimpleName.ToString();
+            return Name?.ToString() ?? "⧼unknown⧽";
         }
     }
 }

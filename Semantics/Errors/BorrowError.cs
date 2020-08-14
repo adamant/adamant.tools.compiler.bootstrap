@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
         public static Diagnostic SharedValueDoesNotLiveLongEnough(
             CodeFile file,
             TextSpan span,
-            SimpleName? variable)
+            Name? variable)
         {
             var msg = variable is null ? "Shared value does not live long enough"
                 : $"Value shared by `{variable}` does not live long enough";

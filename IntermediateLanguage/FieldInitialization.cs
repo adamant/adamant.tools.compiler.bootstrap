@@ -1,4 +1,4 @@
-using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
@@ -7,13 +7,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
     /// </summary>
     public class FieldInitialization
     {
-        public SimpleName ParameterName { get; }
-        public Name FieldName { get; }
+        public FieldSymbol Field { get; }
 
-        public FieldInitialization(SimpleName parameterName, Name fieldName)
+        public FieldInitialization(FieldSymbol field)
         {
-            ParameterName = parameterName;
-            FieldName = fieldName;
+            Field = field;
         }
     }
 }

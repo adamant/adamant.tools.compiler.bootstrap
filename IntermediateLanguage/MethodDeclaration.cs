@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
-using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
@@ -18,12 +17,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         public ControlFlowGraph? IL { get; }
 
         public MethodDeclaration(
-            MaybeQualifiedName name,
+            MethodSymbol symbol,
             Parameter selfParameter,
             FixedList<Parameter> parameters,
-            MethodSymbol symbol,
             ControlFlowGraph? il)
-            : base(true, name, symbol)
+            : base(true, symbol)
         {
             SelfParameter = selfParameter;
             Parameters = parameters;

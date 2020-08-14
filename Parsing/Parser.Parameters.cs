@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var span = Tokens.Current.Span;
             var mutableBinding = Tokens.Accept<IVarKeywordToken>();
             var identifier = Tokens.RequiredToken<IIdentifierOrUnderscoreToken>();
-            var name = nameContext.Qualify(variableNumbers.VariableName(identifier.Value));
+            var name = identifier.Value;
             Tokens.Expect<IColonToken>();
             var type = ParseType();
             IExpressionSyntax? defaultValue = null;
@@ -33,8 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var mutableSelf = Tokens.Accept<IMutableKeywordToken>();
                     var selfSpan = Tokens.Expect<ISelfKeywordToken>();
                     span = TextSpan.Covering(span, selfSpan);
-                    var name = nameContext.Qualify(SpecialNames.Self);
-                    return new SelfParameterSyntax(span, name, mutableSelf);
+                    return new SelfParameterSyntax(span, mutableSelf);
                 }
                 default:
                     return ParseFunctionParameter();
@@ -53,9 +52,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     IExpressionSyntax? defaultValue = null;
                     if (equals != null) defaultValue = ParseExpression();
                     var span = TextSpan.Covering(dot, identifier.Span, defaultValue?.Span);
-                    var fieldName = nameContext.Qualify(SimpleName.Special("field_" + identifier.Value));
                     Name name = identifier.Value;
-                    return new FieldParameterSyntax(span, fieldName, name, defaultValue);
+                    return new FieldParameterSyntax(span, name, defaultValue);
                 }
                 default:
                     return ParseFunctionParameter();

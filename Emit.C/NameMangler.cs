@@ -39,49 +39,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
         public string MangleName(FunctionDeclaration function)
         {
-            // builder with room for the characters we are likely to add
-            var builder = new StringBuilder(EstimateSize(function.FullName) + 5);
-            Mangle(function.FullName, builder);
-            builder.Append(Separator);
-            builder.Append(function.Arity);
-            return mapping.GetAscii(builder.ToString());
+            return Mangle(function.Symbol);
         }
-
         public string MangleName(MethodDeclaration method)
         {
-            // builder with room for the characters we are likely to add
-            var builder = new StringBuilder(EstimateSize(method.FullName) + 5);
-            Mangle(method.FullName, builder);
-            builder.Append(Separator);
-            builder.Append(method.Arity + 1); // add one for self parameter
-            return mapping.GetAscii(builder.ToString());
+            return Mangle(method.Symbol);
         }
-        public string MangleUnqualifiedName(MethodDeclaration method)
+        public string MangleName(FieldDeclaration field)
         {
-            // builder with room for the characters we are likely to add
-            var builder = new StringBuilder(EstimateSize(method.FullName.UnqualifiedName) + 5);
-            Mangle(method.FullName.UnqualifiedName, builder);
-            builder.Append(Separator);
-            builder.Append(method.Arity + 1); // add one for self parameter
-            return mapping.GetAscii(builder.ToString());
+            return Mangle(field.Symbol);
         }
-
+        public string MangleMethodName(MethodDeclaration method)
+        {
+            return MangleMethod(method.Symbol);
+        }
         public string MangleName(ConstructorDeclaration constructor)
         {
-            // builder with room for the characters we are likely to add
-            var builder = new StringBuilder(EstimateSize(constructor.FullName) + 5);
-            Mangle(constructor.FullName, builder);
-            builder.Append(Separator);
-            builder.Append(constructor.Arity);
-            return mapping.GetAscii(builder.ToString());
+            return Mangle(constructor.Symbol);
         }
-
         public string MangleName(ClassDeclaration @class)
         {
-            // builder with room for the characters we are likely to add
-            var builder = new StringBuilder(EstimateSize(@class.FullName) + 5);
-            Mangle(@class.FullName, builder);
-            return mapping.GetAscii(builder.ToString());
+            return Mangle(@class.Symbol);
         }
 
         public object Mangle(DataType type)
@@ -106,13 +84,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             var builder = new StringBuilder(EstimateNamespaceSize(type.ContainingNamespace) + EstimateSize(type.Name) + 5);
             MangleNamespace(type.ContainingNamespace, builder);
             Mangle(type.Name, builder);
-            return mapping.GetAscii(builder.ToString());
-        }
-
-        public string Mangle(MaybeQualifiedName name)
-        {
-            var builder = new StringBuilder(EstimateSize(name));
-            Mangle(name, builder);
             return mapping.GetAscii(builder.ToString());
         }
 
@@ -155,19 +126,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
         private static int EstimateSize(Symbol? symbol)
         {
+            // TODO this doesn't account for Arity etc
             if (symbol is null || symbol is PackageSymbol) return 0;
             return EstimateSize(symbol.ContainingSymbol) + 2 + EstimateSize(symbol.Name);
-        }
-
-        private static int EstimateSize(MaybeQualifiedName name)
-        {
-            return name switch
-            {
-                QualifiedName qualifiedName => EstimateSize(qualifiedName.Qualifier) + 2
-                                               + EstimateSize(qualifiedName.UnqualifiedName),
-                SimpleName simpleName => simpleName.Text.Length,
-                _ => throw ExhaustiveMatch.Failed(name)
-            };
         }
 
         private static void MangleNamespace(NamespaceName namespaceName, StringBuilder builder)
@@ -246,6 +207,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     builder.Append(Separator);
                     builder.Append(sym.Arity + 1); // add one for self parameter
                     break;
+                case FieldSymbol sym:
+                    Mangle(sym.Name, builder);
+                    break;
             }
         }
 
@@ -260,25 +224,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             if (symbol is null || symbol is PackageSymbol) return;
             builder.Append(Separator);
-        }
-
-        private static void Mangle(MaybeQualifiedName name, StringBuilder builder)
-        {
-            switch (name)
-            {
-                default:
-                    throw ExhaustiveMatch.Failed(name);
-                case SimpleName simpleName:
-                    if (simpleName.IsSpecial)
-                        builder.Append('_');
-                    ManglePart(simpleName.Text, builder);
-                    break;
-                case QualifiedName qualifiedName:
-                    Mangle(qualifiedName.Qualifier, builder);
-                    builder.Append(Separator);
-                    Mangle(qualifiedName.UnqualifiedName, builder);
-                    break;
-            }
         }
 
         internal static void ManglePart(string name, StringBuilder builder)

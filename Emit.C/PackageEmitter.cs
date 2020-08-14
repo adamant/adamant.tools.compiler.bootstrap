@@ -76,11 +76,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             var joinedArguments = string.Join(", ", arguments);
             if (entryPoint.Symbol.ReturnDataType == DataType.Void)
             {
-                code.Definitions.AppendLine($"{nameMangler.MangleName(entryPoint)}({joinedArguments});");
+                code.Definitions.AppendLine($"{nameMangler.Mangle(entryPoint.Symbol)}({joinedArguments});");
                 code.Definitions.AppendLine("return 0;");
             }
             else
-                code.Definitions.AppendLine($"return {nameMangler.MangleName(entryPoint)}({joinedArguments})._value;");
+                code.Definitions.AppendLine($"return {nameMangler.Mangle(entryPoint.Symbol)}({joinedArguments})._value;");
 
             code.Definitions.EndBlock();
         }

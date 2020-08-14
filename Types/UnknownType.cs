@@ -1,5 +1,4 @@
 using System;
-using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Types
 {
@@ -37,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(SpecialNames.Unknown);
+            return HashCode.Combine(typeof(UnknownType));
         }
     }
 }

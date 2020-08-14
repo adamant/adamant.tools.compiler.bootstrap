@@ -52,8 +52,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
         private void EmitFieldInitialization(FieldInitialization fieldInitialization, CCodeBuilder code)
         {
-            var fieldName = nameMangler.Mangle(fieldInitialization.FieldName);
-            var parameterName = nameMangler.Mangle(fieldInitialization.ParameterName);
+            var fieldName = nameMangler.Mangle(fieldInitialization.Field);
+            var parameterName = nameMangler.Mangle(fieldInitialization.Field.Name);
             // Emit direct access to avoid any issues about whether corresponding variables exist
             code.AppendLine($"_self._self->{fieldName} = {parameterName};");
         }
@@ -241,7 +241,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 break;
                 case FieldAccessInstruction ins:
                 {
-                    var fieldName = nameMangler.Mangle(ins.FieldName);
+                    var fieldName = nameMangler.Mangle(ins.Field);
                     code.EndLine($"{ConvertOperand(ins.Operand)}._self->{fieldName};");
                 }
                 break;
@@ -319,7 +319,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 case VariablePlace p:
                     return "_" + p.Variable.Name;
                 case FieldPlace p:
-                    var fieldName = nameMangler.Mangle(p.Field.UnqualifiedName);
+                    var fieldName = nameMangler.Mangle(p.Field);
                     return $"{ConvertOperand(p.Target)}._self->{fieldName}";
             }
         }

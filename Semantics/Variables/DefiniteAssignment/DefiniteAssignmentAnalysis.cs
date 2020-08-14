@@ -56,7 +56,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.DefiniteAssignmen
         {
             if (definitelyAssigned[nameExpression.ReferencedSymbol.Result!] == false)
                 diagnostics.Add(SemanticError.VariableMayNotHaveBeenAssigned(file,
-                    nameExpression.Span, nameExpression.SimpleName));
+                    nameExpression.Span, nameExpression.Name ?? throw new InvalidOperationException()));
 
             return definitelyAssigned;
         }

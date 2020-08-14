@@ -17,7 +17,7 @@ CompilationUnit = CodeFile ImplicitNamespaceName:NamespaceName UsingDirectives:U
 UsingDirective = Name:NamespaceName;
 
 // Function Parts
-InvocableName = Name:MaybeQualifiedName;
+InvocableName = Name;
 Argument;
 Body: BodyOrBlock = Statements:BodyStatement*;
 
@@ -30,7 +30,7 @@ LocalBinding: Binding;
 
 // Declarations
 Declaration: 'ISyntax', IHasContainingLexicalScope = File:CodeFile Name? NameSpan:TextSpan Symbol:IPromise<Symbol>;
-EntityDeclaration: Declaration = AccessModifier:IAccessModifierToken? FullName:MaybeQualifiedName;
+EntityDeclaration: Declaration = AccessModifier:IAccessModifierToken?;
 InvocableDeclaration: EntityDeclaration = Parameters:FixedList<IConstructorParameterSyntax> ReachabilityAnnotations:ReachabilityAnnotation* Symbol:IPromise<InvocableSymbol>;
 ConcreteInvocableDeclaration: InvocableDeclaration = Body;
 
@@ -55,12 +55,12 @@ AssociatedFunctionDeclaration: MemberDeclaration, ConcreteInvocableDeclaration =
 
 
 // ---------- Parameters --------------
-Parameter = FullName:MaybeQualifiedName Name? DataType:IPromise<DataType> Unused:bool;
+Parameter = Name? DataType:IPromise<DataType> Unused:bool;
 /// A parameter that can be declared in a constructor
-ConstructorParameter: Parameter = Name;
+ConstructorParameter: Parameter;
 /// A parameter that creates a binding, i.e. a named or self parameter
 BindingParameter: Parameter, LocalBinding;
-NamedParameter: Parameter, ConstructorParameter, BindingParameter = DeclarationNumber:Promise<int?> Type Symbol:Promise<VariableSymbol> DefaultValue:Expression?;
+NamedParameter: Parameter, ConstructorParameter, BindingParameter = Name DeclarationNumber:Promise<int?> Type Symbol:Promise<VariableSymbol> DefaultValue:Expression?;
 SelfParameter: Parameter, BindingParameter = MutableSelf:bool Symbol:Promise<SelfParameterSymbol>;
 FieldParameter: Parameter, ConstructorParameter = ReferencedSymbol:Promise<FieldSymbol?> DefaultValue:Expression?;
 
@@ -79,7 +79,7 @@ CapabilityType: Type = ReferentType:Type Capability:ReferenceCapability;
 Statement;
 ResultStatement: Statement, BlockOrResult;
 BodyStatement: Statement;
-VariableDeclarationStatement: BodyStatement, LocalBinding = FullName:MaybeQualifiedName NameSpan:TextSpan Name DeclarationNumber:Promise<int?> Symbol:Promise<VariableSymbol> Type? InferMutableType:bool;
+VariableDeclarationStatement: BodyStatement, LocalBinding = NameSpan:TextSpan Name DeclarationNumber:Promise<int?> Symbol:Promise<VariableSymbol> Type? InferMutableType:bool;
 ExpressionStatement: BodyStatement;
 
 // Expressions
@@ -94,7 +94,7 @@ BreakExpression: Expression;
 // TODO in the CST, we don't know that this is a field access, it is just a qualified access (not even member because namespaces don't have members)
 FieldAccessExpression: AssignableExpression = AccessOperator Field:NameExpression ReferencedSymbol:IPromise<FieldSymbol?>;
 ForeachExpression: Expression, LocalBinding = VariableName:Name DeclarationNumber:Promise<int?> Symbol:Promise<VariableSymbol> Type? Block:BlockExpression;
-FunctionInvocationExpression: InvocationExpression, IHasContainingLexicalScope = FunctionNameSyntax:InvocableName ReferencedSymbol:Promise<FunctionSymbol?>;
+FunctionInvocationExpression: InvocationExpression, IHasContainingLexicalScope = Namespace:NamespaceName FunctionNameSyntax:InvocableName ReferencedSymbol:Promise<FunctionSymbol?>;
 IfExpression: Expression, ElseClause = ThenBlock:BlockOrResult ElseClause?;
 ImplicitConversionExpression: Expression = Expression DataType;
 ImplicitImmutabilityConversionExpression: ImplicitConversionExpression;
@@ -102,14 +102,14 @@ ImplicitNoneConversionExpression: ImplicitConversionExpression = ConvertToType:'
 ImplicitNumericConversionExpression: ImplicitConversionExpression = ConvertToType:NumericType;
 ImplicitOptionalConversionExpression: ImplicitConversionExpression = ConvertToType:'OptionalType';
 IntegerLiteralExpression: LiteralExpression = Value:BigInteger;
-InvocationExpression: Expression = Name FullName:MaybeQualifiedName  Arguments:Argument*;
+InvocationExpression: Expression = Name Arguments:Argument*;
 LiteralExpression: Expression;
 LoopExpression: Expression = Block:BlockExpression;
 // TODO in the CST, we don't know that this is a method invocation, it is just a qualified invocation (not even member because namespaces don't have members)
 // TODO remove IHasContainingLexicalScope when not needed because of conversion to FunctionInvocationExpression
 MethodInvocationExpression: InvocationExpression, IHasContainingLexicalScope = MethodNameSyntax:InvocableName ReferencedSymbol:Promise<MethodSymbol?>;
 MoveExpression: Expression = ReferencedSymbol:Promise<BindingSymbol?>;
-NameExpression: AssignableExpression, IHasContainingLexicalScope = Name? SimpleName ReferencedSymbol:Promise<BindingSymbol?>;
+NameExpression: AssignableExpression, IHasContainingLexicalScope = Name? ReferencedSymbol:Promise<BindingSymbol?>;
 NewObjectExpression: Expression = Type:TypeName ConstructorName:InvocableName? Arguments:Argument* ReferencedSymbol:Promise<ConstructorSymbol?>;
 NextExpression: Expression;
 NoneLiteralExpression: LiteralExpression;

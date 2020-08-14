@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
-using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
@@ -21,11 +20,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         public FunctionDeclaration(
             bool isExternal,
             bool isMember,
-            MaybeQualifiedName name,
-            FixedList<Parameter> parameters,
             FunctionSymbol symbol,
+            FixedList<Parameter> parameters,
             ControlFlowGraph il)
-            : base(isMember, name, symbol)
+            : base(isMember, symbol)
         {
             Parameters = parameters;
             Symbol = symbol;

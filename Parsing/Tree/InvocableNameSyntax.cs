@@ -6,9 +6,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class InvocableNameSyntax : Syntax, IInvocableNameSyntax
     {
-        public MaybeQualifiedName Name { get; }
+        public Name Name { get; }
 
-        public InvocableNameSyntax(TextSpan span, SimpleName name)
+        public InvocableNameSyntax(TextSpan span, Name name)
             : base(span)
         {
             Name = name;

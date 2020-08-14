@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
         public virtual PackageSymbol? Package { get; }
         public Symbol? ContainingSymbol { get; }
         public TypeName? Name { get; }
-        public bool IsGlobal => ContainingSymbol is null;
+        public bool IsGlobal => ContainingSymbol == Package;
 
         protected Symbol(Symbol? containingSymbol, TypeName? name)
         {

@@ -30,7 +30,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public IAccessModifierToken? AccessModifier { get; }
         public IMutableKeywordToken? MutableModifier { get; }
-        public MaybeQualifiedName FullName { get; }
         public new Name Name { get; }
         public new Promise<ObjectTypeSymbol> Symbol { get; }
         public FixedList<IMemberDeclarationSyntax> Members { get; }
@@ -42,7 +41,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             CodeFile file,
             IAccessModifierToken? accessModifier,
             IMutableKeywordToken? mutableModifier,
-            MaybeQualifiedName fullName,
             TextSpan nameSpan,
             Name name,
             Func<IClassDeclarationSyntax, (FixedList<IMemberDeclarationSyntax>, TextSpan)> parseMembers)
@@ -51,7 +49,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             ContainingNamespaceName = containingNamespaceName;
             AccessModifier = accessModifier;
             MutableModifier = mutableModifier;
-            FullName = fullName;
             Name = name;
             var (members, bodySpan) = parseMembers(this);
             Members = members;
@@ -78,7 +75,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public override string ToString()
         {
-            return $"class {FullName} {{ … }}";
+            return $"class {Name} {{ … }}";
         }
     }
 }

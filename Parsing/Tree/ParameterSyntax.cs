@@ -9,19 +9,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal abstract class ParameterSyntax : Syntax, IParameterSyntax
     {
-        public MaybeQualifiedName FullName { get; }
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public Name? Name { get; }
         public abstract IPromise<DataType> DataType { get; }
         public bool Unused { get; }
 
-        protected ParameterSyntax(TextSpan span, MaybeQualifiedName fullName, Name? name)
+        protected ParameterSyntax(TextSpan span, Name? name)
             : base(span)
         {
-            FullName = fullName;
             Name = name;
-            Unused = fullName.UnqualifiedName.Text.StartsWith("_", StringComparison.Ordinal);
+            Unused = name?.Text.StartsWith("_", StringComparison.Ordinal) ?? false;
         }
     }
 }

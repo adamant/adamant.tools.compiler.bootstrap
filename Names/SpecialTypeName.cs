@@ -48,10 +48,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         {
             return Text;
         }
-
-        public override SimpleName ToSimpleName()
-        {
-            return SimpleName.Special(Text);
-        }
     }
 }

@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public InvocableNameSyntax ToInvocable()
         {
-            return new InvocableNameSyntax(Span, Name.ToSimpleName());
+            return new InvocableNameSyntax(Span, Name);
         }
     }
 }

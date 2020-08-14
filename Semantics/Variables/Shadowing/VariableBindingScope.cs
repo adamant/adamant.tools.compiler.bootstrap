@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Shadowing
             ContainingScope.NestedBindingDeclared(VariableBinding);
         }
 
-        protected override bool LookupWithoutNumber(SimpleName name, [NotNullWhen(true)] out VariableBinding? binding)
+        protected override bool LookupWithoutNumber(Name name, [NotNullWhen(true)] out VariableBinding? binding)
         {
             if (VariableBinding.Name != name)
                 return ContainingScope.Lookup(name, out binding);

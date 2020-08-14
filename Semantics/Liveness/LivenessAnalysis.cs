@@ -54,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
             VariableFlags liveVariables)
         {
             variableDeclaration.VariableIsLiveAfter = liveVariables[variableDeclaration.Symbol.Result]
-                                              ?? throw new Exception($"No liveness data for variable {variableDeclaration.FullName}");
+                                              ?? throw new Exception($"No liveness data for variable {variableDeclaration.Symbol}");
             return liveVariables.Set(variableDeclaration.Symbol.Result, false);
         }
 

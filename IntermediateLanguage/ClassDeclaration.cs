@@ -1,5 +1,4 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
@@ -9,11 +8,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         public FixedList<Declaration> Members { get; }
         public new ObjectTypeSymbol Symbol { get; }
 
-        public ClassDeclaration(
-            MaybeQualifiedName name,
-            ObjectTypeSymbol symbol,
-            FixedList<Declaration> members)
-            : base(false, name, symbol)
+        public ClassDeclaration(ObjectTypeSymbol symbol, FixedList<Declaration> members)
+            : base(false, symbol)
         {
             Symbol = symbol;
             Members = members;

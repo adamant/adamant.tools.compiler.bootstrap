@@ -26,8 +26,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax
         }
         public TextSpan Span { get; }
         public IInvocableNameSyntax FunctionNameSyntax { get; }
+        public NamespaceName Namespace { get; }
         public Name Name { get; }
-        public MaybeQualifiedName FullName { get; }
         public FixedList<IArgumentSyntax> Arguments { get; }
         public Promise<FunctionSymbol?> ReferencedSymbol { get; } = new Promise<FunctionSymbol?>();
 
@@ -63,16 +63,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax
         public FunctionInvocationExpressionSyntax(
             TextSpan span,
             IInvocableNameSyntax functionNameSyntax,
+            NamespaceName ns,
             Name name,
-            MaybeQualifiedName fullName,
             FixedList<IArgumentSyntax> arguments,
             FixedSet<FunctionSymbol> possibleReferents)
         {
             this.possibleReferents = possibleReferents;
             Span = span;
             FunctionNameSyntax = functionNameSyntax;
+            Namespace = ns;
             Name = name;
-            FullName = fullName;
             Arguments = arguments;
         }
 
@@ -83,7 +83,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax
 
         public override string ToString()
         {
-            return $"{FullName}({string.Join(", ", Arguments)})";
+            return Namespace == NamespaceName.Global
+                ? $"{Name}({string.Join(", ", Arguments)})"
+                : $"{Namespace}.{Name}({string.Join(", ", Arguments)})";
         }
 
         public string ToGroupedString(OperatorPrecedence surroundingPrecedence)

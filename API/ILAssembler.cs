@@ -4,6 +4,8 @@ using System.Globalization;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
+using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.API
@@ -54,7 +56,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         {
             var parameters = FormatParameters(function.Parameters);
             builder.BeginLine("fn ");
-            builder.Append(function.FullName.ToString());
+            builder.Append(Convert(function.Symbol));
             builder.Append("(");
             builder.Append(parameters);
             builder.Append(")");
@@ -78,21 +80,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
 
         private static string FormatParameter(Parameter parameter)
         {
-            const string fieldPrefix = "field_";
-            var name = parameter.Name.Text;
-
-            if (parameter.Name.IsSpecial && name.StartsWith(fieldPrefix, StringComparison.OrdinalIgnoreCase))
-                name = "." + name.Substring(fieldPrefix.Length);
-
             var format = parameter.IsMutableBinding ? "var {0}: {1}" : "{0}: {1}";
-            return string.Format(CultureInfo.InvariantCulture, format, name, parameter.DataType);
+            return parameter switch
+            {
+                // TODO what about escaping the name?
+                NamedParameter param =>
+                    string.Format(CultureInfo.InvariantCulture, format, param.Symbol.Name, param.DataType),
+                // TODO is this the correct name for self?
+                SelfParameter param =>
+                    string.Format(CultureInfo.InvariantCulture, format, "self", param.DataType),
+                FieldParameter param => $".{param.InitializeField.Name}",
+                _ => throw ExhaustiveMatch.Failed(parameter)
+            };
         }
 
         private static void Disassemble(MethodDeclaration method, AssemblyBuilder builder)
         {
             var parameters = FormatParameters(method.Parameters.Prepend(method.SelfParameter));
             builder.BeginLine("fn ");
-            builder.Append(method.FullName.ToString());
+            builder.Append(Convert(method.Symbol));
             builder.Append("(");
             builder.Append(parameters);
             builder.Append(")");
@@ -112,7 +118,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         {
             var parameters = FormatParameters(constructor.Parameters);
             builder.BeginLine("fn ");
-            builder.Append(constructor.Name.ToString());
+            builder.Append(Convert(constructor.Symbol));
             builder.Append("(");
             builder.Append(parameters);
             builder.Append(")");
@@ -128,7 +134,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         private void Disassemble(ClassDeclaration @class, AssemblyBuilder builder)
         {
             builder.BeginLine("class ");
-            builder.Append(@class.FullName.ToString());
+            builder.Append(Convert(@class.Symbol));
             builder.EndLine();
             builder.BeginBlock();
             foreach (var member in @class.Members)
@@ -235,7 +241,54 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         private static void Disassemble(FieldDeclaration field, AssemblyBuilder builder)
         {
             var binding = field.IsMutableBinding ? "var" : "let";
-            builder.AppendLine($"{binding} {field.Name}: {field.DataType};");
+            builder.AppendLine($"{binding} {field.Symbol.Name}: {field.DataType};");
+        }
+
+        private static string Convert(TypeSymbol symbol)
+        {
+            if (symbol.ContainingSymbol is null) return Convert(symbol.Name);
+            return Convert(symbol.ContainingSymbol) + "." + Convert(symbol.Name);
+        }
+
+        private static string Convert(FunctionSymbol symbol)
+        {
+            var name = symbol.ContainingSymbol switch
+            {
+                NamespaceOrPackageSymbol ns => Convert(ns),
+                ObjectTypeSymbol sym => Convert(sym),
+                _ => throw new NotSupportedException(symbol.GetType().ToString())
+            };
+
+            name += "."+ Convert(symbol.Name);
+            return name;
+        }
+
+        private static string Convert(MethodSymbol symbol)
+        {
+            return Convert(symbol.ContainingSymbol) + "." + Convert(symbol.Name);
+        }
+
+        private static string Convert(ConstructorSymbol symbol)
+        {
+            var name = Convert(symbol.ContainingSymbol) + ".new";
+            if (!(symbol.Name is null))
+                name += "." + Convert(symbol.Name);
+            return name;
+        }
+
+        private static string Convert(NamespaceOrPackageSymbol symbol)
+        {
+            return symbol switch
+            {
+                NamespaceSymbol sym => Convert(sym.ContainingSymbol) + "." + Convert(sym.Name),
+                PackageSymbol sym => sym.Name + "::",
+                _ => throw ExhaustiveMatch.Failed(symbol)
+            };
+        }
+
+        private static string Convert(TypeName name)
+        {
+            return name.ToString();
         }
     }
 }

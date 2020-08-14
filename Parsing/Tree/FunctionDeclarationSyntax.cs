@@ -38,14 +38,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             TextSpan span,
             CodeFile file,
             IAccessModifierToken? accessModifier,
-            MaybeQualifiedName fullName,
             TextSpan nameSpan,
             Name name,
             FixedList<INamedParameterSyntax> parameters,
             ITypeSyntax? returnType,
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
             IBodySyntax body)
-            : base(span, file, accessModifier, fullName, nameSpan, name, parameters,
+            : base(span, file, accessModifier, nameSpan, name, parameters,
                 reachabilityAnnotations, new Promise<FunctionSymbol>())
         {
             ContainingNamespaceName = containingNamespaceName;
@@ -59,7 +58,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public override string ToString()
         {
             var returnType = ReturnType != null ? " -> " + ReturnType : "";
-            return $"fn {FullName}({string.Join(", ", Parameters)}){returnType} {Body}";
+            return $"fn {Name}({string.Join(", ", Parameters)}){returnType} {Body}";
         }
     }
 }

@@ -748,14 +748,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 if (functionSymbols.Any())
                 {
                     // It is a namespaced or associated function invocation, modify the tree
-                    var nameSpan = TextSpan.Covering(methodInvocation.ContextExpression.Span, methodInvocation.MethodNameSyntax.Span);
-                    var functionName = contextName.ToRootName().Qualify(methodInvocation.FullName);
-                    var nameSyntax = new InvocableNameSyntax(nameSpan, functionName);
                     var functionInvocation = new FunctionInvocationExpressionSyntax(
                         methodInvocation.Span,
-                        nameSyntax,
+                        methodInvocation.MethodNameSyntax,
+                        contextName,
                         methodInvocation.Name,
-                        functionName,
                         methodInvocation.Arguments,
                         functionSymbols);
 

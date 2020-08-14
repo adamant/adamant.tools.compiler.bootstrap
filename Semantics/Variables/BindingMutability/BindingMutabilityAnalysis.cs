@@ -47,7 +47,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.BindingMutability
                 case INameExpressionSyntax identifier:
                     var symbol = identifier.ReferencedSymbol.Result ?? throw new InvalidOperationException("Identifier doesn't have referenced symbol");
                     if (!symbol.IsMutableBinding && definitelyUnassigned[symbol] == false)
-                        diagnostics.Add(SemanticError.VariableMayAlreadyBeAssigned(file, identifier.Span, identifier.SimpleName));
+                        diagnostics.Add(SemanticError.VariableMayAlreadyBeAssigned(file, identifier.Span, identifier.Name ?? throw new InvalidOperationException()));
                     return definitelyUnassigned.Set(symbol, false);
                 case IFieldAccessExpressionSyntax _:
                     return definitelyUnassigned;

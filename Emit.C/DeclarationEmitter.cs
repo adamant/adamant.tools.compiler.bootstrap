@@ -54,7 +54,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
         private void EmitExternalFunctionSignature(FunctionDeclaration function, Code code)
         {
-            var name = function.Name.Text;
+            // I think external functions are supposed to not be mangled?
+            var name = function.Symbol.Name.Text;
             var parameters = Convert(function.Parameters);
             var returnType = typeConverter.Convert(function.Symbol.ReturnDataType.Known());
             code.FunctionDeclarations.AppendLine($"{returnType} {name}({parameters});");
@@ -137,7 +138,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             foreach (var field in @class.Members.OfType<FieldDeclaration>())
             {
                 var fieldType = typeConverter.Convert(field.DataType.Known());
-                var fieldName = nameMangler.Mangle(field.Name);
+                var fieldName = nameMangler.MangleName(field);
                 structs.AppendLine($"{fieldType} {fieldName};");
             }
             structs.EndBlockWithSemicolon();
@@ -145,7 +146,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             structs.BeginBlock();
             foreach (var method in @class.Members.OfType<MethodDeclaration>())
             {
-                var name = nameMangler.MangleUnqualifiedName(method);
+                var name = nameMangler.MangleMethodName(method);
                 var parameters = Convert(method.Parameters.Prepend(method.SelfParameter));
                 var returnType = typeConverter.Convert(method.Symbol.ReturnDataType.Known());
                 structs.AppendLine($"{returnType} (*{name})({parameters});");
@@ -157,7 +158,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             globals.BeginBlock();
             foreach (var method in @class.Members.OfType<MethodDeclaration>())
             {
-                var fieldName = nameMangler.MangleUnqualifiedName(method);
+                var fieldName = nameMangler.MangleMethodName(method);
                 var functionName = nameMangler.MangleName(method);
                 globals.AppendLine($".{fieldName} = {functionName},");
             }

@@ -10,14 +10,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     {
         public IClassDeclarationSyntax DeclaringClass { get; }
         public IAccessModifierToken? AccessModifier { get; }
-        public MaybeQualifiedName FullName { get; }
 
         protected MemberDeclarationSyntax(
             IClassDeclarationSyntax declaringClass,
             TextSpan span,
             CodeFile file,
             IAccessModifierToken? accessModifier,
-            MaybeQualifiedName fullName,
             TextSpan nameSpan,
             Name? name,
             IPromise<Symbol> symbol)
@@ -25,7 +23,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         {
             DeclaringClass = declaringClass;
             AccessModifier = accessModifier;
-            FullName = fullName;
         }
     }
 }

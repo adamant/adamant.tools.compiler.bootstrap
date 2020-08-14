@@ -1,5 +1,3 @@
-using System.Diagnostics;
-using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using ExhaustiveMatching;
 
@@ -15,22 +13,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
     public abstract class Declaration
     {
         public bool IsMember { get; }
-        public MaybeQualifiedName FullName { get; }
-        [DebuggerHidden]
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public SimpleName Name => FullName.UnqualifiedName;
         public Symbol Symbol { get; }
 
-        protected Declaration(bool isMember, MaybeQualifiedName fullName, Symbol symbol)
+        protected Declaration(bool isMember, Symbol symbol)
         {
             IsMember = isMember;
-            FullName = fullName;
             Symbol = symbol;
         }
 
         public override string ToString()
         {
-            return FullName.ToString();
+            return Symbol.ToString();
         }
     }
 }

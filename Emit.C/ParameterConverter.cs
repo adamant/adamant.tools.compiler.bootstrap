@@ -1,5 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Types;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 {
@@ -19,8 +20,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         public string Convert(Parameter parameter)
         {
             var type = typeConverter.Convert(parameter.DataType);
-            var name = nameMangler.Mangle(parameter.Name.UnqualifiedName);
-            return $"{type} {name}";
+            return parameter switch
+            {
+                NamedParameter param => $"{type} {nameMangler.Mangle(param.Symbol.Name)}",
+                SelfParameter _ => $"{type} {nameMangler.SelfName}",
+                FieldParameter param => $"{type} {nameMangler.Mangle(param.InitializeField.Name)}",
+                _ => throw ExhaustiveMatch.Failed(parameter)
+            };
         }
     }
 }

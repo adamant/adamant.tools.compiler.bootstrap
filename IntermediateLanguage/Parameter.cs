@@ -1,22 +1,30 @@
-using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Types;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
-    public class Parameter
+    [Closed(
+        typeof(SelfParameter),
+        typeof(NamedParameter),
+        typeof(FieldParameter))]
+    public abstract class Parameter
     {
+        public BindingSymbol? Symbol { get; }
         public bool IsMutableBinding { get; }
-        public SimpleName Name { get; }
         public DataType DataType { get; internal set; }
+        public FieldSymbol? InitializeField { get; }
 
-        public Parameter(
+        protected Parameter(
+            BindingSymbol? symbol,
             bool isMutableBinding,
-            SimpleName name,
-            DataType type)
+            DataType type,
+            FieldSymbol? initializeField = null)
         {
+            Symbol = symbol;
             IsMutableBinding = isMutableBinding;
-            Name = name;
             DataType = type;
+            InitializeField = initializeField;
         }
     }
 }

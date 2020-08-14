@@ -9,12 +9,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
         typeof(ObjectTypeSymbol))]
     public abstract class TypeSymbol : Symbol
     {
+        public new NamespaceOrPackageSymbol? ContainingSymbol { get; }
         public new TypeName Name { get; }
         public DataType DeclaresDataType { get; }
 
         protected TypeSymbol(NamespaceOrPackageSymbol? containingSymbol, TypeName name, DataType declaresDataType)
             : base(containingSymbol, name)
         {
+            ContainingSymbol = containingSymbol;
             Name = name;
             DeclaresDataType = declaresDataType;
         }

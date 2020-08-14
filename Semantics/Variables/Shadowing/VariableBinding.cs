@@ -8,8 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Shadowing
     public class VariableBinding
     {
         public bool MutableBinding { get; }
-        public SimpleName BindingName { get; }
-        public SimpleName Name { get; }
+        public Name Name { get; }
         public TextSpan NameSpan { get; }
         public IReadOnlyList<VariableBinding> WasShadowedBy => wasShadowedBy;
         private readonly List<VariableBinding> wasShadowedBy = new List<VariableBinding>();
@@ -17,16 +16,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Shadowing
         public VariableBinding(INamedParameterSyntax parameter)
         {
             MutableBinding = parameter.IsMutableBinding;
-            BindingName = parameter.Name?.ToSimpleName() ?? SpecialNames.Self;
-            Name = BindingName.WithoutDeclarationNumber();
+            Name = parameter.Name;
             NameSpan = parameter.Span;
         }
 
         public VariableBinding(IVariableDeclarationStatementSyntax variableDeclaration)
         {
             MutableBinding = variableDeclaration.IsMutableBinding;
-            BindingName = variableDeclaration.FullName.UnqualifiedName;
-            Name = BindingName.WithoutDeclarationNumber();
+            Name = variableDeclaration.Name;
             NameSpan = variableDeclaration.NameSpan;
         }
 

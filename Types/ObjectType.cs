@@ -22,8 +22,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         // TODO this needs a containing package
         public NamespaceName ContainingNamespace { get; }
         public TypeName Name { get; }
-        public MaybeQualifiedName FullName => ContainingNamespace.ToRootName().Qualify(Name.ToSimpleName());
-
         public override bool IsKnown { [DebuggerStepThrough] get => true; }
 
         // TODO referenceCapability needs to match declared mutable?

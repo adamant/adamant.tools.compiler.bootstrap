@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -11,9 +10,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal class ConstructorDeclarationSyntax : InvocableDeclarationSyntax, IConstructorDeclarationSyntax
     {
         public IClassDeclarationSyntax DeclaringClass { get; }
-        [DebuggerHidden]
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public new SimpleName Name => FullName.UnqualifiedName;
         public ISelfParameterSyntax ImplicitSelfParameter { get; }
         public new FixedList<IConstructorParameterSyntax> Parameters { get; }
         public virtual IBodySyntax Body { get; }
@@ -24,14 +20,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             TextSpan span,
             CodeFile file,
             IAccessModifierToken? accessModifier,
-            MaybeQualifiedName fullName,
             TextSpan nameSpan,
             Name? name,
             ISelfParameterSyntax implicitSelfParameter,
             FixedList<IConstructorParameterSyntax> parameters,
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
             IBodySyntax body)
-            : base(span, file, accessModifier, fullName, nameSpan, name, parameters, reachabilityAnnotations,
+            : base(span, file, accessModifier, nameSpan, name, parameters, reachabilityAnnotations,
                 new Promise<ConstructorSymbol>())
         {
             DeclaringClass = declaringType;
@@ -43,7 +38,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public override string ToString()
         {
-            return $"{FullName}({string.Join(", ", Parameters)})";
+            return Name is null
+                ? $"new({string.Join(", ", Parameters)})"
+                : $"new {Name}({string.Join(", ", Parameters)})";
         }
     }
 }

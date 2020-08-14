@@ -149,7 +149,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             Diagnostics diagnostics)
         {
             var mainFunctions = declarations.OfType<FunctionDeclaration>()
-                .Where(f => f.FullName.UnqualifiedName.Text == "main" && !f.FullName.UnqualifiedName.IsSpecial)
+                .Where(f => f.Symbol.Name == "main" && f.Symbol.IsGlobal)
                 .ToList();
 
             // TODO warn on and remove main functions that don't have correct parameters or types

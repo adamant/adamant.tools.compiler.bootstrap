@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.CST;
@@ -5,10 +6,8 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.TerminatorInstructions;
-using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
-using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
@@ -50,26 +49,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IFunctionDeclarationSyntax function:
                 {
                     var il = ilFactory.CreateGraph(function);
-                    declaration = new FunctionDeclaration(function.IsExternalFunction, false,
-                        function.FullName, BuildParameters(function.Parameters), function.Symbol.Result, il);
+                    declaration = new FunctionDeclaration(function.IsExternalFunction, false, function.Symbol.Result, BuildParameters(function.Parameters), il);
                     break;
                 }
                 case IAssociatedFunctionDeclarationSyntax associatedFunction:
                 {
                     var il = ilFactory.CreateGraph(associatedFunction);
-                    declaration = new FunctionDeclaration(false, true,
-                        associatedFunction.FullName, BuildParameters(associatedFunction.Parameters), associatedFunction.Symbol.Result, il);
+                    declaration = new FunctionDeclaration(false, true, associatedFunction.Symbol.Result, BuildParameters(associatedFunction.Parameters), il);
                     break;
                 }
                 case IConcreteMethodDeclarationSyntax method:
                 {
                     var il = ilFactory.CreateGraph(method);
-                    declaration = new MethodDeclaration(method.FullName, BuildParameter(method.SelfParameter), BuildParameters(method.Parameters), method.Symbol.Result, il);
+                    declaration = new MethodDeclaration(method.Symbol.Result, BuildParameter(method.SelfParameter), BuildParameters(method.Parameters), il);
                     break;
                 }
                 case IAbstractMethodDeclarationSyntax method:
                 {
-                    declaration = new MethodDeclaration(method.FullName, BuildParameter(method.SelfParameter), BuildParameters(method.Parameters), method.Symbol.Result, null);
+                    declaration = new MethodDeclaration(method.Symbol.Result, BuildParameter(method.SelfParameter), BuildParameters(method.Parameters), null);
                     break;
                 }
                 case IConstructorDeclarationSyntax constructor:
@@ -77,18 +74,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     var il = ilFactory.CreateGraph(constructor);
                     var parameters = BuildConstructorParameters(constructor);
                     var fieldInitializations = BuildFieldInitializations(constructor);
-                    declaration = new ConstructorDeclaration(constructor.FullName,
-                       parameters, fieldInitializations, constructor.Symbol.Result, il);
+                    declaration = new ConstructorDeclaration(constructor.Symbol.Result, parameters, fieldInitializations, il);
                     break;
                 }
                 case IFieldDeclarationSyntax fieldDeclaration:
-                    declaration = new FieldDeclaration(fieldDeclaration.IsMutableBinding,
-                        fieldDeclaration.FullName, fieldDeclaration.Symbol.Result.DataType.Known(),
-                        fieldDeclaration.Symbol.Result);
+                    declaration = new FieldDeclaration(fieldDeclaration.Symbol.Result);
                     break;
                 case IClassDeclarationSyntax classDeclaration:
-                    declaration = new ClassDeclaration(classDeclaration.FullName,
-                        classDeclaration.Symbol.Result,
+                    declaration = new ClassDeclaration(classDeclaration.Symbol.Result,
                         BuildClassMembers(classDeclaration, symbolTree));
                     break;
             }
@@ -117,11 +110,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
             if (declarations.TryGetValue(constructorSymbol, out var declaration))
                 return declaration;
 
-            var selfType = classDeclaration.Symbol.Result.DeclaresDataType;
-            var selfParameter = new Parameter(false, SpecialNames.Self, selfType);
-            var parameters = selfParameter.Yield().ToFixedList();
-
             var selfParameterSymbol = symbolTree.Children(constructorSymbol).OfType<SelfParameterSymbol>().Single();
+            var selfParameter = new SelfParameter(selfParameterSymbol);
+            var parameters = selfParameter.Yield().ToFixedList<Parameter>();
+
             var graph = new ControlFlowGraphBuilder(classDeclaration.File);
             graph.AddSelfParameter(selfParameterSymbol);
             var block = graph.NewBlock();
@@ -132,12 +124,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
             //var block = il.NewBlock();
             //block.End(classDeclaration.NameSpan, Scope.Outer);
 
-            var defaultConstructor = new ConstructorDeclaration(
-                                            classDeclaration.FullName.Qualify(SpecialNames.Constructor()), // TODO how to get a name
-                                            parameters,
-                                            FixedList<FieldInitialization>.Empty,
-                                            constructorSymbol,
-                                            graph.Build());
+            var defaultConstructor = new ConstructorDeclaration(// TODO how to get a name
+                constructorSymbol,
+                                            parameters, FixedList<FieldInitialization>.Empty, graph.Build());
 
             //defaultConstructor.ControlFlowOld.InsertedDeletes = new InsertedDeletes();
             declarations.Add(constructorSymbol, defaultConstructor);
@@ -151,8 +140,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
 
         private static FixedList<Parameter> BuildConstructorParameters(IConstructorDeclarationSyntax constructorDeclaration)
         {
-            var selfType = constructorDeclaration.ImplicitSelfParameter.Symbol.Result.DataType.Known();
-            var selfParameter = new Parameter(false, SpecialNames.Self, selfType);
+            var selfParameterSymbol = constructorDeclaration.ImplicitSelfParameter.Symbol.Result;
+            var selfParameter = new SelfParameter(selfParameterSymbol);
             return selfParameter.Yield().Concat(constructorDeclaration.Parameters.Select(BuildParameter)).ToFixedList();
         }
 
@@ -160,12 +149,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         {
             return parameter switch
             {
-                INamedParameterSyntax namedParameter =>
-                    new Parameter(namedParameter.IsMutableBinding, namedParameter.FullName.UnqualifiedName, namedParameter.DataType.Known()),
-                ISelfParameterSyntax selfParameter =>
-                    new Parameter(selfParameter.IsMutableBinding, selfParameter.FullName.UnqualifiedName, selfParameter.DataType.Known()),
+                INamedParameterSyntax namedParameter => new NamedParameter(namedParameter.Symbol.Result),
+                ISelfParameterSyntax selfParameter => new SelfParameter(selfParameter.Symbol.Result),
                 IFieldParameterSyntax fieldParameter =>
-                    new Parameter(false, fieldParameter.FullName.UnqualifiedName, fieldParameter.DataType.Known()),
+                     new FieldParameter(fieldParameter.ReferencedSymbol.Result ?? throw new InvalidOperationException()),
                 _ => throw ExhaustiveMatch.Failed(parameter)
             };
         }
@@ -180,7 +167,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
 
         private static FieldInitialization BuildFieldInitialization(IFieldParameterSyntax parameter)
         {
-            return new FieldInitialization(parameter.FullName.UnqualifiedName, parameter.Name);
+            var field = parameter.ReferencedSymbol.Result ?? throw new InvalidOperationException();
+            return new FieldInitialization(field);
         }
     }
 }

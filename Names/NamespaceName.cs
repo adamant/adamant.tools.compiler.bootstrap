@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -41,16 +40,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
             yield return Global;
             for (int n = 1; n <= Segments.Count; n++)
                 yield return new NamespaceName(Segments.Take(n));
-        }
-
-        public RootName ToRootName()
-        {
-            RootName name = GlobalNamespaceName.Instance;
-
-            foreach (var segment in Segments)
-                name = name.Qualify(segment.Text);
-
-            return name;
         }
 
         public override string ToString()

@@ -11,7 +11,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal abstract class InvocableDeclarationSyntax : DeclarationSyntax, IInvocableDeclarationSyntax
     {
         public IAccessModifierToken? AccessModifier { get; }
-        public MaybeQualifiedName FullName { get; }
         public FixedList<IConstructorParameterSyntax> Parameters { get; }
         public FixedList<IReachabilityAnnotationSyntax> ReachabilityAnnotations { get; }
         public new IPromise<InvocableSymbol> Symbol { get; }
@@ -20,7 +19,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             TextSpan span,
             CodeFile file,
             IAccessModifierToken? accessModifier,
-            MaybeQualifiedName fullName,
             TextSpan nameSpan,
             Name? name,
             IEnumerable<IConstructorParameterSyntax> parameters,
@@ -29,7 +27,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             : base(span, file, name, nameSpan, symbol)
         {
             AccessModifier = accessModifier;
-            FullName = fullName;
             Parameters = parameters.ToFixedList();
             ReachabilityAnnotations = reachabilityAnnotations;
             Symbol = symbol;

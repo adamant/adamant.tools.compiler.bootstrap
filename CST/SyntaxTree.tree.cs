@@ -46,7 +46,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface IInvocableNameSyntax : ISyntax
     {
-        MaybeQualifiedName Name { get; }
+        Name Name { get; }
     }
 
     public partial interface IArgumentSyntax : ISyntax
@@ -116,7 +116,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IEntityDeclarationSyntax : IDeclarationSyntax
     {
         IAccessModifierToken? AccessModifier { get; }
-        MaybeQualifiedName FullName { get; }
     }
 
     [Closed(
@@ -244,7 +243,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(IFieldParameterSyntax))]
     public partial interface IParameterSyntax : ISyntax
     {
-        MaybeQualifiedName FullName { get; }
         Name? Name { get; }
         IPromise<DataType> DataType { get; }
         bool Unused { get; }
@@ -255,7 +253,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(IFieldParameterSyntax))]
     public partial interface IConstructorParameterSyntax : IParameterSyntax
     {
-        new Name Name { get; }
     }
 
     [Closed(
@@ -267,6 +264,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface INamedParameterSyntax : IParameterSyntax, IConstructorParameterSyntax, IBindingParameterSyntax
     {
+        new Name Name { get; }
         Promise<int?> DeclarationNumber { get; }
         ITypeSyntax Type { get; }
         new Promise<VariableSymbol> Symbol { get; }
@@ -347,7 +345,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface IVariableDeclarationStatementSyntax : IBodyStatementSyntax, ILocalBindingSyntax
     {
-        MaybeQualifiedName FullName { get; }
         TextSpan NameSpan { get; }
         Name Name { get; }
         Promise<int?> DeclarationNumber { get; }
@@ -439,6 +436,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface IFunctionInvocationExpressionSyntax : IInvocationExpressionSyntax, IHasContainingLexicalScope
     {
+        NamespaceName Namespace { get; }
         IInvocableNameSyntax FunctionNameSyntax { get; }
         Promise<FunctionSymbol?> ReferencedSymbol { get; }
     }
@@ -490,7 +488,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IInvocationExpressionSyntax : IExpressionSyntax
     {
         Name Name { get; }
-        MaybeQualifiedName FullName { get; }
         FixedList<IArgumentSyntax> Arguments { get; }
     }
 
@@ -522,7 +519,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface INameExpressionSyntax : IAssignableExpressionSyntax, IHasContainingLexicalScope
     {
         Name? Name { get; }
-        SimpleName SimpleName { get; }
         Promise<BindingSymbol?> ReferencedSymbol { get; }
     }
 

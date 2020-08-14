@@ -57,7 +57,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = identifier.Value;
-            var fullName = nameContext.Qualify(variableNumbers.VariableName(identifier.Value));
             ITypeSyntax? type = null;
             bool inferMutableType = false;
             if (Tokens.Accept<IColonToken>())
@@ -70,7 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var semicolon = Tokens.Expect<ISemicolonToken>();
             var span = TextSpan.Covering(binding, semicolon);
             return new VariableDeclarationStatementSyntax(span,
-                mutableBinding, name, fullName, identifier.Span, type, inferMutableType, initializer);
+                mutableBinding, name, identifier.Span, type, inferMutableType, initializer);
         }
 
         private (ITypeSyntax? Type, bool InferMutableType) ParseVariableDeclarationType()

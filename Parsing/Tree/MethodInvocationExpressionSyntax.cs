@@ -39,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name name,
             IInvocableNameSyntax methodNameSyntax,
             FixedList<IArgumentSyntax> arguments)
-            : base(span, name, methodNameSyntax.Name, arguments)
+            : base(span, name, arguments)
         {
             this.contextExpression = contextExpression;
             MethodNameSyntax = methodNameSyntax;
@@ -49,7 +49,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public override string ToString()
         {
-            return $"{ContextExpression.ToGroupedString(ExpressionPrecedence)}.{FullName}({string.Join(", ", Arguments)})";
+            return $"{ContextExpression.ToGroupedString(ExpressionPrecedence)}.{Name}({string.Join(", ", Arguments)})";
         }
     }
 }
