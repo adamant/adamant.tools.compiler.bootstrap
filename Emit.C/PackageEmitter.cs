@@ -8,20 +8,20 @@ using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 {
-    public class PackageEmitter : IEmitter<Package>
+    public class PackageEmitter : IEmitter<PackageIL>
     {
         private readonly NameMangler nameMangler;
-        private readonly IEmitter<Declaration> declarationEmitter;
+        private readonly IEmitter<DeclarationIL> declarationEmitter;
 
         public PackageEmitter(
             NameMangler nameMangler,
-            IEmitter<Declaration> declarationEmitter)
+            IEmitter<DeclarationIL> declarationEmitter)
         {
             this.nameMangler = nameMangler;
             this.declarationEmitter = declarationEmitter;
         }
 
-        public void Emit(Package package, Code code)
+        public void Emit(PackageIL package, Code code)
         {
             foreach (var declaration in package.Declarations)
                 declarationEmitter.Emit(declaration, code);
@@ -49,7 +49,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.Definitions.AppendLine("// Definitions");
         }
 
-        public void EmitEntryPointAdapter(FunctionDeclaration entryPoint, Code code)
+        public void EmitEntryPointAdapter(FunctionIL entryPoint, Code code)
         {
             if (entryPoint is null) return;
 

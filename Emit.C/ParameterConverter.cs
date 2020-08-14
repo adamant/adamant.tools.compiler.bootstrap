@@ -4,7 +4,7 @@ using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 {
-    public class ParameterConverter : IConverter<Parameter>
+    public class ParameterConverter : IConverter<ParameterIL>
     {
         private readonly NameMangler nameMangler;
         private readonly IConverter<DataType> typeConverter;
@@ -17,14 +17,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             this.nameMangler = nameMangler;
         }
 
-        public string Convert(Parameter parameter)
+        public string Convert(ParameterIL parameter)
         {
             var type = typeConverter.Convert(parameter.DataType);
             return parameter switch
             {
-                NamedParameter param => $"{type} {nameMangler.Mangle(param.Symbol.Name)}",
-                SelfParameter _ => $"{type} {nameMangler.SelfName}",
-                FieldParameter param => $"{type} {nameMangler.Mangle(param.InitializeField.Name)}",
+                NamedParameterIL param => $"{type} {nameMangler.Mangle(param.Symbol.Name)}",
+                SelfParameterIL _ => $"{type} {nameMangler.SelfName}",
+                FieldParameterIL param => $"{type} {nameMangler.Mangle(param.InitializeField.Name)}",
                 _ => throw ExhaustiveMatch.Failed(parameter)
             };
         }

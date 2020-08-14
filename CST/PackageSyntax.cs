@@ -23,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
         public FixedList<ICompilationUnitSyntax> CompilationUnits { get; }
 
-        public FixedDictionary<Name, Package> References { get; }
+        public FixedDictionary<Name, PackageIL> References { get; }
 
         public IEnumerable<Diagnostic> Diagnostics =>
             CompilationUnits.SelectMany(cu => cu.Diagnostics);
@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         public PackageSyntax(
             Name name,
             FixedList<ICompilationUnitSyntax> compilationUnits,
-            FixedDictionary<Name, Package> references)
+            FixedDictionary<Name, PackageIL> references)
         {
             Symbol = new PackageSymbol(name);
             SymbolTreeBuilder = new SymbolTreeBuilder(Symbol);

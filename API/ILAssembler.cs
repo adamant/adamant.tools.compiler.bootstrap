@@ -14,10 +14,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
     {
         protected const int StandardStatementWidth = 50;
 
-        public string Disassemble(Package package)
+        public string Disassemble(PackageIL package)
         {
             var builder = new AssemblyBuilder();
-            var typeMembers = package.Declarations.OfType<ClassDeclaration>()
+            var typeMembers = package.Declarations.OfType<ClassIL>()
                 .SelectMany(t => t.Members).ToList();
             foreach (var declaration in package.Declarations.Except(typeMembers))
             {
@@ -28,31 +28,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             return builder.Code;
         }
 
-        public void Disassemble(Declaration declaration, AssemblyBuilder builder)
+        public void Disassemble(DeclarationIL declaration, AssemblyBuilder builder)
         {
             switch (declaration)
             {
                 default:
                     throw ExhaustiveMatch.Failed(declaration);
-                case FunctionDeclaration function:
+                case FunctionIL function:
                     Disassemble(function, builder);
                     break;
-                case MethodDeclaration method:
+                case MethodDeclarationIL method:
                     Disassemble(method, builder);
                     break;
-                case ConstructorDeclaration constructor:
+                case ConstructorIL constructor:
                     Disassemble(constructor, builder);
                     break;
-                case ClassDeclaration type:
+                case ClassIL type:
                     Disassemble(type, builder);
                     break;
-                case FieldDeclaration field:
+                case FieldIL field:
                     Disassemble(field, builder);
                     break;
             }
         }
 
-        private static void Disassemble(FunctionDeclaration function, AssemblyBuilder builder)
+        private static void Disassemble(FunctionIL function, AssemblyBuilder builder)
         {
             var parameters = FormatParameters(function.Parameters);
             builder.BeginLine("fn ");
@@ -72,29 +72,29 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             }
         }
 
-        private static string FormatParameters(IEnumerable<Parameter> parameters)
+        private static string FormatParameters(IEnumerable<ParameterIL> parameters)
         {
             var formatted = string.Join(", ", parameters.Select(FormatParameter));
             return formatted;
         }
 
-        private static string FormatParameter(Parameter parameter)
+        private static string FormatParameter(ParameterIL parameter)
         {
             var format = parameter.IsMutableBinding ? "var {0}: {1}" : "{0}: {1}";
             return parameter switch
             {
                 // TODO what about escaping the name?
-                NamedParameter param =>
+                NamedParameterIL param =>
                     string.Format(CultureInfo.InvariantCulture, format, param.Symbol.Name, param.DataType),
                 // TODO is this the correct name for self?
-                SelfParameter param =>
+                SelfParameterIL param =>
                     string.Format(CultureInfo.InvariantCulture, format, "self", param.DataType),
-                FieldParameter param => $".{param.InitializeField.Name}",
+                FieldParameterIL param => $".{param.InitializeField.Name}",
                 _ => throw ExhaustiveMatch.Failed(parameter)
             };
         }
 
-        private static void Disassemble(MethodDeclaration method, AssemblyBuilder builder)
+        private static void Disassemble(MethodDeclarationIL method, AssemblyBuilder builder)
         {
             var parameters = FormatParameters(method.Parameters.Prepend(method.SelfParameter));
             builder.BeginLine("fn ");
@@ -114,7 +114,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             }
         }
 
-        private static void Disassemble(ConstructorDeclaration constructor, AssemblyBuilder builder)
+        private static void Disassemble(ConstructorIL constructor, AssemblyBuilder builder)
         {
             var parameters = FormatParameters(constructor.Parameters);
             builder.BeginLine("fn ");
@@ -131,7 +131,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.EndBlock();
         }
 
-        private void Disassemble(ClassDeclaration @class, AssemblyBuilder builder)
+        private void Disassemble(ClassIL @class, AssemblyBuilder builder)
         {
             builder.BeginLine("class ");
             builder.Append(Convert(@class.Symbol));
@@ -238,7 +238,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         //    return claims.Any();
         //}
 
-        private static void Disassemble(FieldDeclaration field, AssemblyBuilder builder)
+        private static void Disassemble(FieldIL field, AssemblyBuilder builder)
         {
             var binding = field.IsMutableBinding ? "var" : "let";
             builder.AppendLine($"{binding} {field.Symbol.Name}: {field.DataType};");

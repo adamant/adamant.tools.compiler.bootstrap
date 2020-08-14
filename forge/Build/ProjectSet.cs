@@ -65,9 +65,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
         {
             _ = verbose; // verbose parameter will be needed in the future
             var taskFactory = new TaskFactory(taskScheduler);
-            var projectBuilds = new Dictionary<Project, Task<Package?>>();
+            var projectBuilds = new Dictionary<Project, Task<PackageIL?>>();
 
-            var projectBuildsSource = new TaskCompletionSource<FixedDictionary<Project, Task<Package?>>>();
+            var projectBuildsSource = new TaskCompletionSource<FixedDictionary<Project, Task<PackageIL?>>>();
             var projectBuildsTask = projectBuildsSource.Task;
 
             // Sort projects to detect cycles and so we can assume the tasks already exist
@@ -89,10 +89,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             await Task.WhenAll(projectBuilds.Values).ConfigureAwait(false);
         }
 
-        private static async Task<Package?> Build(
+        private static async Task<PackageIL?> Build(
             AdamantCompiler compiler,
             Project project,
-            Task<FixedDictionary<Project, Task<Package?>>> projectBuildsTask,
+            Task<FixedDictionary<Project, Task<PackageIL?>>> projectBuildsTask,
             object consoleLock)
         {
             var projectBuilds = await projectBuildsTask.ConfigureAwait(false);
@@ -100,7 +100,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             var sourcePaths = Directory.EnumerateFiles(sourceDir, "*.ad", SearchOption.AllDirectories);
             // Wait for the references, unfortunately, this requires an ugly loop.
             var referenceTasks = project.References.ToDictionary(r => r.Name, r => projectBuilds[r.Project]);
-            var references = new Dictionary<Name, Package>();
+            var references = new Dictionary<Name, PackageIL>();
             foreach (var referenceTask in referenceTasks)
             {
                 var package = await referenceTask.Value.ConfigureAwait(false);
@@ -199,10 +199,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             return true;
         }
 
-        private static string EmitCode(Project project, Package package, string cacheDir)
+        private static string EmitCode(Project project, PackageIL package, string cacheDir)
         {
-            var emittedPackages = new HashSet<Package>();
-            var packagesToEmit = new Queue<Package>();
+            var emittedPackages = new HashSet<PackageIL>();
+            var packagesToEmit = new Queue<PackageIL>();
             packagesToEmit.Enqueue(package);
 
             var codeEmitter = new CodeEmitter();

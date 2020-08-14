@@ -2,11 +2,11 @@ using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
-    public sealed class SelfParameter : Parameter
+    public sealed class NamedParameterIL : ParameterIL
     {
-        public new SelfParameterSymbol Symbol { get; }
+        public new VariableSymbol Symbol { get; }
 
-        public SelfParameter(SelfParameterSymbol symbol)
+        public NamedParameterIL(VariableSymbol symbol)
             : base(symbol, symbol.IsMutableBinding, symbol.DataType)
         {
             Symbol = symbol;

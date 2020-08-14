@@ -6,18 +6,18 @@ using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 {
-    public class DeclarationEmitter : IEmitter<Declaration>
+    public class DeclarationEmitter : IEmitter<DeclarationIL>
     {
         private readonly NameMangler nameMangler;
-        private readonly IConverter<Parameter> parameterConverter;
+        private readonly IConverter<ParameterIL> parameterConverter;
         private readonly IConverter<DataType> typeConverter;
-        private readonly IEmitter<IInvocableDeclaration> controlFlowEmitter;
+        private readonly IEmitter<IInvocableDeclarationIL> controlFlowEmitter;
 
         public DeclarationEmitter(
             NameMangler nameMangler,
-            IConverter<Parameter> parameterConverter,
+            IConverter<ParameterIL> parameterConverter,
             IConverter<DataType> typeConverter,
-            IEmitter<IInvocableDeclaration> controlFlowEmitter)
+            IEmitter<IInvocableDeclarationIL> controlFlowEmitter)
         {
             this.nameMangler = nameMangler;
             this.parameterConverter = parameterConverter;
@@ -25,34 +25,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             this.controlFlowEmitter = controlFlowEmitter;
         }
 
-        public void Emit(Declaration declaration, Code code)
+        public void Emit(DeclarationIL declaration, Code code)
         {
             switch (declaration)
             {
                 default:
                     throw ExhaustiveMatch.Failed(declaration);
-                case FunctionDeclaration function:
+                case FunctionIL function:
                     if (function.IsExternal)
                         EmitExternalFunctionSignature(function, code);
                     else
                         EmitFunction(function, code);
                     break;
-                case MethodDeclaration method:
+                case MethodDeclarationIL method:
                     EmitMethod(method, code);
                     break;
-                case ConstructorDeclaration constructor:
+                case ConstructorIL constructor:
                     EmitConstructor(constructor, code);
                     break;
-                case ClassDeclaration type:
+                case ClassIL type:
                     EmitType(type, code);
                     break;
-                case FieldDeclaration _:
+                case FieldIL _:
                     // fields are emitted as part of the type
                     break;
             }
         }
 
-        private void EmitExternalFunctionSignature(FunctionDeclaration function, Code code)
+        private void EmitExternalFunctionSignature(FunctionIL function, Code code)
         {
             // I think external functions are supposed to not be mangled?
             var name = function.Symbol.Name.Text;
@@ -61,7 +61,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.FunctionDeclarations.AppendLine($"{returnType} {name}({parameters});");
         }
 
-        private void EmitFunction(FunctionDeclaration function, Code code)
+        private void EmitFunction(FunctionIL function, Code code)
         {
             var name = nameMangler.MangleName(function);
             var parameters = Convert(function.Parameters);
@@ -77,7 +77,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.Definitions.EndBlock();
         }
 
-        private void EmitMethod(MethodDeclaration method, Code code)
+        private void EmitMethod(MethodDeclarationIL method, Code code)
         {
             if (method.IL is null) return;
 
@@ -95,7 +95,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.Definitions.EndBlock();
         }
 
-        private void EmitConstructor(ConstructorDeclaration constructor, Code code)
+        private void EmitConstructor(ConstructorIL constructor, Code code)
         {
             // Don't emit constructors without control flow, they are generic
             // TODO need to handle better
@@ -115,12 +115,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.Definitions.EndBlock();
         }
 
-        private string Convert(IEnumerable<Parameter> parameters)
+        private string Convert(IEnumerable<ParameterIL> parameters)
         {
             return string.Join(", ", parameters.Select(parameterConverter.Convert));
         }
 
-        private void EmitType(ClassDeclaration @class, Code code)
+        private void EmitType(ClassIL @class, Code code)
         {
             var typeName = nameMangler.MangleName(@class);
 
@@ -135,7 +135,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             var structs = code.StructDeclarations;
             structs.AppendLine($"struct {selfType}");
             structs.BeginBlock();
-            foreach (var field in @class.Members.OfType<FieldDeclaration>())
+            foreach (var field in @class.Members.OfType<FieldIL>())
             {
                 var fieldType = typeConverter.Convert(field.DataType.Known());
                 var fieldName = nameMangler.MangleName(field);
@@ -144,7 +144,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             structs.EndBlockWithSemicolon();
             structs.AppendLine($"struct {vtableType}");
             structs.BeginBlock();
-            foreach (var method in @class.Members.OfType<MethodDeclaration>())
+            foreach (var method in @class.Members.OfType<MethodDeclarationIL>())
             {
                 var name = nameMangler.MangleMethodName(method);
                 var parameters = Convert(method.Parameters.Prepend(method.SelfParameter));
@@ -156,7 +156,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             var globals = code.StructDeclarations;
             globals.AppendLine($"const {vtableType} {typeName}___vtable = ({vtableType})");
             globals.BeginBlock();
-            foreach (var method in @class.Members.OfType<MethodDeclaration>())
+            foreach (var method in @class.Members.OfType<MethodDeclarationIL>())
             {
                 var fieldName = nameMangler.MangleMethodName(method);
                 var functionName = nameMangler.MangleName(method);

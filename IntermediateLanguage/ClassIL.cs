@@ -3,12 +3,12 @@ using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
-    public class ClassDeclaration : Declaration
+    public class ClassIL : DeclarationIL
     {
-        public FixedList<Declaration> Members { get; }
+        public FixedList<DeclarationIL> Members { get; }
         public new ObjectTypeSymbol Symbol { get; }
 
-        public ClassDeclaration(ObjectTypeSymbol symbol, FixedList<Declaration> members)
+        public ClassIL(ObjectTypeSymbol symbol, FixedList<DeclarationIL> members)
             : base(false, symbol)
         {
             Symbol = symbol;

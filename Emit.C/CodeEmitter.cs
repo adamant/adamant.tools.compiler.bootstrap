@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             packageEmitter.EmitPreamble(code);
         }
 
-        public override void Emit(Package package)
+        public override void Emit(PackageIL package)
         {
             packageEmitter.Emit(package, code);
         }

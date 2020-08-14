@@ -5,7 +5,6 @@ using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Primitives;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.AST;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DeclarationNumbers;
@@ -40,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         public bool SaveReachabilityGraphs { get; set; } = false;
 
         [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "OO")]
-        public Package Check(PackageSyntax package)
+        public PackageIL Check(PackageSyntax package)
         {
             var symbolTrees = new SymbolForest(Primitive.SymbolTree, package.SymbolTreeBuilder,
                 package.References.Values.Select(p => p.SymbolTree));
@@ -76,7 +75,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             var entryPoint = DetermineEntryPoint(declarations, diagnostics);
 
             var references = package.References.Values.ToFixedList();
-            return new Package(package.SymbolTreeBuilder.Build(), diagnostics.Build(), references, declarations, entryPoint);
+            return new PackageIL(package.SymbolTreeBuilder.Build(), diagnostics.Build(), references, declarations, entryPoint);
         }
 
         private static FixedList<IEntityDeclarationSyntax> GetEntityDeclarations(
@@ -113,7 +112,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             new ExpressionSemanticsValidator().Walk(entities);
 #endif
 
-            var package = new ASTBuilder().BuildPackage(entities);
+            //var package = new ASTBuilder().BuildPackage(entities);
 
             // From this point forward, analysis focuses on callable bodies
             // TODO what about field initializers?
@@ -137,7 +136,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // TODO remove live variables if SaveLivenessAnalysis is false
         }
 
-        private static FixedList<Declaration> BuildIL(
+        private static FixedList<DeclarationIL> BuildIL(
             FixedList<IEntityDeclarationSyntax> entityDeclarations,
             ISymbolTree symbolTree)
         {
@@ -147,11 +146,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             return declarationBuilder.AllDeclarations.ToFixedList();
         }
 
-        private static FunctionDeclaration DetermineEntryPoint(
-            FixedList<Declaration> declarations,
+        private static FunctionIL DetermineEntryPoint(
+            FixedList<DeclarationIL> declarations,
             Diagnostics diagnostics)
         {
-            var mainFunctions = declarations.OfType<FunctionDeclaration>()
+            var mainFunctions = declarations.OfType<FunctionIL>()
                 .Where(f => f.Symbol.Name == "main" && f.Symbol.IsGlobal)
                 .ToList();
 

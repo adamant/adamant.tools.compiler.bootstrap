@@ -7,7 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
-    public class Package
+    public class PackageIL
     {
         public PackageSymbol Symbol { get; }
         public FixedSymbolTree SymbolTree { get; }
@@ -16,16 +16,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         /// Referenced packages
         /// </summary>
         /// <remarks>No longer need aliases. All references are now explicit.</remarks>
-        public FixedList<Package> References { get; }
-        public FixedList<Declaration> Declarations { get; }
-        public FunctionDeclaration EntryPoint { get; internal set; }
+        public FixedList<PackageIL> References { get; }
+        public FixedList<DeclarationIL> Declarations { get; }
+        public FunctionIL EntryPoint { get; internal set; }
 
-        public Package(
+        public PackageIL(
             FixedSymbolTree symbolTree,
             FixedList<Diagnostic> diagnostics,
-            FixedList<Package> references,
-            IEnumerable<Declaration> declarations,
-            FunctionDeclaration entryPoint)
+            FixedList<PackageIL> references,
+            IEnumerable<DeclarationIL> declarations,
+            FunctionIL entryPoint)
         {
             Symbol = symbolTree.Package;
             SymbolTree = symbolTree;
@@ -35,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
             Declarations = declarations.ToFixedList();
         }
 
-        public IEnumerable<Declaration> GetNonMemberDeclarations()
+        public IEnumerable<DeclarationIL> GetNonMemberDeclarations()
         {
             return Declarations.Where(d => !d.IsMember);
         }

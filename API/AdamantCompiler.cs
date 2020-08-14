@@ -28,18 +28,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         /// </summary>
         public bool SaveReachabilityGraphs { get; set; } = false;
 
-        public Task<Package> CompilePackageAsync(
+        public Task<PackageIL> CompilePackageAsync(
             Name name,
             IEnumerable<ICodeFileSource> files,
-            FixedDictionary<Name, Task<Package>> referenceTasks)
+            FixedDictionary<Name, Task<PackageIL>> referenceTasks)
         {
             return CompilePackageAsync(name, files, referenceTasks, TaskScheduler.Default);
         }
 
-        public async Task<Package> CompilePackageAsync(
+        public async Task<PackageIL> CompilePackageAsync(
             Name name,
             IEnumerable<ICodeFileSource> fileSources,
-            FixedDictionary<Name, Task<Package>> referenceTasks,
+            FixedDictionary<Name, Task<PackageIL>> referenceTasks,
             TaskScheduler taskScheduler)
         {
             var lexer = new Lexer();
@@ -85,18 +85,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             return analyzer.Check(packageSyntax);
         }
 
-        public Package CompilePackage(
+        public PackageIL CompilePackage(
             string name,
             IEnumerable<ICodeFileSource> fileSources,
-            FixedDictionary<Name, Package> references)
+            FixedDictionary<Name, PackageIL> references)
         {
             return CompilePackage(name, fileSources.Select(s => s.Load()), references);
         }
 
-        public Package CompilePackage(
+        public PackageIL CompilePackage(
             string name,
             IEnumerable<CodeFile> files,
-            FixedDictionary<Name, Package> references)
+            FixedDictionary<Name, PackageIL> references)
         {
             var lexer = new Lexer();
             var parser = new CompilationUnitParser();

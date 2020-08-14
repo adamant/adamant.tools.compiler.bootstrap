@@ -5,17 +5,17 @@ using ExhaustiveMatching;
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
     [Closed(
-        typeof(SelfParameter),
-        typeof(NamedParameter),
-        typeof(FieldParameter))]
-    public abstract class Parameter
+        typeof(SelfParameterIL),
+        typeof(NamedParameterIL),
+        typeof(FieldParameterIL))]
+    public abstract class ParameterIL
     {
         public BindingSymbol? Symbol { get; }
         public bool IsMutableBinding { get; }
         public DataType DataType { get; internal set; }
         public FieldSymbol? InitializeField { get; }
 
-        protected Parameter(
+        protected ParameterIL(
             BindingSymbol? symbol,
             bool isMutableBinding,
             DataType type,

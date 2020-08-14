@@ -15,7 +15,7 @@ using static Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructi
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 {
-    public class ControlFlowEmitter : IEmitter<IInvocableDeclaration>
+    public class ControlFlowEmitter : IEmitter<IInvocableDeclarationIL>
     {
         private readonly NameMangler nameMangler;
         private readonly IConverter<DataType> typeConverter;
@@ -28,12 +28,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             this.nameMangler = nameMangler;
         }
 
-        public void Emit(IInvocableDeclaration invocable, Code code)
+        public void Emit(IInvocableDeclarationIL invocable, Code code)
         {
             var cfg = invocable.IL!;
             var definitions = code.Definitions;
 
-            if (invocable is ConstructorDeclaration constructor)
+            if (invocable is ConstructorIL constructor)
             {
                 foreach (var fieldInitialization in constructor.FieldInitializations)
                     EmitFieldInitialization(fieldInitialization, definitions);
@@ -50,7 +50,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 EmitBlock(block, invocable.IsConstructor, definitions);
         }
 
-        private void EmitFieldInitialization(FieldInitialization fieldInitialization, CCodeBuilder code)
+        private void EmitFieldInitialization(FieldInitializationIL fieldInitialization, CCodeBuilder code)
         {
             var fieldName = nameMangler.Mangle(fieldInitialization.Field);
             var parameterName = nameMangler.Mangle(fieldInitialization.Field.Name);

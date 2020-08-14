@@ -5,7 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit
 {
     public abstract class Emitter
     {
-        public abstract void Emit(Package package);
+        public abstract void Emit(PackageIL package);
         public abstract string GetEmittedCode();
     }
 }

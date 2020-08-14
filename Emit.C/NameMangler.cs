@@ -37,27 +37,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
         public string SelfName { get; } = "_self";
 
-        public string MangleName(FunctionDeclaration function)
+        public string MangleName(FunctionIL function)
         {
             return Mangle(function.Symbol);
         }
-        public string MangleName(MethodDeclaration method)
+        public string MangleName(MethodDeclarationIL method)
         {
             return Mangle(method.Symbol);
         }
-        public string MangleName(FieldDeclaration field)
+        public string MangleName(FieldIL field)
         {
             return Mangle(field.Symbol);
         }
-        public string MangleMethodName(MethodDeclaration method)
+        public string MangleMethodName(MethodDeclarationIL method)
         {
             return MangleMethod(method.Symbol);
         }
-        public string MangleName(ConstructorDeclaration constructor)
+        public string MangleName(ConstructorIL constructor)
         {
             return Mangle(constructor.Symbol);
         }
-        public string MangleName(ClassDeclaration @class)
+        public string MangleName(ClassIL @class)
         {
             return Mangle(@class.Symbol);
         }

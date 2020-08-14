@@ -5,23 +5,23 @@ using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
-    public class FunctionDeclaration : Declaration, IInvocableDeclaration
+    public class FunctionIL : DeclarationIL, IInvocableDeclarationIL
     {
         public bool IsExternal { get; }
 
         [SuppressMessage("Design", "CA1033:Interface methods should be callable by child types", Justification = "NA")]
-        bool IInvocableDeclaration.IsConstructor => false;
+        bool IInvocableDeclarationIL.IsConstructor => false;
 
-        public FixedList<Parameter> Parameters { get; }
+        public FixedList<ParameterIL> Parameters { get; }
         public int Arity => Parameters.Count;
         public new FunctionSymbol Symbol { get; }
         public ControlFlowGraph IL { get; }
 
-        public FunctionDeclaration(
+        public FunctionIL(
             bool isExternal,
             bool isMember,
             FunctionSymbol symbol,
-            FixedList<Parameter> parameters,
+            FixedList<ParameterIL> parameters,
             ControlFlowGraph il)
             : base(isMember, symbol)
         {

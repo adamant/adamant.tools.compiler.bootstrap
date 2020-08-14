@@ -5,21 +5,21 @@ using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
-    public class MethodDeclaration : Declaration, IInvocableDeclaration
+    public class MethodDeclarationIL : DeclarationIL, IInvocableDeclarationIL
     {
         [SuppressMessage("Design", "CA1033:Interface methods should be callable by child types",
             Justification = "NA")]
-        bool IInvocableDeclaration.IsConstructor => false;
-        public Parameter SelfParameter { get; }
-        public FixedList<Parameter> Parameters { get; }
+        bool IInvocableDeclarationIL.IsConstructor => false;
+        public ParameterIL SelfParameter { get; }
+        public FixedList<ParameterIL> Parameters { get; }
         public int Arity => Parameters.Count;
         public new MethodSymbol Symbol { get; }
         public ControlFlowGraph? IL { get; }
 
-        public MethodDeclaration(
+        public MethodDeclarationIL(
             MethodSymbol symbol,
-            Parameter selfParameter,
-            FixedList<Parameter> parameters,
+            ParameterIL selfParameter,
+            FixedList<ParameterIL> parameters,
             ControlFlowGraph? il)
             : base(true, symbol)
         {

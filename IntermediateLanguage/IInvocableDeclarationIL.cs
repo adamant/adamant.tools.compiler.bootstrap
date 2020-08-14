@@ -5,13 +5,13 @@ using ExhaustiveMatching;
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
     [Closed(
-        typeof(FunctionDeclaration),
-        typeof(MethodDeclaration),
-        typeof(ConstructorDeclaration))]
-    public interface IInvocableDeclaration
+        typeof(FunctionIL),
+        typeof(MethodDeclarationIL),
+        typeof(ConstructorIL))]
+    public interface IInvocableDeclarationIL
     {
         bool IsConstructor { get; }
-        FixedList<Parameter> Parameters { get; }
+        FixedList<ParameterIL> Parameters { get; }
         ControlFlowGraph? IL { get; }
     }
 }

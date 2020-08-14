@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.CST;
@@ -9,6 +10,9 @@ using Package = Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree.Package;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
 {
+    // ReSharper disable once UnusedMember.Global
+    [SuppressMessage("Performance", "CA1812: Avoid uninstantiated internal classes",
+        Justification = "In Progress")]
     internal class ASTBuilder
     {
         public Package BuildPackage(FixedList<IEntityDeclarationSyntax> entities)

@@ -53,7 +53,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
                 SaveLivenessAnalysis = true,
                 SaveReachabilityGraphs = true,
             };
-            var references = new Dictionary<Name, Package>();
+            var references = new Dictionary<Name, PackageIL>();
 
             // Reference Standard Library
             var stdLibPackage = CompileStdLib(compiler);
@@ -106,7 +106,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             }
         }
 
-        private Package CompileStdLib(AdamantCompiler compiler)
+        private PackageIL CompileStdLib(AdamantCompiler compiler)
         {
             try
             {
@@ -117,7 +117,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
                 var codeFiles = sourcePaths.Select(p => LoadCode(p, sourceDir, rootNamespace))
                     .ToList();
                 return compiler.CompilePackage("adamant.stdlib", codeFiles,
-                    FixedDictionary<Name, Package>.Empty);
+                    FixedDictionary<Name, PackageIL>.Empty);
             }
             catch (FatalCompilationErrorException ex)
             {
@@ -206,7 +206,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
                 .ToList();
         }
 
-        private static void EmitCode(Package package, Package stdLibPackage, string path)
+        private static void EmitCode(PackageIL package, PackageIL stdLibPackage, string path)
         {
             var codeEmitter = new CodeEmitter();
             codeEmitter.Emit(package);
