@@ -23,7 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Metadata\Metadata.csproj" />
     <ProjectReference Include="..\Names\Names.csproj" />
     <ProjectReference Include="..\Symbols\Symbols.csproj" />
   </ItemGroup>

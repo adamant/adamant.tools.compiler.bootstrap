@@ -65,7 +65,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             // --------------------------------------------------
             // This is where the representation transitions to IR
-            var declarations = BuildIL(entities);
+            var declarations = BuildIL(entities, package.SymbolTreeBuilder);
             // --------------------------------------------------
 
             // If there are errors from the previous phase, don't continue on
@@ -135,11 +135,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         }
 
         private static FixedList<Declaration> BuildIL(
-            FixedList<IEntityDeclarationSyntax> entityDeclarations)
+            FixedList<IEntityDeclarationSyntax> entityDeclarations,
+            ISymbolTree symbolTree)
         {
             var ilFactory = new ILFactory();
             var declarationBuilder = new DeclarationBuilder(ilFactory);
-            declarationBuilder.Build(entityDeclarations);
+            declarationBuilder.Build(entityDeclarations, symbolTree);
             return declarationBuilder.AllDeclarations.ToFixedList();
         }
 

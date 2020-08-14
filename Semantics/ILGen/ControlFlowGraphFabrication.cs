@@ -9,7 +9,6 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Operands;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Places;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.TerminatorInstructions;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
@@ -70,17 +69,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     throw ExhaustiveMatch.Failed(invocable);
                 case IConcreteMethodDeclarationSyntax method:
                     // TODO what about the self parameter of methods?
-                    returnType = method.ReturnDataType.Known();
+                    returnType = method.Symbol.Result.ReturnDataType.Known();
                     break;
                 case IConstructorDeclarationSyntax constructor:
                     selfParameter = constructor.ImplicitSelfParameter.Symbol.Result;
                     returnType = DataType.Void; // the body should `return;`
                     break;
                 case IAssociatedFunctionDeclarationSyntax associatedFunction:
-                    returnType = associatedFunction.ReturnDataType.Known();
+                    returnType = associatedFunction.Symbol.Result.ReturnDataType.Known();
                     break;
                 case IFunctionDeclarationSyntax function:
-                    returnType = function.ReturnDataType.Known();
+                    returnType = function.Symbol.Result.ReturnDataType.Known();
                     break;
             }
 

@@ -28,12 +28,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public CodeFile File { get; }
         public Name? Name { get; }
         public TextSpan NameSpan { get; }
-        protected abstract IPromise<Symbol> SymbolPromise { get; }
-        IPromise<Symbol> IDeclarationSyntax.Symbol => SymbolPromise;
-        protected DeclarationSyntax(TextSpan span, CodeFile file, Name? name, TextSpan nameSpan)
+        public IPromise<Symbol> Symbol { get; }
+        protected DeclarationSyntax(TextSpan span, CodeFile file, Name? name, TextSpan nameSpan, IPromise<Symbol> symbol)
             : base(span)
         {
             NameSpan = nameSpan;
+            Symbol = symbol;
             File = file;
             Name = name;
         }

@@ -4,7 +4,6 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph;
 using Adamant.Tools.Compiler.Bootstrap.Types;
@@ -238,7 +237,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     {
                         // TODO make a deep copy of the graph so the existing graph is intact
                         // create a new temp with the correct reference capabilities to the value
-                        var returnValue = graph.AddReturnValue(exp, invocableDeclaration.ReturnDataType)!;
+                        var returnValue = graph.AddReturnValue(exp, invocableDeclaration.Symbol.Result.ReturnDataType
+                                                                                        .Known())!;
                         returnValue.AssignFrom(temp, returnValue.ReferenceType.ReferenceCapability);
                         // Exit the function, releasing all temps and variables except the returned value
                         graph.ExitFunction(returnValue);

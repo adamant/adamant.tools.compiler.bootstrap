@@ -1,6 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
@@ -11,8 +10,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal class ForeachExpressionSyntax : ExpressionSyntax, IForeachExpressionSyntax
     {
         public bool IsMutableBinding { get; }
-        MaybeQualifiedName IMetadata.FullName => FullVariableName;
-        private MaybeQualifiedName FullVariableName { get; }
         public Name VariableName { get; }
         public Promise<int?> DeclarationNumber { get; } = new Promise<int?>();
         public Promise<VariableSymbol> Symbol { get; } = new Promise<VariableSymbol>();
@@ -21,8 +18,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public ITypeSyntax? Type { get; }
         DataType IBindingSyntax.BindingDataType => Symbol.Result.DataType;
-        DataType IBindingMetadata.DataType => Symbol.Result.DataType;
-
         private IExpressionSyntax inExpression;
         public ref IExpressionSyntax InExpression => ref inExpression;
 
@@ -31,7 +26,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public ForeachExpressionSyntax(
             TextSpan span,
             bool isMutableBinding,
-            MaybeQualifiedName fullVariableName,
             Name variableName,
             ITypeSyntax? typeSyntax,
             IExpressionSyntax inExpression,
@@ -39,7 +33,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             : base(span)
         {
             IsMutableBinding = isMutableBinding;
-            FullVariableName = fullVariableName;
             VariableName = variableName;
             this.inExpression = inExpression;
             Block = block;

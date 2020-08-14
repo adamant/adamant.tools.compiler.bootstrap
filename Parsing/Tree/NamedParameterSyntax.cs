@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class NamedParameterSyntax : ParameterSyntax, INamedParameterSyntax
     {
-        public override bool IsMutableBinding { get; }
+        public bool IsMutableBinding { get; }
         public new Name Name { get; }
         public Promise<int?> DeclarationNumber { get; } = new Promise<int?>();
         public Promise<VariableSymbol> Symbol { get; } = new Promise<VariableSymbol>();

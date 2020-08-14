@@ -1,14 +1,12 @@
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using Adamant.Tools.Compiler.Bootstrap.Types;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
-    public class FunctionDeclaration : Declaration, IInvocableDeclaration, IFunctionMetadata
+    public class FunctionDeclaration : Declaration, IInvocableDeclaration
     {
         public bool IsExternal { get; }
 
@@ -17,22 +15,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 
         public FixedList<Parameter> Parameters { get; }
         public int Arity => Parameters.Count;
-        public DataType ReturnDataType { get; }
+        public new FunctionSymbol Symbol { get; }
         public ControlFlowGraph IL { get; }
-
-        IEnumerable<IBindingMetadata> IFunctionMetadata.Parameters => Parameters;
 
         public FunctionDeclaration(
             bool isExternal,
             bool isMember,
             MaybeQualifiedName name,
             FixedList<Parameter> parameters,
-            DataType returnType,
+            FunctionSymbol symbol,
             ControlFlowGraph il)
-            : base(isMember, name, MetadataSet.Empty)
+            : base(isMember, name, symbol)
         {
             Parameters = parameters;
-            ReturnDataType = returnType;
+            Symbol = symbol;
             IL = il;
             IsExternal = isExternal;
         }

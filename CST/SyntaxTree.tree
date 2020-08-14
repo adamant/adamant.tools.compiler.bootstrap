@@ -7,7 +7,6 @@
 ◊using Adamant.Tools.Compiler.Bootstrap.Core;
 ◊using Adamant.Tools.Compiler.Bootstrap.Framework;
 ◊using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
-◊using Adamant.Tools.Compiler.Bootstrap.Metadata;
 ◊using Adamant.Tools.Compiler.Bootstrap.Names;
 ◊using Adamant.Tools.Compiler.Bootstrap.Symbols;
 ◊using Adamant.Tools.Compiler.Bootstrap.Tokens;
@@ -26,13 +25,13 @@ Body: BodyOrBlock = Statements:BodyStatement*;
 BodyOrBlock = Statements:Statement*;
 ElseClause;
 BlockOrResult: ElseClause;
-Binding = Symbol:IPromise<BindingSymbol> BindingDataType:DataType;
+Binding = IsMutableBinding:bool BindingDataType:DataType Symbol:IPromise<BindingSymbol>;
 LocalBinding: Binding;
 
 // Declarations
 Declaration: 'ISyntax', IHasContainingLexicalScope = File:CodeFile Name? NameSpan:TextSpan Symbol:IPromise<Symbol>;
-EntityDeclaration: Declaration = AccessModifier:IAccessModifierToken?;
-InvocableDeclaration: EntityDeclaration, IFunctionMetadata = ReachabilityAnnotations:ReachabilityAnnotation*;
+EntityDeclaration: Declaration = AccessModifier:IAccessModifierToken? FullName:MaybeQualifiedName;
+InvocableDeclaration: EntityDeclaration = Parameters:FixedList<IConstructorParameterSyntax> ReachabilityAnnotations:ReachabilityAnnotation* Symbol:IPromise<InvocableSymbol>;
 ConcreteInvocableDeclaration: InvocableDeclaration = Body;
 
 // Non-Member Declarations
@@ -42,20 +41,21 @@ NamespaceDeclaration: NonMemberDeclaration = IsGlobalQualified:bool DeclaredName
 
 // Non-Member Entity Declarations
 NonMemberEntityDeclaration: EntityDeclaration, NonMemberDeclaration = Name;
-ClassDeclaration: NonMemberEntityDeclaration = MutableModifier:IMutableKeywordToken? Name Symbol:Promise<ObjectTypeSymbol> Members:MemberDeclaration*;
-FunctionDeclaration: NonMemberEntityDeclaration, ConcreteInvocableDeclaration = IsExternalFunction:bool Name Symbol:Promise<FunctionSymbol> ReturnType:Type? ReturnDataType:Promise<DataType>;
-AssociatedFunctionDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = Name Symbol:Promise<FunctionSymbol> ReturnType:Type? ReturnDataType:Promise<DataType>;
+ClassDeclaration: NonMemberEntityDeclaration = MutableModifier:IMutableKeywordToken? Name Symbol:Promise<ObjectTypeSymbol> Members:MemberDeclaration* DefaultConstructorSymbol:ConstructorSymbol?;
+FunctionDeclaration: NonMemberEntityDeclaration, ConcreteInvocableDeclaration = IsExternalFunction:bool Name Parameters:FixedList<INamedParameterSyntax> ReturnType:Type? Symbol:Promise<FunctionSymbol>;
 
 // Member Declarations
 MemberDeclaration: EntityDeclaration = DeclaringClass:ClassDeclaration;
-MethodDeclaration: MemberDeclaration, InvocableDeclaration = Name Symbol:Promise<MethodSymbol> SelfParameter ReturnType:Type? ReturnDataType:Promise<DataType>;
+MethodDeclaration: MemberDeclaration, InvocableDeclaration = Name SelfParameter Parameters:FixedList<INamedParameterSyntax> ReturnType:Type? Symbol:Promise<MethodSymbol>;
 AbstractMethodDeclaration: MethodDeclaration;
 ConcreteMethodDeclaration: MethodDeclaration, ConcreteInvocableDeclaration;
-ConstructorDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = Symbol:Promise<ConstructorSymbol> ImplicitSelfParameter:SelfParameter;
+ConstructorDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = ImplicitSelfParameter:SelfParameter Parameters:FixedList<IConstructorParameterSyntax> Symbol:Promise<ConstructorSymbol>;
 FieldDeclaration: MemberDeclaration, Binding = Name Symbol:Promise<FieldSymbol> Type;
+AssociatedFunctionDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = Name Parameters:FixedList<INamedParameterSyntax> ReturnType:Type? Symbol:Promise<FunctionSymbol>;
+
 
 // ---------- Parameters --------------
-Parameter: 'ISyntax', IBindingMetadata = Name? DataType:IPromise<DataType> Unused:bool;
+Parameter = FullName:MaybeQualifiedName Name? DataType:IPromise<DataType> Unused:bool;
 /// A parameter that can be declared in a constructor
 ConstructorParameter: Parameter = Name;
 /// A parameter that creates a binding, i.e. a named or self parameter
@@ -79,7 +79,7 @@ CapabilityType: Type = ReferentType:Type Capability:ReferenceCapability;
 Statement;
 ResultStatement: Statement, BlockOrResult;
 BodyStatement: Statement;
-VariableDeclarationStatement: BodyStatement, LocalBinding, IBindingMetadata = NameSpan:TextSpan Name DeclarationNumber:Promise<int?> Symbol:Promise<VariableSymbol> Type? InferMutableType:bool;
+VariableDeclarationStatement: BodyStatement, LocalBinding = FullName:MaybeQualifiedName NameSpan:TextSpan Name DeclarationNumber:Promise<int?> Symbol:Promise<VariableSymbol> Type? InferMutableType:bool;
 ExpressionStatement: BodyStatement;
 
 // Expressions

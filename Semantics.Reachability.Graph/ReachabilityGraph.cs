@@ -123,7 +123,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         public Variable? AddField(IFieldDeclarationSyntax fieldDeclaration)
         {
-            var referenceType = fieldDeclaration.DataType.Known().UnderlyingReferenceType();
+            var referenceType = fieldDeclaration.Symbol.Result.DataType.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
 
             var variable = Variable.ForField(this, fieldDeclaration);

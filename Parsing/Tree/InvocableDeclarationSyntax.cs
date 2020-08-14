@@ -1,12 +1,10 @@
 using System.Collections.Generic;
-using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
-using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
@@ -15,12 +13,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public IAccessModifierToken? AccessModifier { get; }
         public MaybeQualifiedName FullName { get; }
         public FixedList<IConstructorParameterSyntax> Parameters { get; }
-        IEnumerable<IBindingMetadata> IFunctionMetadata.Parameters => Parameters;
-        public Promise<DataType> ReturnDataType { get; } = new Promise<DataType>();
-        DataType IFunctionMetadata.ReturnDataType => ReturnDataType.Result;
         public FixedList<IReachabilityAnnotationSyntax> ReachabilityAnnotations { get; }
-
-        public MetadataSet ChildMetadata { get; protected set; }
+        public new IPromise<InvocableSymbol> Symbol { get; }
 
         protected InvocableDeclarationSyntax(
             TextSpan span,
@@ -31,28 +25,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name? name,
             IEnumerable<IConstructorParameterSyntax> parameters,
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
-            MetadataSet childMetadata)
-            : base(span, file, name, nameSpan)
+            IPromise<InvocableSymbol> symbol)
+            : base(span, file, name, nameSpan, symbol)
         {
             AccessModifier = accessModifier;
             FullName = fullName;
             Parameters = parameters.ToFixedList();
             ReachabilityAnnotations = reachabilityAnnotations;
-            ChildMetadata = childMetadata;
-        }
-
-        protected static MetadataSet GetChildMetadata(
-            ISelfParameterSyntax? selfParameter,
-            IEnumerable<IParameterSyntax> parameters,
-            IBodySyntax? body)
-        {
-            if (!(selfParameter is null))
-                parameters = parameters.Prepend(selfParameter);
-
-            var variableDeclarations = body?.GetAllVariableDeclarations()
-                                       ?? Enumerable.Empty<IBindingMetadata>();
-            var childSymbols = parameters.Concat(variableDeclarations);
-            return new MetadataSet(childSymbols);
+            Symbol = symbol;
         }
     }
 }

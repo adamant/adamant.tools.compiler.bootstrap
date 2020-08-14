@@ -1,4 +1,3 @@
-using System;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Names;
@@ -9,8 +8,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class FieldParameterSyntax : ParameterSyntax, IFieldParameterSyntax
     {
-        private bool? isMutableBinding;
-        public override bool IsMutableBinding => isMutableBinding ?? throw new Exception($"Tried to access {nameof(IsMutableBinding)} of field parameter before it had been assigned.");
         public new Name Name { get; }
         public Promise<FieldSymbol?> ReferencedSymbol { get; } = new Promise<FieldSymbol?>();
         public override IPromise<DataType> DataType { get; }
@@ -28,12 +25,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name = name;
             DefaultValue = defaultValue;
             DataType = ReferencedSymbol.Select(s => s?.DataType ?? Types.DataType.Unknown);
-        }
-
-        public void SetIsMutableBinding(bool value)
-        {
-            if (isMutableBinding != null) throw new InvalidOperationException("Can't set IsMutableBinding repeatedly");
-            isMutableBinding = value;
         }
 
         public override string ToString()

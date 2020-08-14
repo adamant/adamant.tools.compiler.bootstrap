@@ -1,42 +1,33 @@
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using Adamant.Tools.Compiler.Bootstrap.Types;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
-    public class MethodDeclaration : Declaration, IInvocableDeclaration, IMethodMetadata
+    public class MethodDeclaration : Declaration, IInvocableDeclaration
     {
-        public bool IsExternal => false;
         [SuppressMessage("Design", "CA1033:Interface methods should be callable by child types",
             Justification = "NA")]
         bool IInvocableDeclaration.IsConstructor => false;
         public Parameter SelfParameter { get; }
-
-        [SuppressMessage("Design", "CA1033:Interface methods should be callable by child types",
-            Justification = "NA")]
-        IBindingMetadata IMethodMetadata.SelfParameterMetadata => SelfParameter;
         public FixedList<Parameter> Parameters { get; }
         public int Arity => Parameters.Count;
-        public DataType ReturnDataType { get; }
+        public new MethodSymbol Symbol { get; }
         public ControlFlowGraph? IL { get; }
-
-        IEnumerable<IBindingMetadata> IFunctionMetadata.Parameters => Parameters;
 
         public MethodDeclaration(
             MaybeQualifiedName name,
             Parameter selfParameter,
             FixedList<Parameter> parameters,
-            DataType returnType,
+            MethodSymbol symbol,
             ControlFlowGraph? il)
-            : base(true, name, MetadataSet.Empty)
+            : base(true, name, symbol)
         {
             SelfParameter = selfParameter;
             Parameters = parameters;
-            ReturnDataType = returnType;
+            Symbol = symbol;
             IL = il;
         }
     }

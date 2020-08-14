@@ -24,18 +24,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                 case IClassDeclarationSyntax _:
                     // Don't recur into body, we will see those as separate members
                     return;
-                case IMethodDeclarationSyntax methodDeclaration:
-                    WalkChildren(methodDeclaration);
-                    _ = methodDeclaration.ReturnDataType.Result;
-                    return;
-                case IFunctionDeclarationSyntax functionDeclaration:
-                    WalkChildren(functionDeclaration);
-                    _ = functionDeclaration.ReturnDataType.Result;
-                    return;
-                case IAssociatedFunctionDeclarationSyntax associatedFunctionDeclaration:
-                    WalkChildren(associatedFunctionDeclaration);
-                    _ = associatedFunctionDeclaration.ReturnDataType.Result;
-                    return;
                 case ITypeSyntax type:
                     WalkChildren(type);
                     type.NamedType.Assigned();

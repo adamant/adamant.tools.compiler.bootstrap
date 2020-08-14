@@ -1,8 +1,6 @@
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
@@ -14,15 +12,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     {
         public bool IsMutableBinding { get; }
         public new Name Name { get; }
-        public Promise<FieldSymbol> Symbol { get; } = new Promise<FieldSymbol>();
+        public new Promise<FieldSymbol> Symbol { get; }
         IPromise<BindingSymbol> IBindingSyntax.Symbol => Symbol;
-        protected override IPromise<Symbol> SymbolPromise => Symbol;
         public ITypeSyntax Type { get; }
         private IExpressionSyntax? initializer;
         [DisallowNull] public ref IExpressionSyntax? Initializer => ref initializer;
-        [DebuggerHidden]
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        DataType IBindingMetadata.DataType => Symbol.Result.DataType;
         public DataType BindingDataType => Symbol.Result.DataType;
 
         public FieldDeclarationSyntax(
@@ -36,12 +30,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name name,
             ITypeSyntax type,
             IExpressionSyntax? initializer)
-            : base(declaringClass, span, file, accessModifier, fullName, nameSpan, name)
+            : base(declaringClass, span, file, accessModifier, fullName, nameSpan, name, new Promise<FieldSymbol>())
         {
             IsMutableBinding = mutableBinding;
             Name = name;
             Type = type;
             this.initializer = initializer;
+            Symbol = (Promise<FieldSymbol>)base.Symbol;
         }
 
         public override string ToString()

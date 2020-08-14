@@ -22,8 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             ITypeSyntax? returnType,
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations)
             : base(declaringClass, span, file, accessModifier, fullName, nameSpan, name,
-                selfParameter, parameters, returnType, reachabilityAnnotations,
-                GetChildMetadata(selfParameter, parameters, null))
+                selfParameter, parameters, returnType, reachabilityAnnotations)
         {
         }
 

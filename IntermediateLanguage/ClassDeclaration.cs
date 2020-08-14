@@ -1,22 +1,21 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using Adamant.Tools.Compiler.Bootstrap.Types;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
-    public class ClassDeclaration : Declaration, ITypeMetadata
+    public class ClassDeclaration : Declaration
     {
         public FixedList<Declaration> Members { get; }
-        public DataType DeclaresDataType { get; }
+        public new ObjectTypeSymbol Symbol { get; }
 
         public ClassDeclaration(
             MaybeQualifiedName name,
-            DataType declaresType,
+            ObjectTypeSymbol symbol,
             FixedList<Declaration> members)
-            : base(false, name, new MetadataSet(members))
+            : base(false, name, symbol)
         {
-            DeclaresDataType = declaresType;
+            Symbol = symbol;
             Members = members;
         }
     }

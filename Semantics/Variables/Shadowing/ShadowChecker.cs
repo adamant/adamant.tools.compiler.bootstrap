@@ -33,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Shadowing
             switch (syntax)
             {
                 case IConcreteInvocableDeclarationSyntax syn:
-                    foreach (var parameter in syn.Parameters)
+                    foreach (var parameter in syn.Parameters.OfType<INamedParameterSyntax>())
                         bindingScope = new VariableBindingScope(bindingScope, parameter);
                     break;
                 case IBodyOrBlockSyntax syn:

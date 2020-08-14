@@ -57,7 +57,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IFunctionDeclarationSyntax function:
                 {
                     var resolver = new BasicBodyAnalyzer(function, symbolTreeBuilder, symbolTrees, stringSymbol, diagnostics,
-                        function.ReturnDataType.Result);
+                        function.Symbol.Result.ReturnDataType);
                     resolver.ResolveTypes(function.Body);
                     break;
                 }
@@ -65,13 +65,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 {
                     var resolver = new BasicBodyAnalyzer(associatedFunction, symbolTreeBuilder, symbolTrees,
                         stringSymbol, diagnostics,
-                        associatedFunction.ReturnDataType.Result);
+                        associatedFunction.Symbol.Result.ReturnDataType);
                     resolver.ResolveTypes(associatedFunction.Body);
                     break;
                 }
                 case IConcreteMethodDeclarationSyntax method:
                 {
-                    var resolver = new BasicBodyAnalyzer(method, symbolTreeBuilder, symbolTrees, stringSymbol, diagnostics, method.ReturnDataType.Result);
+                    var resolver = new BasicBodyAnalyzer(method, symbolTreeBuilder,
+                        symbolTrees, stringSymbol, diagnostics, method.Symbol.Result.ReturnDataType);
                     resolver.ResolveTypes(method.Body);
                     break;
                 }

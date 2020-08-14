@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Shadowing
         public IReadOnlyList<VariableBinding> WasShadowedBy => wasShadowedBy;
         private readonly List<VariableBinding> wasShadowedBy = new List<VariableBinding>();
 
-        public VariableBinding(IParameterSyntax parameter)
+        public VariableBinding(INamedParameterSyntax parameter)
         {
             MutableBinding = parameter.IsMutableBinding;
             BindingName = parameter.Name?.ToSimpleName() ?? SpecialNames.Self;

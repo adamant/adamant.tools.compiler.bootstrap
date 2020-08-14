@@ -14,11 +14,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public new SimpleName Name => FullName.UnqualifiedName;
-        public Promise<ConstructorSymbol> Symbol { get; } = new Promise<ConstructorSymbol>();
-        protected override IPromise<Symbol> SymbolPromise => Symbol;
         public ISelfParameterSyntax ImplicitSelfParameter { get; }
         public new FixedList<IConstructorParameterSyntax> Parameters { get; }
         public virtual IBodySyntax Body { get; }
+        public new Promise<ConstructorSymbol> Symbol { get; }
 
         public ConstructorDeclarationSyntax(
             IClassDeclarationSyntax declaringType,
@@ -33,12 +32,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
             IBodySyntax body)
             : base(span, file, accessModifier, fullName, nameSpan, name, parameters, reachabilityAnnotations,
-                GetChildMetadata(implicitSelfParameter, parameters, body))
+                new Promise<ConstructorSymbol>())
         {
             DeclaringClass = declaringType;
             ImplicitSelfParameter = implicitSelfParameter;
             Parameters = parameters;
             Body = body;
+            Symbol = (Promise<ConstructorSymbol>)base.Symbol;
         }
 
         public override string ToString()

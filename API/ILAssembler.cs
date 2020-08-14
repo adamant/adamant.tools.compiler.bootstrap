@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
-using Adamant.Tools.Compiler.Bootstrap.Semantics;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.API
@@ -62,7 +61,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.EndLine();
             builder.BeginLine(builder.IndentCharacters);
             builder.Append("-> ");
-            builder.EndLine(function.ReturnDataType.ToString());
+            builder.EndLine(function.Symbol.ReturnDataType.ToString());
             if (function.IL != null)
             {
                 builder.BeginBlock();
@@ -100,7 +99,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.EndLine();
             builder.BeginLine(builder.IndentCharacters);
             builder.Append("-> ");
-            builder.EndLine(method.ReturnDataType.ToString());
+            builder.EndLine(method.Symbol.ReturnDataType.ToString());
             if (method.IL != null)
             {
                 builder.BeginBlock();
@@ -120,7 +119,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.EndLine();
             builder.BeginLine(builder.IndentCharacters);
             builder.Append("-> ");
-            builder.EndLine(constructor.ReturnDataType.ToString());
+            builder.EndLine(constructor.Symbol.ContainingSymbol.DeclaresDataType.ToString());
             builder.BeginBlock();
             Disassemble(constructor.IL, builder);
             builder.EndBlock();

@@ -2,7 +2,6 @@ using System.Numerics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
@@ -86,8 +85,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(IFieldDeclarationSyntax))]
     public partial interface IBindingSyntax : ISyntax
     {
-        IPromise<BindingSymbol> Symbol { get; }
+        bool IsMutableBinding { get; }
         DataType BindingDataType { get; }
+        IPromise<BindingSymbol> Symbol { get; }
     }
 
     [Closed(
@@ -116,21 +116,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IEntityDeclarationSyntax : IDeclarationSyntax
     {
         IAccessModifierToken? AccessModifier { get; }
+        MaybeQualifiedName FullName { get; }
     }
 
     [Closed(
         typeof(IConcreteInvocableDeclarationSyntax),
         typeof(IMethodDeclarationSyntax))]
-    public partial interface IInvocableDeclarationSyntax : IEntityDeclarationSyntax, IFunctionMetadata
+    public partial interface IInvocableDeclarationSyntax : IEntityDeclarationSyntax
     {
+        FixedList<IConstructorParameterSyntax> Parameters { get; }
         FixedList<IReachabilityAnnotationSyntax> ReachabilityAnnotations { get; }
+        new IPromise<InvocableSymbol> Symbol { get; }
     }
 
     [Closed(
         typeof(IFunctionDeclarationSyntax),
-        typeof(IAssociatedFunctionDeclarationSyntax),
         typeof(IConcreteMethodDeclarationSyntax),
-        typeof(IConstructorDeclarationSyntax))]
+        typeof(IConstructorDeclarationSyntax),
+        typeof(IAssociatedFunctionDeclarationSyntax))]
     public partial interface IConcreteInvocableDeclarationSyntax : IInvocableDeclarationSyntax
     {
         IBodySyntax Body { get; }
@@ -169,30 +172,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         new Name Name { get; }
         new Promise<ObjectTypeSymbol> Symbol { get; }
         FixedList<IMemberDeclarationSyntax> Members { get; }
+        ConstructorSymbol? DefaultConstructorSymbol { get; }
     }
 
     public partial interface IFunctionDeclarationSyntax : INonMemberEntityDeclarationSyntax, IConcreteInvocableDeclarationSyntax
     {
         bool IsExternalFunction { get; }
         new Name Name { get; }
-        new Promise<FunctionSymbol> Symbol { get; }
+        new FixedList<INamedParameterSyntax> Parameters { get; }
         ITypeSyntax? ReturnType { get; }
-        Promise<DataType> ReturnDataType { get; }
-    }
-
-    public partial interface IAssociatedFunctionDeclarationSyntax : IMemberDeclarationSyntax, IConcreteInvocableDeclarationSyntax
-    {
-        new Name Name { get; }
         new Promise<FunctionSymbol> Symbol { get; }
-        ITypeSyntax? ReturnType { get; }
-        Promise<DataType> ReturnDataType { get; }
     }
 
     [Closed(
-        typeof(IAssociatedFunctionDeclarationSyntax),
         typeof(IMethodDeclarationSyntax),
         typeof(IConstructorDeclarationSyntax),
-        typeof(IFieldDeclarationSyntax))]
+        typeof(IFieldDeclarationSyntax),
+        typeof(IAssociatedFunctionDeclarationSyntax))]
     public partial interface IMemberDeclarationSyntax : IEntityDeclarationSyntax
     {
         IClassDeclarationSyntax DeclaringClass { get; }
@@ -204,10 +200,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IMethodDeclarationSyntax : IMemberDeclarationSyntax, IInvocableDeclarationSyntax
     {
         new Name Name { get; }
-        new Promise<MethodSymbol> Symbol { get; }
         ISelfParameterSyntax SelfParameter { get; }
+        new FixedList<INamedParameterSyntax> Parameters { get; }
         ITypeSyntax? ReturnType { get; }
-        Promise<DataType> ReturnDataType { get; }
+        new Promise<MethodSymbol> Symbol { get; }
     }
 
     public partial interface IAbstractMethodDeclarationSyntax : IMethodDeclarationSyntax
@@ -220,8 +216,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface IConstructorDeclarationSyntax : IMemberDeclarationSyntax, IConcreteInvocableDeclarationSyntax
     {
-        new Promise<ConstructorSymbol> Symbol { get; }
         ISelfParameterSyntax ImplicitSelfParameter { get; }
+        new FixedList<IConstructorParameterSyntax> Parameters { get; }
+        new Promise<ConstructorSymbol> Symbol { get; }
     }
 
     public partial interface IFieldDeclarationSyntax : IMemberDeclarationSyntax, IBindingSyntax
@@ -231,14 +228,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         ITypeSyntax Type { get; }
     }
 
+    public partial interface IAssociatedFunctionDeclarationSyntax : IMemberDeclarationSyntax, IConcreteInvocableDeclarationSyntax
+    {
+        new Name Name { get; }
+        new FixedList<INamedParameterSyntax> Parameters { get; }
+        ITypeSyntax? ReturnType { get; }
+        new Promise<FunctionSymbol> Symbol { get; }
+    }
+
     [Closed(
         typeof(IConstructorParameterSyntax),
         typeof(IBindingParameterSyntax),
         typeof(INamedParameterSyntax),
         typeof(ISelfParameterSyntax),
         typeof(IFieldParameterSyntax))]
-    public partial interface IParameterSyntax : ISyntax, IBindingMetadata
+    public partial interface IParameterSyntax : ISyntax
     {
+        MaybeQualifiedName FullName { get; }
         Name? Name { get; }
         IPromise<DataType> DataType { get; }
         bool Unused { get; }
@@ -339,8 +345,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     {
     }
 
-    public partial interface IVariableDeclarationStatementSyntax : IBodyStatementSyntax, ILocalBindingSyntax, IBindingMetadata
+    public partial interface IVariableDeclarationStatementSyntax : IBodyStatementSyntax, ILocalBindingSyntax
     {
+        MaybeQualifiedName FullName { get; }
         TextSpan NameSpan { get; }
         Name Name { get; }
         Promise<int?> DeclarationNumber { get; }

@@ -1,9 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
 
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
-    public partial interface IFieldDeclarationSyntax : IBindingMetadata
+    public partial interface IFieldDeclarationSyntax
     {
         [DisallowNull] ref IExpressionSyntax? Initializer { get; }
     }

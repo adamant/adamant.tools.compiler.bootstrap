@@ -9,7 +9,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Shadowing
         public BindingScope ContainingScope { get; }
         public VariableBinding VariableBinding { get; }
 
-        public VariableBindingScope(BindingScope containingScope, IParameterSyntax parameter)
+        public VariableBindingScope(
+            BindingScope containingScope,
+            INamedParameterSyntax parameter)
         {
             ContainingScope = containingScope;
             VariableBinding = new VariableBinding(parameter);

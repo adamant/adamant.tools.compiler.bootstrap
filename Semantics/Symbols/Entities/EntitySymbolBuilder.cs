@@ -73,7 +73,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
             var resolver = new TypeResolver(method.File, diagnostics);
             var selfParameterType = ResolveSelfParameterType(method.SelfParameter, method.DeclaringClass);
             var parameterTypes = ResolveParameterTypes(resolver, method.Parameters, method.DeclaringClass);
-            var returnType = ResolveReturnType(method.ReturnDataType, method.ReturnType, resolver);
+            var returnType = ResolveReturnType(method.ReturnType, resolver);
             var symbol = new MethodSymbol(declaringClassSymbol, method.Name, selfParameterType, parameterTypes, returnType);
             method.Symbol.Fulfill(symbol);
             symbolTree.Add(symbol);
@@ -100,7 +100,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
             associatedFunction.Symbol.BeginFulfilling();
             var resolver = new TypeResolver(associatedFunction.File, diagnostics);
             var parameterTypes = ResolveParameterTypes(resolver, associatedFunction.Parameters, null);
-            var returnType = ResolveReturnType(associatedFunction.ReturnDataType, associatedFunction.ReturnType, resolver);
+            var returnType = ResolveReturnType(associatedFunction.ReturnType, resolver);
             var declaringClassSymbol = associatedFunction.DeclaringClass.Symbol.Result;
             var symbol = new FunctionSymbol(declaringClassSymbol, associatedFunction.Name, parameterTypes, returnType);
             associatedFunction.Symbol.Fulfill(symbol);
@@ -127,7 +127,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
             function.Symbol.BeginFulfilling();
             var resolver = new TypeResolver(function.File, diagnostics);
             var parameterTypes = ResolveParameterTypes(resolver, function.Parameters, null);
-            var returnType = ResolveReturnType(function.ReturnDataType, function.ReturnType, resolver);
+            var returnType = ResolveReturnType(function.ReturnType, resolver);
             var symbol = new FunctionSymbol(function.ContainingNamespaceSymbol, function.Name, parameterTypes, returnType);
             function.Symbol.Fulfill(symbol);
             symbolTree.Add(symbol);
@@ -179,7 +179,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
                         fieldParameter.ReferencedSymbol.BeginFulfilling();
                         if (field is null)
                         {
-                            fieldParameter.SetIsMutableBinding(false);
                             types.Add(DataType.Unknown);
                             fieldParameter.ReferencedSymbol.Fulfill(null);
                             // TODO report an error
@@ -187,7 +186,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
                         }
                         else
                         {
-                            fieldParameter.SetIsMutableBinding(field.IsMutableBinding);
                             var fieldSymbol = BuildFieldSymbol(field);
                             fieldParameter.ReferencedSymbol.Fulfill(fieldSymbol);
                             types.Add(fieldSymbol.DataType);
@@ -232,7 +230,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
         {
             var selfType = declaringClass.Symbol.Result.DeclaresDataType;
             if (selfParameter.MutableSelf)
-                selfType = selfType.ForConstructorSelf();
+                selfType = selfType.ToConstructorSelf();
             return selfType;
         }
 
@@ -248,14 +246,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
         }
 
         private static DataType ResolveReturnType(
-            Promise<DataType> returnTypePromise,
-            ITypeSyntax? returnTypeSyntax,
-            TypeResolver resolver)
+            ITypeSyntax? returnTypeSyntax, TypeResolver resolver)
         {
-            returnTypePromise.BeginFulfilling();
             var returnType = returnTypeSyntax != null
                 ? resolver.Evaluate(returnTypeSyntax) : DataType.Void;
-            returnTypePromise.Fulfill(returnType);
             return returnType;
         }
     }

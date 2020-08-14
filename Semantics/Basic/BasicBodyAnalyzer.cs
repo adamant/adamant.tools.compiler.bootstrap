@@ -5,7 +5,6 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax;
@@ -449,9 +448,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         exp.ReferencedSymbol.Fulfill(null);
                         return exp.DataType  = DataType.Unknown;
                     }
-                    var constructedType = (ObjectType)constructingType;
+
                     // TODO handle null typesymbol
                     var typeSymbol = exp.Type.ReferencedSymbol.Result ?? throw new InvalidOperationException();
+                    var classType = (ObjectType)constructingType;
+                    ObjectType constructedType;
                     var constructorSymbols = symbolTreeBuilder.Children(typeSymbol).OfType<ConstructorSymbol>().ToFixedList();
                     constructorSymbols = ResolveOverload(constructorSymbols, argumentTypes);
                     switch (constructorSymbols.Count)
@@ -459,6 +460,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         case 0:
                             diagnostics.Add(NameBindingError.CouldNotBindConstructor(file, exp.Span));
                             exp.ReferencedSymbol.Fulfill(null);
+                            constructedType = classType.ToConstructorReturn();
                             break;
                         case 1:
                             var constructorSymbol = constructorSymbols.Single();
@@ -468,16 +470,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                                 InsertImplicitConversionIfNeeded(ref arg.Expression, parameterDataType);
                                 CheckArgumentTypeCompatibility(parameterDataType, arg.Expression);
                             }
+                            constructedType = constructorSymbol.ReturnDataType;
                             break;
                         default:
                             diagnostics.Add(NameBindingError.AmbiguousConstructorCall(file, exp.Span));
                             exp.ReferencedSymbol.Fulfill(null);
+                            constructedType = classType.ToConstructorReturn();
                             break;
                     }
 
-                    constructedType = constructedType.To(ReferenceCapability.Isolated);
-                    if (constructedType.DeclaredMutable)
-                        constructedType = constructedType.ToMutable();
+
                     return exp.DataType = constructedType;
                 }
                 case IForeachExpressionSyntax exp:

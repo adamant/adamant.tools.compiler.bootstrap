@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using ExhaustiveMatching;
 
@@ -9,6 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
         typeof(TypeSymbol),
         typeof(InvocableSymbol),
         typeof(BindingSymbol))]
+    [DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
     public abstract class Symbol : IEquatable<Symbol>
     {
         public virtual PackageSymbol? Package { get; }

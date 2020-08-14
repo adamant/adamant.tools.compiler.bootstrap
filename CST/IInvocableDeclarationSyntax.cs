@@ -1,5 +1,3 @@
-using Adamant.Tools.Compiler.Bootstrap.Framework;
-
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
     /// <summary>
@@ -7,6 +5,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     /// </summary>
     public partial interface IInvocableDeclarationSyntax
     {
-        new FixedList<IConstructorParameterSyntax> Parameters { get; }
     }
 }

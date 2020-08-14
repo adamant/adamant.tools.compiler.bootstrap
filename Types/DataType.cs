@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using ExhaustiveMatching;
@@ -13,8 +14,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         typeof(ReferenceType),
         typeof(ValueType),
         typeof(EmptyType),
-        typeof(UnknownType)
-        )]
+        typeof(UnknownType))]
+    [DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
     public abstract class DataType : IEquatable<DataType>
     {
         #region Standard Types

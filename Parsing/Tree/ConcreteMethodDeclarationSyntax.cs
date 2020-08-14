@@ -26,8 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
             IBodySyntax body)
             : base(declaringClass, span, file, accessModifier, fullName, nameSpan, name, selfParameter,
-                parameters, returnType, reachabilityAnnotations,
-                GetChildMetadata(selfParameter, parameters, body))
+                parameters, returnType, reachabilityAnnotations)
         {
             Body = body;
         }

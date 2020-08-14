@@ -21,24 +21,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
             switch (syntax)
             {
                 case IClassDeclarationSyntax classDeclaration:
-                    classDeclaration.DeclaresDataType.Known();
+                    classDeclaration.Symbol.Result.DeclaresDataType.Known();
                     // Don't recur into body, we will see those as separate members
                     return;
                 case IConstructorDeclarationSyntax constructorDeclaration:
                     WalkChildren(constructorDeclaration);
                     constructorDeclaration.ImplicitSelfParameter.Symbol.Result.DataType.Known();
+                    constructorDeclaration.Symbol.Result.ReturnDataType.Known();
                     return;
                 case IMethodDeclarationSyntax methodDeclaration:
                     WalkChildren(methodDeclaration);
-                    methodDeclaration.ReturnDataType.Known();
+                    methodDeclaration.Symbol.Result.ReturnDataType.Known();
                     return;
                 case IFunctionDeclarationSyntax functionDeclaration:
                     WalkChildren(functionDeclaration);
-                    functionDeclaration.ReturnDataType.Known();
+                    functionDeclaration.Symbol.Result.ReturnDataType.Known();
                     return;
                 case IAssociatedFunctionDeclarationSyntax associatedFunctionDeclaration:
                     WalkChildren(associatedFunctionDeclaration);
-                    associatedFunctionDeclaration.ReturnDataType.Known();
+                    associatedFunctionDeclaration.Symbol.Result.ReturnDataType.Known();
                     return;
                 case IParameterSyntax parameter:
                     WalkChildren(parameter);
@@ -46,7 +47,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                     return;
                 case IFieldDeclarationSyntax fieldDeclaration:
                     WalkChildren(fieldDeclaration);
-                    fieldDeclaration.DataType.Known();
+                    fieldDeclaration.Symbol.Result.DataType.Known();
                     return;
                 case ITypeSyntax type:
                     WalkChildren(type);

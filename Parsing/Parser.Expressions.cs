@@ -406,7 +406,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var mutableBinding = Tokens.Accept<IVarKeywordToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var variableName = identifier.Value;
-            var fullVariableName = nameContext.Qualify(variableNumbers.VariableName(identifier.Value));
             ITypeSyntax? type = null;
             if (Tokens.Accept<IColonToken>())
                 type = ParseType();
@@ -414,7 +413,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var expression = ParseExpression();
             var block = ParseBlock();
             var span = TextSpan.Covering(foreachKeyword, block.Span);
-            return new ForeachExpressionSyntax(span, mutableBinding, fullVariableName, variableName, type, expression, block);
+            return new ForeachExpressionSyntax(span, mutableBinding, variableName, type, expression, block);
         }
 
         private IWhileExpressionSyntax ParseWhile()

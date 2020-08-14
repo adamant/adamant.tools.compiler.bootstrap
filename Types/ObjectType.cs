@@ -51,9 +51,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         /// Make a mutable version of this type regardless of whether it was declared
         /// mutable for use as the constructor parameter.
         /// </summary>
-        public ObjectType ForConstructorSelf()
+        public ObjectType ToConstructorSelf()
         {
             return new ObjectType(ContainingNamespace, Name, DeclaredMutable, ReferenceCapability.Borrowed);
+        }
+
+        public ObjectType ToConstructorReturn()
+        {
+            var constructedType = this.To(ReferenceCapability.Isolated);
+            if (constructedType.DeclaredMutable) constructedType = constructedType.ToMutable();
+            return constructedType;
         }
 
         public override string ToString()

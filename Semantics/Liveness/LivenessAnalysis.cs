@@ -63,7 +63,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
             VariableFlags liveVariables)
         {
             foreachExpression.VariableIsLiveAfterAssignment = liveVariables[foreachExpression.Symbol.Result]
-                                            ?? throw new Exception($"No liveness data for variable {foreachExpression.FullName}");
+                                            ?? throw new Exception($"No liveness data for variable {foreachExpression.Symbol}");
             return liveVariables.Set(foreachExpression.Symbol.Result, false);
         }
     }

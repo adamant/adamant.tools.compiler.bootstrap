@@ -1,6 +1,6 @@
 using System.Diagnostics;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
@@ -12,21 +12,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         typeof(MethodDeclaration),
         typeof(FieldDeclaration),
         typeof(ConstructorDeclaration))]
-    public abstract class Declaration : IMetadata
+    public abstract class Declaration
     {
         public bool IsMember { get; }
         public MaybeQualifiedName FullName { get; }
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public SimpleName Name => FullName.UnqualifiedName;
+        public Symbol Symbol { get; }
 
-        public MetadataSet ChildMetadata { get; }
-
-        protected Declaration(bool isMember, MaybeQualifiedName fullName, MetadataSet childMetadata)
+        protected Declaration(bool isMember, MaybeQualifiedName fullName, Symbol symbol)
         {
             IsMember = isMember;
             FullName = fullName;
-            ChildMetadata = childMetadata;
+            Symbol = symbol;
         }
 
         public override string ToString()

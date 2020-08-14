@@ -63,8 +63,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Primitives", "Primitives\Pr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntermediateLanguage", "IntermediateLanguage\IntermediateLanguage.csproj", "{C8CA4E6C-305E-406A-8BED-2B8605F1867C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Metadata", "Metadata\Metadata.csproj", "{CBBD6937-5DC4-497E-B616-1905096E8E36}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Semantics.Reachability.Graph", "Semantics.Reachability.Graph\Semantics.Reachability.Graph.csproj", "{EBD4DF1A-B115-4DFF-B135-0385E3B96CCA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Unit.Semantics.Reachability.Graph", "Tests.Unit.Semantics.Reachability.Graph\Tests.Unit.Semantics.Reachability.Graph.csproj", "{E689D18A-B96A-4F36-8641-BBAD4F9B8020}"
@@ -182,10 +180,6 @@ Global
 		{C8CA4E6C-305E-406A-8BED-2B8605F1867C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8CA4E6C-305E-406A-8BED-2B8605F1867C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C8CA4E6C-305E-406A-8BED-2B8605F1867C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CBBD6937-5DC4-497E-B616-1905096E8E36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CBBD6937-5DC4-497E-B616-1905096E8E36}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CBBD6937-5DC4-497E-B616-1905096E8E36}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CBBD6937-5DC4-497E-B616-1905096E8E36}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EBD4DF1A-B115-4DFF-B135-0385E3B96CCA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EBD4DF1A-B115-4DFF-B135-0385E3B96CCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EBD4DF1A-B115-4DFF-B135-0385E3B96CCA}.Release|Any CPU.ActiveCfg = Release|Any CPU

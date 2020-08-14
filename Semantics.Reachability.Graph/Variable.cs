@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         internal static Variable? ForField(ReachabilityGraph graph, IFieldDeclarationSyntax field)
         {
             // Non-reference types don't participate in reachability (yet)
-            var referenceType = field.DataType.Known().UnderlyingReferenceType();
+            var referenceType = field.Symbol.Result.DataType.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
 
             var variable = new Variable(graph, field.Symbol.Result);
