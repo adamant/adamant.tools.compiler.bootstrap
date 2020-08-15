@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(IExpression))]
     public partial interface IAbstractSyntax
     {
-        TextSpan TextSpan { get; }
+        TextSpan Span { get; }
     }
 
     [Closed(
@@ -110,7 +110,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
     public partial interface IFieldDeclaration : IMemberDeclaration, IBinding
     {
-        FieldSymbol FieldSymbol { get; }
+        new FieldSymbol Symbol { get; }
     }
 
     public partial interface IAssociatedFunctionDeclaration : IMemberDeclaration, IConcreteInvocableDeclaration

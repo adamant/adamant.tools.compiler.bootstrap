@@ -5,11 +5,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
 {
     internal abstract class AbstractSyntax : IAbstractSyntax
     {
-        public TextSpan TextSpan { get; }
+        public TextSpan Span { get; }
 
         protected AbstractSyntax(TextSpan span)
         {
-            TextSpan = span;
+            Span = span;
         }
     }
 }

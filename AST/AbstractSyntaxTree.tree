@@ -6,41 +6,41 @@
 ◊using Adamant.Tools.Compiler.Bootstrap.Framework;
 ◊using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
-'IAbstractSyntax' = TextSpan;
+'IAbstractSyntax' = Span:'TextSpan';
 
 // ---------- Bindings
-Binding = Symbol:BindingSymbol;
+Binding = Symbol:'BindingSymbol';
 LocalBinding: Binding;
 
 // ---------- Declarations
 // Note: in the AST all declarations are entities because there are no namespace declarations
-Declaration = Symbol;
-InvocableDeclaration: Declaration = Parameters:FixedList<IConstructorParameter>;
+Declaration = Symbol:'Symbol';
+InvocableDeclaration: Declaration = Parameters:ConstructorParameter*;
 ConcreteInvocableDeclaration: InvocableDeclaration = Body;
 
 // ---------- Non-Member Declarations
 NonMemberDeclaration: Declaration;
-ClassDeclaration: NonMemberDeclaration = Symbol:ObjectTypeSymbol Members:MemberDeclaration*;
-FunctionDeclaration: NonMemberDeclaration = Symbol:FunctionSymbol Parameters:FixedList<INamedParameter>;
+ClassDeclaration: NonMemberDeclaration = Symbol:'ObjectTypeSymbol' Members:MemberDeclaration*;
+FunctionDeclaration: NonMemberDeclaration = Symbol:'FunctionSymbol' Parameters:NamedParameter*;
 
 // ---------- Member Declarations
 MemberDeclaration: Declaration;
-MethodDeclaration: MemberDeclaration = Symbol:MethodSymbol SelfParameter Parameters:FixedList<INamedParameter>;
+MethodDeclaration: MemberDeclaration = Symbol:'MethodSymbol' SelfParameter Parameters:NamedParameter*;
 AbstractMethodDeclaration: MethodDeclaration;
 ConcreteMethodDeclaration: MethodDeclaration, ConcreteInvocableDeclaration;
-ConstructorDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = ImplicitSelfParameter:SelfParameter Parameters:FixedList<IConstructorParameter> Symbol:ConstructorSymbol;
-FieldDeclaration: MemberDeclaration, Binding = FieldSymbol;
-AssociatedFunctionDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = Symbol:FunctionSymbol Parameters:FixedList<INamedParameter>;
+ConstructorDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = ImplicitSelfParameter:SelfParameter Parameters:ConstructorParameter* Symbol:'ConstructorSymbol';
+FieldDeclaration: MemberDeclaration, Binding = Symbol:'FieldSymbol';
+AssociatedFunctionDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = Symbol:'FunctionSymbol' Parameters:NamedParameter*;
 
 // ---------- Parameters --------------
-Parameter = Unused:bool;
+Parameter = Unused:'bool';
 /// A parameter that can be declared in a constructor
 ConstructorParameter: Parameter;
 /// A parameter that creates a binding, i.e. a named or self parameter
 BindingParameter: Parameter, LocalBinding;
-NamedParameter: Parameter, ConstructorParameter, BindingParameter = Symbol:VariableSymbol DefaultValue:Expression?;
-SelfParameter: Parameter, BindingParameter = Symbol:SelfParameterSymbol;
-FieldParameter: Parameter, ConstructorParameter = ReferencedSymbol:FieldSymbol DefaultValue:Expression?;
+NamedParameter: Parameter, ConstructorParameter, BindingParameter = Symbol:'VariableSymbol' DefaultValue:Expression?;
+SelfParameter: Parameter, BindingParameter = Symbol:'SelfParameterSymbol';
+FieldParameter: Parameter, ConstructorParameter = ReferencedSymbol:'FieldSymbol' DefaultValue:Expression?;
 
 
 // ---------- Function Parts

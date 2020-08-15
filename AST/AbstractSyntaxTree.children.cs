@@ -24,6 +24,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
                         yield return child;
                     yield break;
                 case IFunctionDeclaration n:
+                    foreach(var child in n.Parameters)
+                        yield return child;
                     yield break;
                 case IAbstractMethodDeclaration n:
                     yield break;
@@ -31,10 +33,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
                     yield break;
                 case IConstructorDeclaration n:
                     yield return n.ImplicitSelfParameter;
+                    foreach(var child in n.Parameters)
+                        yield return child;
                     yield break;
                 case IFieldDeclaration n:
                     yield break;
                 case IAssociatedFunctionDeclaration n:
+                    foreach(var child in n.Parameters)
+                        yield return child;
                     yield break;
                 case INamedParameter n:
                     if(!(n.DefaultValue is null))
