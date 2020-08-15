@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             InCurrentPackage = false;
             ContainingNamespace = containingSymbol?.NamespaceName ?? NamespaceName.Global;
             Name = symbol.Name ?? throw new ArgumentException("Symbol must have a name", nameof(symbol));
-            Symbol = Promise.ForValue(symbol);
+            Symbol = AcyclicPromise.ForValue(symbol);
         }
     }
 }

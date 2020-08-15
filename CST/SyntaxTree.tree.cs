@@ -154,7 +154,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IClassDeclarationSyntax : INonMemberEntityDeclarationSyntax
     {
         IMutableKeywordToken? MutableModifier { get; }
-        new Promise<ObjectTypeSymbol> Symbol { get; }
+        new AcyclicPromise<ObjectTypeSymbol> Symbol { get; }
         FixedList<IMemberDeclarationSyntax> Members { get; }
         ConstructorSymbol? DefaultConstructorSymbol { get; }
     }
@@ -165,7 +165,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         new Name Name { get; }
         new FixedList<INamedParameterSyntax> Parameters { get; }
         ITypeSyntax? ReturnType { get; }
-        new Promise<FunctionSymbol> Symbol { get; }
+        new AcyclicPromise<FunctionSymbol> Symbol { get; }
     }
 
     [Closed(
@@ -187,7 +187,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         ISelfParameterSyntax SelfParameter { get; }
         new FixedList<INamedParameterSyntax> Parameters { get; }
         ITypeSyntax? ReturnType { get; }
-        new Promise<MethodSymbol> Symbol { get; }
+        new AcyclicPromise<MethodSymbol> Symbol { get; }
     }
 
     public partial interface IAbstractMethodDeclarationSyntax : IMethodDeclarationSyntax
@@ -203,13 +203,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IConstructorDeclarationSyntax : IMemberDeclarationSyntax, IConcreteInvocableDeclarationSyntax
     {
         ISelfParameterSyntax ImplicitSelfParameter { get; }
-        new Promise<ConstructorSymbol> Symbol { get; }
+        new AcyclicPromise<ConstructorSymbol> Symbol { get; }
     }
 
     public partial interface IFieldDeclarationSyntax : IMemberDeclarationSyntax, IBindingSyntax
     {
         new Name Name { get; }
-        new Promise<FieldSymbol> Symbol { get; }
+        new AcyclicPromise<FieldSymbol> Symbol { get; }
         ITypeSyntax Type { get; }
     }
 
@@ -218,7 +218,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         new Name Name { get; }
         new FixedList<INamedParameterSyntax> Parameters { get; }
         ITypeSyntax? ReturnType { get; }
-        new Promise<FunctionSymbol> Symbol { get; }
+        new AcyclicPromise<FunctionSymbol> Symbol { get; }
     }
 
     [Closed(

@@ -2,6 +2,9 @@ using System;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Core.Promises
 {
+    /// <summary>
+    /// A promise derived from another promise by transforming the value
+    /// </summary>
     internal class DerivedPromise<T, S> : IPromise<S>
     {
         private readonly IPromise<T> promise;
@@ -12,14 +15,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core.Promises
             this.promise = promise;
             this.selector = selector;
         }
-        public PromiseState State => promise.State;
+
+        public bool IsFulfilled => promise.IsFulfilled;
 
         public S Result => selector(promise.Result);
 
         public IPromise<TSub>? As<TSub>()
         {
             if (this is IPromise<TSub> convertedPromise) return convertedPromise;
-            if (State == PromiseState.Fulfilled && Result is TSub convertedValue)
+            if (IsFulfilled && Result is TSub convertedValue)
                 return new Promise<TSub>(convertedValue);
             return null;
         }

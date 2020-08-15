@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Promises;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.CST.Walkers;
@@ -179,7 +178,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         private static LexicalScope BuildVariableScope(
             LexicalScope containingScope,
             Name name,
-            Promise<VariableSymbol> symbol)
+            IPromise<VariableSymbol> symbol)
         {
             var symbols = new Dictionary<TypeName, FixedSet<IPromise<Symbol>>>()
             {

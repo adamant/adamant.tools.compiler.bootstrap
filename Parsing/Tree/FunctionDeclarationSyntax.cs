@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public ITypeSyntax? ReturnType { [DebuggerStepThrough] get; }
         public new FixedList<INamedParameterSyntax> Parameters { [DebuggerStepThrough] get; }
         public IBodySyntax Body { [DebuggerStepThrough] get; }
-        public new Promise<FunctionSymbol> Symbol { get; }
+        public new AcyclicPromise<FunctionSymbol> Symbol { get; }
 
         public FunctionDeclarationSyntax(
             NamespaceName containingNamespaceName,
@@ -46,14 +46,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
             IBodySyntax body)
             : base(span, file, accessModifier, nameSpan, name, parameters,
-                reachabilityAnnotations, new Promise<FunctionSymbol>())
+                reachabilityAnnotations, new AcyclicPromise<FunctionSymbol>())
         {
             ContainingNamespaceName = containingNamespaceName;
             Name = name;
             Parameters = parameters;
             ReturnType = returnType;
             Body = body;
-            Symbol = (Promise<FunctionSymbol>)base.Symbol;
+            Symbol = (AcyclicPromise<FunctionSymbol>)base.Symbol;
         }
 
         public override string ToString()

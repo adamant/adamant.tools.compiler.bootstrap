@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Promises;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.CST.Walkers;
@@ -78,7 +77,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
 
         private void CheckSymbol(ISyntax syntax, IPromise<Symbol?> promise)
         {
-            if (promise.State != PromiseState.Fulfilled)
+            if (!promise.IsFulfilled)
                 throw new Exception($"Syntax doesn't have a symbol '{syntax}'");
 
             if (promise.Result is null)
@@ -90,7 +89,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
 
         private static void CheckReferencedSymbol(ISyntax syntax, IPromise<Symbol?> promise)
         {
-            if (promise.State != PromiseState.Fulfilled)
+            if (!promise.IsFulfilled)
                 throw new Exception($"Syntax doesn't have a referenced symbol '{syntax}'");
 
             if (promise.Result is null)

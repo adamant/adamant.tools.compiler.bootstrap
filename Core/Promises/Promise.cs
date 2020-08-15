@@ -1,60 +1,34 @@
 using System;
 using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Core.Promises
 {
+    /// <summary>
+    /// A simple promise of a future value. The value can be set only once.
+    /// </summary>
     [DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
     public class Promise<T> : IPromise<T>
     {
-        public PromiseState State { get; private set; }
+        public bool IsFulfilled { get; private set; }
         private T value = default!;
 
-        public Promise()
-        {
-            State = PromiseState.Pending;
-        }
+        [DebuggerHidden]
+        public Promise() { }
 
+        [DebuggerHidden]
         public Promise(T value)
         {
             this.value = value;
-            State = PromiseState.Fulfilled;
-        }
-
-        [DebuggerHidden]
-        public void BeginFulfilling()
-        {
-            Requires.That(nameof(State), State == PromiseState.Pending, "must be pending is " + State);
-            State = PromiseState.InProgress;
-        }
-
-        [DebuggerHidden]
-        public bool TryBeginFulfilling(Action? whenInProgress = null)
-        {
-            switch (State)
-            {
-                default:
-                    throw ExhaustiveMatch.Failed(State);
-                case PromiseState.InProgress:
-                    whenInProgress?.Invoke();
-                    return false;
-                case PromiseState.Fulfilled:
-                    // We have already resolved it
-                    return false;
-                case PromiseState.Pending:
-                    State = PromiseState.InProgress;
-                    // we need to compute it
-                    return true;
-            }
+            IsFulfilled = true;
         }
 
         [DebuggerHidden]
         public T Fulfill(T value)
         {
-            Requires.That(nameof(State), State == PromiseState.InProgress, "must be in progress is " + State);
+            Requires.That(nameof(IsFulfilled), !IsFulfilled, "must not already be fulfilled");
             this.value = value;
-            State = PromiseState.Fulfilled;
+            IsFulfilled = true;
             return value;
         }
 
@@ -63,7 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core.Promises
         {
             get
             {
-                if (State != PromiseState.Fulfilled) throw new InvalidOperationException("Promise not fulfilled");
+                if (!IsFulfilled) throw new InvalidOperationException("Promise not fulfilled");
 
                 return value;
             }
@@ -72,7 +46,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core.Promises
         public IPromise<TSub>? As<TSub>()
         {
             if (this is IPromise<TSub> convertedPromise) return convertedPromise;
-            if (State == PromiseState.Fulfilled && Result is TSub convertedValue)
+            if (IsFulfilled && Result is TSub convertedValue)
                 return new Promise<TSub>(convertedValue);
             return null;
         }
@@ -80,19 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core.Promises
         // Useful for debugging
         public override string ToString()
         {
-            switch (State)
-            {
-                default:
-#pragma warning disable CA1065 // Do not raise exceptions in unexpected locations
-                    throw ExhaustiveMatch.Failed(State);
-#pragma warning restore CA1065 // Do not raise exceptions in unexpected locations
-                case PromiseState.Pending:
-                    return "⧼pending⧽";
-                case PromiseState.InProgress:
-                    return "⧼in progress⧽";
-                case PromiseState.Fulfilled:
-                    return value?.ToString() ?? "⧼null⧽";
-            }
+            return IsFulfilled ? value?.ToString() ?? "⧼null⧽" : "⧼pending⧽";
         }
     }
 

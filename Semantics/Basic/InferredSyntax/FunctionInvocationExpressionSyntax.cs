@@ -79,7 +79,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax
 
         public IEnumerable<IPromise<FunctionSymbol>> LookupInContainingScope()
         {
-            return possibleReferents.Select(Promise.ForValue);
+            return possibleReferents.Select(AcyclicPromise.ForValue);
         }
 
         public override string ToString()

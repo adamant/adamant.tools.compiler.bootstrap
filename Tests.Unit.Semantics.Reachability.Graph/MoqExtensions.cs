@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Reachability.Gra
         public static IReturnsResult<TMock> Returns<TMock>(this IReturns<TMock, IPromise<DataType>> mock, DataType type)
             where TMock : class
         {
-            var promise = new Promise<DataType>();
+            var promise = new AcyclicPromise<DataType>();
             promise.BeginFulfilling();
             promise.Fulfill(type);
             return mock.Returns(promise);

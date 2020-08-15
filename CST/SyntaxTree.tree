@@ -38,18 +38,18 @@ NamespaceDeclaration: NonMemberDeclaration = IsGlobalQualified:'bool' DeclaredNa
 
 // ---------- Non-Member Entity Declarations
 NonMemberEntityDeclaration: EntityDeclaration, NonMemberDeclaration = Name:'Name';
-ClassDeclaration: NonMemberEntityDeclaration = MutableModifier:'IMutableKeywordToken'? Name:'Name' Symbol:'Promise<ObjectTypeSymbol>' Members:MemberDeclaration* DefaultConstructorSymbol:'ConstructorSymbol'?;
-FunctionDeclaration: NonMemberEntityDeclaration, ConcreteInvocableDeclaration = IsExternalFunction:'bool' Name:'Name' Parameters:NamedParameter* ReturnType:Type? ReachabilityAnnotations:ReachabilityAnnotation* Body Symbol:'Promise<FunctionSymbol>';
+ClassDeclaration: NonMemberEntityDeclaration = MutableModifier:'IMutableKeywordToken'? Name:'Name' Symbol:'AcyclicPromise<ObjectTypeSymbol>' Members:MemberDeclaration* DefaultConstructorSymbol:'ConstructorSymbol'?;
+FunctionDeclaration: NonMemberEntityDeclaration, ConcreteInvocableDeclaration = IsExternalFunction:'bool' Name:'Name' Parameters:NamedParameter* ReturnType:Type? ReachabilityAnnotations:ReachabilityAnnotation* Body Symbol:'AcyclicPromise<FunctionSymbol>';
 
 // ---------- Member Declarations
 // Note: by declaring the DeclaringClass property type with quotes, it avoids the system assuming it must represent a child syntax node
 MemberDeclaration: EntityDeclaration = DeclaringClass:'IClassDeclarationSyntax';
-MethodDeclaration: MemberDeclaration, InvocableDeclaration = Name:'Name' SelfParameter Parameters:NamedParameter* ReturnType:Type? Symbol:'Promise<MethodSymbol>';
+MethodDeclaration: MemberDeclaration, InvocableDeclaration = Name:'Name' SelfParameter Parameters:NamedParameter* ReturnType:Type? Symbol:'AcyclicPromise<MethodSymbol>';
 AbstractMethodDeclaration: MethodDeclaration = SelfParameter Parameters:NamedParameter* ReturnType:Type? ReachabilityAnnotations:ReachabilityAnnotation*;
 ConcreteMethodDeclaration: MethodDeclaration, ConcreteInvocableDeclaration = SelfParameter Parameters:NamedParameter* ReturnType:Type? ReachabilityAnnotations:ReachabilityAnnotation* Body;
-ConstructorDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = ImplicitSelfParameter:SelfParameter Parameters:ConstructorParameter* ReachabilityAnnotations:ReachabilityAnnotation* Body Symbol:'Promise<ConstructorSymbol>';
-FieldDeclaration: MemberDeclaration, Binding = Name:'Name' Symbol:'Promise<FieldSymbol>' Type;
-AssociatedFunctionDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = Name:'Name' Parameters:NamedParameter* ReturnType:Type? ReachabilityAnnotations:ReachabilityAnnotation* Body Symbol:'Promise<FunctionSymbol>';
+ConstructorDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = ImplicitSelfParameter:SelfParameter Parameters:ConstructorParameter* ReachabilityAnnotations:ReachabilityAnnotation* Body Symbol:'AcyclicPromise<ConstructorSymbol>';
+FieldDeclaration: MemberDeclaration, Binding = Name:'Name' Symbol:'AcyclicPromise<FieldSymbol>' Type;
+AssociatedFunctionDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = Name:'Name' Parameters:NamedParameter* ReturnType:Type? ReachabilityAnnotations:ReachabilityAnnotation* Body Symbol:'AcyclicPromise<FunctionSymbol>';
 
 
 // ---------- Parameters --------------

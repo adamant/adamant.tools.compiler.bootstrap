@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Promises;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.CST.Walkers;
@@ -45,10 +44,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DeclarationNumbers
 
         private void ProcessDeclaration(Name name, Promise<int?> declarationNumber)
         {
-            declarationNumber.BeginFulfilling();
             if (lastDeclaration.TryGetValue(name, out var previousDeclarationNumber))
             {
-                if (previousDeclarationNumber.State == PromiseState.InProgress)
+                if (!previousDeclarationNumber.IsFulfilled)
                     // There is at least two declarations, start counting from 1
                     previousDeclarationNumber.Fulfill(1);
                 declarationNumber.Fulfill(previousDeclarationNumber.Result + 1);
@@ -61,7 +59,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DeclarationNumbers
         private void AssignSingleDeclarationsNull()
         {
             var unfulfilledDeclarationNumbers = lastDeclaration.Values
-                                                    .Where(declarationNumber => declarationNumber.State == PromiseState.InProgress);
+                                                    .Where(declarationNumber => !declarationNumber.IsFulfilled);
             foreach (var declarationNumber in unfulfilledDeclarationNumbers)
                 // Only a single declaration, don't apply unique numbers
                 declarationNumber.Fulfill(null);

@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public ISelfParameterSyntax ImplicitSelfParameter { get; }
         public new FixedList<IConstructorParameterSyntax> Parameters { get; }
         public virtual IBodySyntax Body { get; }
-        public new Promise<ConstructorSymbol> Symbol { get; }
+        public new AcyclicPromise<ConstructorSymbol> Symbol { get; }
 
         public ConstructorDeclarationSyntax(
             IClassDeclarationSyntax declaringType,
@@ -28,13 +28,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
             IBodySyntax body)
             : base(span, file, accessModifier, nameSpan, name, parameters, reachabilityAnnotations,
-                new Promise<ConstructorSymbol>())
+                new AcyclicPromise<ConstructorSymbol>())
         {
             DeclaringClass = declaringType;
             ImplicitSelfParameter = implicitSelfParameter;
             Parameters = parameters;
             Body = body;
-            Symbol = (Promise<ConstructorSymbol>)base.Symbol;
+            Symbol = (AcyclicPromise<ConstructorSymbol>)base.Symbol;
         }
 
         public override string ToString()

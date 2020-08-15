@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Core.Promises;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.LexicalScopes;
 using Adamant.Tools.Compiler.Bootstrap.Names;

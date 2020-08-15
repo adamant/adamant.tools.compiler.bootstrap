@@ -36,7 +36,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                 case ITypeNameSyntax typeName:
                 {
                     var symbolPromises = typeName.LookupInContainingScope().ToFixedList();
-                    typeName.ReferencedSymbol.BeginFulfilling();
                     switch (symbolPromises.Count)
                     {
                         case 0:

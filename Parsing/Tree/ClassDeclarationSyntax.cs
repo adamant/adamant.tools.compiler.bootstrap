@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public IAccessModifierToken? AccessModifier { get; }
         public IMutableKeywordToken? MutableModifier { get; }
         public new Name Name { get; }
-        public new Promise<ObjectTypeSymbol> Symbol { get; }
+        public new AcyclicPromise<ObjectTypeSymbol> Symbol { get; }
         public FixedList<IMemberDeclarationSyntax> Members { get; }
         public ConstructorSymbol? DefaultConstructorSymbol { get; private set; }
 
@@ -45,7 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             TextSpan nameSpan,
             Name name,
             Func<IClassDeclarationSyntax, (FixedList<IMemberDeclarationSyntax>, TextSpan)> parseMembers)
-            : base(headerSpan, file, name, nameSpan, new Promise<ObjectTypeSymbol>())
+            : base(headerSpan, file, name, nameSpan, new AcyclicPromise<ObjectTypeSymbol>())
         {
             ContainingNamespaceName = containingNamespaceName;
             AccessModifier = accessModifier;
@@ -54,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             var (members, bodySpan) = parseMembers(this);
             Members = members;
             Span = TextSpan.Covering(headerSpan, bodySpan);
-            Symbol = (Promise<ObjectTypeSymbol>)base.Symbol;
+            Symbol = (AcyclicPromise<ObjectTypeSymbol>)base.Symbol;
         }
 
         public void CreateDefaultConstructor(SymbolTreeBuilder symbolTree)

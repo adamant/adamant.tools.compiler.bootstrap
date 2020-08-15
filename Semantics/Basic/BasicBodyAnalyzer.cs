@@ -89,7 +89,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private void ResolveTypes(IVariableDeclarationStatementSyntax variableDeclaration)
         {
-            variableDeclaration.Symbol.BeginFulfilling();
             DataType type;
             if (variableDeclaration.Type != null)
             {
@@ -239,7 +238,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     switch (exp.Referent)
                     {
                         case INameExpressionSyntax nameExpression:
-                            exp.ReferencedSymbol.BeginFulfilling();
                             nameExpression.Semantics = ExpressionSemantics.Acquire;
                             var type = InferType(ref exp.Referent, false);
                             switch (type)
@@ -270,7 +268,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     {
                         case INameExpressionSyntax nameExpression:
                         {
-                            exp.ReferencedSymbol.BeginFulfilling();
                             nameExpression.Semantics = ExpressionSemantics.Borrow;
                             var type = InferType(ref exp.Referent, false);
                             switch (type)
@@ -438,7 +435,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
                 case INewObjectExpressionSyntax exp:
                 {
-                    exp.ReferencedSymbol.BeginFulfilling();
                     var argumentTypes = exp.Arguments.Select(argument => InferType(ref argument.Expression)).ToFixedList();
                     // TODO handle named constructors here
                     var constructingType = typeResolver.Evaluate(exp.Type);
@@ -484,7 +480,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
                 case IForeachExpressionSyntax exp:
                 {
-                    exp.Symbol.BeginFulfilling();
                     var declaredType = typeResolver.Evaluate(exp.Type);
                     var expressionType = CheckForeachInType(declaredType, ref exp.InExpression);
                     var variableType = declaredType ?? expressionType;
@@ -761,9 +756,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
             }
 
-            methodInvocation.ReferencedSymbol.BeginFulfilling();
-
-
             var argumentTypes = methodInvocation.Arguments.Select(argument => InferType(ref argument.Expression)).ToFixedList();
             var contextType = InferType(ref methodInvocation.ContextExpression, false);
             // If it is unknown, we already reported an error
@@ -836,8 +828,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         private DataType InferFunctionInvocationType(
             IFunctionInvocationExpressionSyntax functionInvocationExpression)
         {
-            functionInvocationExpression.ReferencedSymbol.BeginFulfilling();
-
             var argumentTypes = functionInvocationExpression.Arguments.Select(argument => InferType(ref argument.Expression)).ToFixedList();
             var functionSymbols = functionInvocationExpression.LookupInContainingScope().Select(s => s.Result).ToFixedList();
             functionSymbols = ResolveOverload(functionSymbols, argumentTypes);
@@ -923,7 +913,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         public DataType InferNameType(INameExpressionSyntax nameExpression)
         {
-            nameExpression.ReferencedSymbol.BeginFulfilling();
             if (nameExpression.Name is null)
             {
                 // Name unknown, no error
@@ -959,7 +948,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         private DataType InferSelfType(ISelfExpressionSyntax selfExpression)
         {
             DataType type;
-            selfExpression.ReferencedSymbol.BeginFulfilling();
             switch (containingSymbol)
             {
                 default:
@@ -1043,7 +1031,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             INameExpressionSyntax exp,
             FixedList<FieldSymbol> matchingSymbols)
         {
-            exp.ReferencedSymbol.BeginFulfilling();
             switch (matchingSymbols.Count)
             {
                 case 0:

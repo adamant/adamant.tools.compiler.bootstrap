@@ -36,7 +36,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Namespaces
                 case INamespaceDeclarationSyntax syn:
                 {
                     syn.ContainingNamespaceSymbol = containingSymbol;
-                    syn.Symbol.BeginFulfilling();
                     // TODO correctly handle Global qualifier
                     var sym = BuildNamespaceSymbol(containingSymbol, syn.DeclaredNames);
                     syn.Symbol.Fulfill(sym);

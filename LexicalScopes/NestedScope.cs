@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Core.Promises;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
-using SymbolDictionary = Adamant.Tools.Compiler.Bootstrap.Framework.FixedDictionary<Adamant.Tools.Compiler.Bootstrap.Names.TypeName, Adamant.Tools.Compiler.Bootstrap.Framework.FixedSet<Adamant.Tools.Compiler.Bootstrap.Core.IPromise<Adamant.Tools.Compiler.Bootstrap.Symbols.Symbol>>>;
+using SymbolDictionary = Adamant.Tools.Compiler.Bootstrap.Framework.FixedDictionary<Adamant.Tools.Compiler.Bootstrap.Names.TypeName, Adamant.Tools.Compiler.Bootstrap.Framework.FixedSet<Adamant.Tools.Compiler.Bootstrap.Core.Promises.IPromise<Adamant.Tools.Compiler.Bootstrap.Symbols.Symbol>>>;
 
 namespace Adamant.Tools.Compiler.Bootstrap.LexicalScopes
 {

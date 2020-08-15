@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public ISelfParameterSyntax SelfParameter { get; }
         public new FixedList<INamedParameterSyntax> Parameters { get; }
         public ITypeSyntax? ReturnType { get; }
-        public new Promise<MethodSymbol> Symbol { get; }
+        public new AcyclicPromise<MethodSymbol> Symbol { get; }
 
         protected MethodDeclarationSyntax(
             IClassDeclarationSyntax declaringClass,
@@ -29,14 +29,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             ITypeSyntax? returnType,
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations)
             : base(span, file, accessModifier, nameSpan, name,
-                parameters, reachabilityAnnotations, new Promise<MethodSymbol>())
+                parameters, reachabilityAnnotations, new AcyclicPromise<MethodSymbol>())
         {
             DeclaringClass = declaringClass;
             Name = name;
             SelfParameter = selfParameter;
             Parameters = parameters;
             ReturnType = returnType;
-            Symbol = (Promise<MethodSymbol>)base.Symbol;
+            Symbol = (AcyclicPromise<MethodSymbol>)base.Symbol;
         }
     }
 }

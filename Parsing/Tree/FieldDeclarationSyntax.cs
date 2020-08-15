@@ -5,7 +5,6 @@ using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
-using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
@@ -13,12 +12,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     {
         public bool IsMutableBinding { get; }
         public new Name Name { get; }
-        public new Promise<FieldSymbol> Symbol { get; }
+        public new AcyclicPromise<FieldSymbol> Symbol { get; }
         IPromise<BindingSymbol> IBindingSyntax.Symbol => Symbol;
         public ITypeSyntax Type { get; }
         private IExpressionSyntax? initializer;
         [DisallowNull] public ref IExpressionSyntax? Initializer => ref initializer;
-        public DataType BindingDataType => Symbol.Result.DataType;
 
         public FieldDeclarationSyntax(
             IClassDeclarationSyntax declaringClass,
@@ -30,13 +28,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name name,
             ITypeSyntax type,
             IExpressionSyntax? initializer)
-            : base(declaringClass, span, file, accessModifier, nameSpan, name, new Promise<FieldSymbol>())
+            : base(declaringClass, span, file, accessModifier, nameSpan, name, new AcyclicPromise<FieldSymbol>())
         {
             IsMutableBinding = mutableBinding;
             Name = name;
             Type = type;
             this.initializer = initializer;
-            Symbol = (Promise<FieldSymbol>)base.Symbol;
+            Symbol = (AcyclicPromise<FieldSymbol>)base.Symbol;
         }
 
         public override string ToString()

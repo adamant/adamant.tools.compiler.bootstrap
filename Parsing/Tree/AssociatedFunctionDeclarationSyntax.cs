@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public new FixedList<INamedParameterSyntax> Parameters { get; }
         public ITypeSyntax? ReturnType { get; }
         public IBodySyntax Body { get; }
-        public new Promise<FunctionSymbol> Symbol { get; }
+        public new AcyclicPromise<FunctionSymbol> Symbol { get; }
 
         public AssociatedFunctionDeclarationSyntax(
             IClassDeclarationSyntax declaringClass,
@@ -29,14 +29,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
             IBodySyntax body)
             : base(span, file, accessModifier, nameSpan, name, parameters,
-                reachabilityAnnotations, new Promise<FunctionSymbol>())
+                reachabilityAnnotations, new AcyclicPromise<FunctionSymbol>())
         {
             DeclaringClass = declaringClass;
             Name = name;
             Parameters = parameters;
             ReturnType = returnTypeSyntax;
             Body = body;
-            Symbol = (Promise<FunctionSymbol>)base.Symbol;
+            Symbol = (AcyclicPromise<FunctionSymbol>)base.Symbol;
         }
 
         public override string ToString()

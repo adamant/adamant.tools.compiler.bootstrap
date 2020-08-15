@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Core.Promises;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
@@ -111,7 +110,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
 
         private FieldSymbol BuildFieldSymbol(IFieldDeclarationSyntax field)
         {
-            if (field.Symbol.State == PromiseState.Fulfilled)
+            if (field.Symbol.IsFulfilled)
                 return field.Symbol.Result;
 
             field.Symbol.BeginFulfilling();
@@ -177,7 +176,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
                         var field = (declaringClass ?? throw new InvalidOperationException("Field parameter outside of class declaration"))
                                     .Members.OfType<IFieldDeclarationSyntax>()
                                     .SingleOrDefault(f => f.Name == fieldParameter.Name);
-                        fieldParameter.ReferencedSymbol.BeginFulfilling();
                         if (field is null)
                         {
                             types.Add(DataType.Unknown);
@@ -211,7 +209,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
                         throw ExhaustiveMatch.Failed(param);
                     case INamedParameterSyntax namedParam:
                     {
-                        namedParam.Symbol.BeginFulfilling();
                         var symbol = new VariableSymbol(containingSymbol, namedParam.Name,
                             namedParam.DeclarationNumber.Result, namedParam.IsMutableBinding, type);
                         namedParam.Symbol.Fulfill(symbol);
@@ -240,7 +237,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
             ISelfParameterSyntax param,
             DataType type)
         {
-            param.Symbol.BeginFulfilling();
             var symbol = new SelfParameterSymbol(containingSymbol, param.IsMutableBinding, type);
             param.Symbol.Fulfill(symbol);
             symbolTree.Add(symbol);

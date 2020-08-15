@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Core.Promises;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Types
 {
