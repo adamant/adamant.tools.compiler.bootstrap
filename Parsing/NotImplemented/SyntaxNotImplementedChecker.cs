@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.NotImplemented
         {
             this.compilationUnit = compilationUnit;
             this.diagnostics = diagnostics;
-            file = compilationUnit.CodeFile;
+            file = compilationUnit.File;
         }
 
         public void Check()

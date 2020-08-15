@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface ICompilationUnitSyntax : ISyntax
     {
-        CodeFile CodeFile { get; }
+        CodeFile File { get; }
         NamespaceName ImplicitNamespaceName { get; }
         FixedList<IUsingDirectiveSyntax> UsingDirectives { get; }
         FixedList<INonMemberDeclarationSyntax> Declarations { get; }

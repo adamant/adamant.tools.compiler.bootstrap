@@ -45,6 +45,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                         yield return child;
                     yield break;
                 case IFunctionDeclarationSyntax n:
+                    foreach(var child in n.Parameters)
+                        yield return child;
                     if(!(n.ReturnType is null))
                         yield return n.ReturnType;
                     yield break;
@@ -54,11 +56,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                     yield break;
                 case IConstructorDeclarationSyntax n:
                     yield return n.ImplicitSelfParameter;
+                    foreach(var child in n.Parameters)
+                        yield return child;
                     yield break;
                 case IFieldDeclarationSyntax n:
                     yield return n.Type;
                     yield break;
                 case IAssociatedFunctionDeclarationSyntax n:
+                    foreach(var child in n.Parameters)
+                        yield return child;
                     if(!(n.ReturnType is null))
                         yield return n.ReturnType;
                     yield break;

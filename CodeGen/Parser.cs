@@ -48,15 +48,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             return lines.Select(l => l.Substring(start.Length).TrimEnd(';').Trim());
         }
 
-        private static Rule DefaultBaseType(Rule rule, GrammarSymbol? baseType)
+        private static GrammarRule DefaultBaseType(GrammarRule rule, GrammarSymbol? baseType)
         {
             if (baseType is null
                 || rule.Parents.Any()
                 || rule.Nonterminal == baseType) return rule;
-            return new Rule(rule.Nonterminal, baseType.YieldValue(), rule.Properties);
+            return new GrammarRule(rule.Nonterminal, baseType.YieldValue(), rule.Properties);
         }
 
-        private static IEnumerable<Rule> GetRules(List<string> lines)
+        private static IEnumerable<GrammarRule> GetRules(List<string> lines)
         {
             var ruleLines = lines.Select(l => l.Trim())
                                  .Where(l => !l.StartsWith(Program.DirectiveMarker, StringComparison.InvariantCulture)
@@ -73,11 +73,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
                 var (nonterminal, parents) = ParseDeclaration(declaration);
                 var definition = equalSplit.Length == 2 ? equalSplit[1].Trim() : null;
                 var properties = ParseDefinition(definition);
-                yield return new Rule(nonterminal, parents, properties);
+                yield return new GrammarRule(nonterminal, parents, properties);
             }
         }
 
-        private static IEnumerable<Property> ParseDefinition(string? definition)
+        private static IEnumerable<GrammarProperty> ParseDefinition(string? definition)
         {
             if (definition is null) yield break;
 
@@ -95,14 +95,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
                     case 1:
                     {
                         var name = parts[0];
-                        yield return new Property(name, new GrammarSymbol(name), isOptional, isList);
+                        yield return new GrammarProperty(name, new GrammarSymbol(name), isOptional, isList);
                     }
                     break;
                     case 2:
                     {
                         var name = parts[0];
                         var type = parts[1];
-                        yield return new Property(name, ParseSymbol(type), isOptional, isList);
+                        yield return new GrammarProperty(name, ParseSymbol(type), isOptional, isList);
                     }
                     break;
                     default:

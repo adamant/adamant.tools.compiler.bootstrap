@@ -311,7 +311,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
             Assert.False(property.IsList);
         }
 
-
         [Fact]
         public void ParsesListTypedProperty()
         {

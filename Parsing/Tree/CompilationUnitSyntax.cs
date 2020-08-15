@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class CompilationUnitSyntax : Syntax, ICompilationUnitSyntax
     {
-        public CodeFile CodeFile { get; }
+        public CodeFile File { get; }
         public NamespaceName ImplicitNamespaceName { get; }
         public FixedList<IUsingDirectiveSyntax> UsingDirectives { get; }
         public FixedList<INonMemberDeclarationSyntax> Declarations { get; }
@@ -20,12 +20,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public CompilationUnitSyntax(
             NamespaceName implicitNamespaceName,
             TextSpan span,
-            CodeFile codeFile,
+            CodeFile file,
             FixedList<IUsingDirectiveSyntax> usingDirectives,
             FixedList<INonMemberDeclarationSyntax> declarations)
             : base(span)
         {
-            CodeFile = codeFile;
+            File = file;
             ImplicitNamespaceName = implicitNamespaceName;
             UsingDirectives = usingDirectives;
             Declarations = declarations;
@@ -40,7 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public override string ToString()
         {
-            return CodeFile.Reference.ToString();
+            return File.Reference.ToString();
         }
 
         private static IEnumerable<IEntityDeclarationSyntax> GetEntityDeclarations(IEnumerable<IDeclarationSyntax> declarations)

@@ -24,12 +24,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             return symbol.Text;
         }
 
-        private bool IsLeaf(Rule rule)
+        private bool IsLeaf(GrammarRule rule)
         {
             return !grammar.Rules.Any(r => r.Parents.Contains(rule.Nonterminal));
         }
 
-        private bool IsNonTerminal(Property property)
+        private bool IsNonTerminal(GrammarProperty property)
         {
             return grammar.Rules.Any(r => r.Nonterminal == property.Type);
         }

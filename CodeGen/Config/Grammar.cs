@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen.Config
         public string Suffix { get; }
         public string ListType { get; }
         public FixedList<string> UsingNamespaces { get; }
-        public FixedList<Rule> Rules { get; }
+        public FixedList<GrammarRule> Rules { get; }
 
         public Grammar(
             string? @namespace,
@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen.Config
             string suffix,
             string listType,
             IEnumerable<string> usingNamespaces,
-            IEnumerable<Rule> rules)
+            IEnumerable<GrammarRule> rules)
         {
             Namespace = @namespace;
             BaseType = baseType;
