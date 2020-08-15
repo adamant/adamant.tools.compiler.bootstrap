@@ -65,6 +65,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public partial interface IClassDeclaration : INonMemberDeclaration
     {
         new ObjectTypeSymbol Symbol { get; }
+        FixedList<IMemberDeclaration> Members { get; }
     }
 
     public partial interface IFunctionDeclaration : INonMemberDeclaration

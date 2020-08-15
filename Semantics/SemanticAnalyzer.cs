@@ -6,6 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Primitives;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.AST;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DeclarationNumbers;
@@ -40,33 +41,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         public bool SaveReachabilityGraphs { get; set; } = false;
 
         [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "OO")]
-        public PackageIL Check(PackageSyntax package)
+        public PackageIL Check(PackageSyntax packageSyntax)
         {
-            var symbolTrees = new SymbolForest(Primitive.SymbolTree, package.SymbolTreeBuilder,
-                package.References.Values.Select(p => p.SymbolTree));
+            var symbolTrees = new SymbolForest(Primitive.SymbolTree, packageSyntax.SymbolTreeBuilder, packageSyntax.References.Values.Select(p => p.SymbolTree));
 
             // First pull over all the lexer and parser warnings
-            var diagnostics = new Diagnostics(package.Diagnostics);
+            var diagnostics = new Diagnostics(packageSyntax.Diagnostics);
 
             // If there are errors from the lex and parse phase, don't continue on
             diagnostics.ThrowIfFatalErrors();
 
-            NamespaceSymbolBuilder.BuildNamespaceSymbols(package);
+            NamespaceSymbolBuilder.BuildNamespaceSymbols(packageSyntax);
 
             // Build up lexical scopes down to the declaration level
-            new LexicalScopesBuilder().BuildFor(package);
+            new LexicalScopesBuilder().BuildFor(packageSyntax);
 
             // Make a list of all the entity declarations (i.e. not namespaces)
-            var entities = GetEntityDeclarations(package);
+            var entities = GetEntityDeclarations(packageSyntax);
 
-            CheckSemantics(entities, diagnostics, package.SymbolTreeBuilder, symbolTrees);
+            var package = CheckSemantics(entities, diagnostics, packageSyntax.SymbolTreeBuilder, symbolTrees);
 
             // If there are errors from the semantics phase, don't continue on
             diagnostics.ThrowIfFatalErrors();
 
             // --------------------------------------------------
             // This is where the representation transitions to IR
-            var declarations = BuildIL(entities, package.SymbolTreeBuilder);
+            var declarations = BuildIL(entities, packageSyntax.SymbolTreeBuilder);
             // --------------------------------------------------
 
             // If there are errors from the previous phase, don't continue on
@@ -75,8 +75,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             var entryPoint = DetermineEntryPoint(declarations, diagnostics);
 
-            var references = package.References.Values.ToFixedList();
-            return new PackageIL(package.SymbolTreeBuilder.Build(), diagnostics.Build(), references, declarations, entryPoint);
+            var references = packageSyntax.References.Values.ToFixedList();
+            return new PackageIL(packageSyntax.SymbolTreeBuilder.Build(), diagnostics.Build(), references, declarations, entryPoint);
         }
 
         private static FixedList<IEntityDeclarationSyntax> GetEntityDeclarations(
@@ -87,7 +87,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                 .ToFixedList();
         }
 
-        private static void CheckSemantics(
+        private static Package CheckSemantics(
             FixedList<IEntityDeclarationSyntax> entities,
             Diagnostics diagnostics,
             SymbolTreeBuilder symbolTreeBuilder,
@@ -135,6 +135,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             ReachabilityAnalyzer.Analyze(invocables, diagnostics);
 
             // TODO remove live variables if SaveLivenessAnalysis is false
+
+            return package;
         }
 
         private static FixedList<DeclarationIL> BuildIL(

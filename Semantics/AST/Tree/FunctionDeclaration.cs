@@ -16,6 +16,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
             Symbol = symbol;
             Parameters = parameters;
         }
-
     }
 }

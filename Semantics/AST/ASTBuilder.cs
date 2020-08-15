@@ -5,7 +5,6 @@ using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree;
 using ExhaustiveMatching;
-using Package = Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree.Package;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
 {
@@ -20,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
         {
             var nonMemberDeclarations = entities
                                         .OfType<INonMemberEntityDeclarationSyntax>()
-                                        .Select(BuildNonMemberDeclaration).ToFixedSet();
+                                        .Select(BuildNonMemberDeclaration).ToFixedList();
 
             return new Package(nonMemberDeclarations);
         }
@@ -38,8 +37,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
         private static IClassDeclaration BuildClass(IClassDeclarationSyntax syn)
         {
             var symbol = syn.Symbol.Result;
-
-            return new ClassDeclaration(syn.Span, symbol);
+            // TODO build class members
+            var members = FixedList<IMemberDeclaration>.Empty;
+            return new ClassDeclaration(syn.Span, symbol, members);
         }
 
         private static IFunctionDeclaration BuildFunction(IFunctionDeclarationSyntax syn)

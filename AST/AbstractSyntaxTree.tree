@@ -20,7 +20,7 @@ ConcreteInvocableDeclaration: InvocableDeclaration = Body;
 
 // ---------- Non-Member Declarations
 NonMemberDeclaration: Declaration;
-ClassDeclaration: NonMemberDeclaration = Symbol:ObjectTypeSymbol;
+ClassDeclaration: NonMemberDeclaration = Symbol:ObjectTypeSymbol Members:MemberDeclaration*;
 FunctionDeclaration: NonMemberDeclaration = Symbol:FunctionSymbol Parameters:FixedList<INamedParameter>;
 
 // ---------- Member Declarations
