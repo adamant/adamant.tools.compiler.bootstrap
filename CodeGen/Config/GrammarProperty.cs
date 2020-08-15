@@ -3,16 +3,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen.Config
     public class GrammarProperty
     {
         public string Name { get; }
-        public GrammarSymbol Type { get; }
-        public bool IsOptional { get; }
-        public bool IsList { get; }
+        public GrammarType Type { get; }
 
-        public GrammarProperty(string name, GrammarSymbol type, bool isOptional, bool isList)
+        public GrammarProperty(string name, GrammarType type)
         {
             Name = name;
             Type = type;
-            IsList = isList;
-            IsOptional = isOptional;
         }
     }
 }

@@ -105,7 +105,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             #line hidden
             
             #line 31 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
-          if(property.IsList) { 
+          if(property.Type.IsList) { 
             
             #line default
             #line hidden
@@ -119,7 +119,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             this.Write(")\r\n                        yield return child;\r\n");
             
             #line 34 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
-          } else if(property.IsOptional) { 
+          } else if(property.Type.IsOptional) { 
             
             #line default
             #line hidden

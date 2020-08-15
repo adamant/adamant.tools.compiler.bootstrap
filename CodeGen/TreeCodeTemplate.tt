@@ -17,7 +17,7 @@ namespace <#=grammar.Namespace #>
     {
 <#      foreach(var property in rule.Properties)
         { #>
-        <#=IsNew(rule, property) ? "new " : "" #><#=TypeName(property) #> <#=property.Name #> { get; }
+        <#=IsNew(rule, property) ? "new " : "" #><#=TypeName(property.Type) #> <#=property.Name #> { get; }
 <#      } #>
     }
 

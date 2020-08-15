@@ -95,14 +95,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
                     case 1:
                     {
                         var name = parts[0];
-                        yield return new GrammarProperty(name, new GrammarSymbol(name), isOptional, isList);
+                        yield return new GrammarProperty(name, new GrammarType(new GrammarSymbol(name), isOptional, isList));
                     }
                     break;
                     case 2:
                     {
                         var name = parts[0];
                         var type = parts[1];
-                        yield return new GrammarProperty(name, ParseSymbol(type), isOptional, isList);
+                        yield return new GrammarProperty(name, new GrammarType(ParseSymbol(type), isOptional, isList));
                     }
                     break;
                     default:

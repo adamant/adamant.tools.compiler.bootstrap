@@ -27,12 +27,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
                    .Any();
         }
 
-        private string TypeName(GrammarProperty property)
+        private string TypeName(GrammarType type)
         {
-            var type = TypeName(property.Type);
-            if (property.IsOptional) type += "?";
-            if (property.IsList) type = $"{grammar.ListType}<{type}>";
-            return type;
+            var value = TypeName(type.Symbol);
+            if (type.IsOptional) value += "?";
+            if (type.IsList) value = $"{grammar.ListType}<{type}>";
+            return value;
         }
 
         private string BaseTypes(GrammarRule rule)

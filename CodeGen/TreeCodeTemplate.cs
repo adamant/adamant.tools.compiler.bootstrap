@@ -100,7 +100,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             #line hidden
             
             #line 20 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\TreeCodeTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(TypeName(property)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(TypeName(property.Type)));
             
             #line default
             #line hidden

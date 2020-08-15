@@ -28,10 +28,10 @@ namespace <#=grammar.Namespace #>
 <#  foreach(var rule in grammar.Rules.Where(IsLeaf)) { #>
                 case <#=TypeName(rule.Nonterminal) #> n:
 <#      foreach(var property in rule.Properties.Where(IsNonTerminal)) { #>
-<#          if(property.IsList) { #>
+<#          if(property.Type.IsList) { #>
                     foreach(var child in n.<#=property.Name #>)
                         yield return child;
-<#          } else if(property.IsOptional) { #>
+<#          } else if(property.Type.IsOptional) { #>
                     if(!(n.<#=property.Name #> is null))
                         yield return n.<#=property.Name #>;
 <#          } else { #>
