@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             foreach (var compilationUnit in package.CompilationUnits)
             {
                 var builder = new LexicalScopesBuilderWalker(globalScope, namespaces);
-                builder.Walk(compilationUnit, globalScope);
+                builder.BuildFor(compilationUnit, globalScope);
             }
         }
 

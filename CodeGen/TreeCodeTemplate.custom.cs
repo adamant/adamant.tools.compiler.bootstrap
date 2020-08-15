@@ -6,11 +6,11 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
 {
-    public partial class CodeTemplate
+    public partial class TreeCodeTemplate
     {
         private readonly Grammar grammar;
 
-        public CodeTemplate(Grammar grammar)
+        public TreeCodeTemplate(Grammar grammar)
         {
             this.grammar = grammar;
         }

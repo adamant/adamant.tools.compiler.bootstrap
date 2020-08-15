@@ -42,6 +42,9 @@
     <Compile Update="SyntaxTree.tree.cs">
       <DependentUpon>SyntaxTree.tree</DependentUpon>
     </Compile>
+        <Compile Update="SyntaxTree.children.cs">
+      <DependentUpon>SyntaxTree.tree</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">

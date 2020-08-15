@@ -23,6 +23,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             this.namespaces = namespaces;
         }
 
+        public void BuildFor(ICompilationUnitSyntax compilationUnit, LexicalScope containingScope)
+        {
+            Walk(compilationUnit, containingScope);
+        }
+
         protected override void WalkNonNull(ISyntax syntax, LexicalScope containingScope)
         {
             if (syntax is IHasContainingLexicalScope hasContainingLexicalScope)

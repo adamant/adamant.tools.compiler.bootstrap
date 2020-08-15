@@ -26,6 +26,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
         private IBackwardDataFlowAnalysis<TState>? checker;
         private TState? currentState;
 
+        public void Check(IConcreteInvocableDeclarationSyntax syntax)
+        {
+            Walk(syntax, false);
+        }
+
         protected override void WalkNonNull(ISyntax syntax, bool isLValue)
         {
             // TODO this doesn't handle loops correctly

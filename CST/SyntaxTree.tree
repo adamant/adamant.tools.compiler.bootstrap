@@ -1,4 +1,5 @@
 ◊namespace Adamant.Tools.Compiler.Bootstrap.CST;
+◊walkers_namespace Adamant.Tools.Compiler.Bootstrap.CST.Walkers;
 ◊base 'ISyntax';
 ◊prefix I;
 ◊suffix Syntax;

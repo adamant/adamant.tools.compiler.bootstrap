@@ -23,18 +23,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             {
                 Console.WriteLine("~~~~~~ Compiler Code Generator");
                 var inputPath = args[0];
-                var outputPath = Path.ChangeExtension(inputPath, ".tree.cs");
+                var treeOutputPath = Path.ChangeExtension(inputPath, ".tree.cs");
+                var childrenOutputPath = Path.ChangeExtension(inputPath, ".children.cs");
                 Console.WriteLine($"Input:  {inputPath}");
-                Console.WriteLine($"Output: {outputPath}");
+                Console.WriteLine($"Tree Output: {treeOutputPath}");
+                Console.WriteLine($"Children Output: {childrenOutputPath}");
 
                 var inputFile = File.ReadAllText(inputPath)
                                 ?? throw new InvalidOperationException("null from reading input file");
                 var grammar = Parser.ReadGrammarConfig(inputFile);
-                var code = CodeBuilder.Generate(grammar);
-                // Only write if changed so VS doesn't think we constantly change the file and need to recompile
-                var previousCode = File.Exists(outputPath) ? File.ReadAllText(outputPath, new UTF8Encoding(false, true)) : null;
-                if (code != previousCode)
-                    File.WriteAllText(outputPath, code);
+
+                var treeCode = CodeBuilder.GenerateTree(grammar);
+                WriteIfChanged(treeOutputPath, treeCode);
+
+                var walkerCode = CodeBuilder.GenerateChildren(grammar);
+                WriteIfChanged(childrenOutputPath, walkerCode);
                 return 0;
             }
             catch (Exception ex)
@@ -43,6 +46,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
                 Console.WriteLine(ex.StackTrace);
                 return -1;
             }
+        }
+
+        /// <summary>
+        /// Only write code if it has changed so VS doesn't think the file is
+        /// constantly changing and needs to be recompiled.
+        /// </summary>
+        private static void WriteIfChanged(string filePath, string code)
+        {
+            var previousCode = File.Exists(filePath)
+                ? File.ReadAllText(filePath, new UTF8Encoding(false, true))
+                : null;
+            if (code != previousCode) File.WriteAllText(filePath, code);
         }
     }
 }

@@ -35,6 +35,9 @@
     <Compile Update="AbstractSyntaxTree.tree.cs">
       <DependentUpon>AbstractSyntaxTree.tree</DependentUpon>
     </Compile>
+    <Compile Update="AbstractSyntaxTree.children.cs">
+      <DependentUpon>AbstractSyntaxTree.tree</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">

@@ -38,7 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
         {
             var dataFlowAnalyzer = new ForwardDataFlowAnalyzer<TState>(strategy, symbolTree, diagnostics);
             foreach (var invocableDeclaration in invocableDeclarations)
-                dataFlowAnalyzer.Walk(invocableDeclaration, false);
+                dataFlowAnalyzer.Check(invocableDeclaration);
         }
 
         public static void Check<TState>(
@@ -50,7 +50,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
         {
             var dataFlowAnalyzer = new BackwardDataFlowAnalyzer<TState>(strategy, symbolTree, diagnostics);
             foreach (var invocableDeclaration in invocableDeclarations)
-                dataFlowAnalyzer.Walk(invocableDeclaration, false);
+                dataFlowAnalyzer.Check(invocableDeclaration);
         }
     }
 }
