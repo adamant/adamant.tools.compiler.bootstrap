@@ -27,6 +27,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
         {
             switch (syntax)
             {
+                case IReachabilityAnnotationSyntax _:
+                    // skip for now
+                    return;
                 case IClassDeclarationSyntax syn:
                     CheckSymbol(syn, syn.Symbol);
                     // Don't recur into body, we will see those as separate members

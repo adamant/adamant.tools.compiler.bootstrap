@@ -36,6 +36,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
             // TODO this doesn't handle loops correctly
             switch (syntax)
             {
+                case IReachabilityAnnotationSyntax _:
+                    // Ignore for now
+                    return;
                 case IConcreteInvocableDeclarationSyntax exp:
                     checker = strategy.BeginAnalysis(exp, symbolTree, diagnostics);
                     currentState = checker.StartState();

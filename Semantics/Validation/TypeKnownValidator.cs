@@ -20,6 +20,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
         {
             switch (syntax)
             {
+                case IReachabilityAnnotationSyntax _:
+                    // Ignore for now
+                    return;
                 case IClassDeclarationSyntax classDeclaration:
                     classDeclaration.Symbol.Result.DeclaresDataType.Known();
                     // Don't recur into body, we will see those as separate members
