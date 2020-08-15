@@ -72,6 +72,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         new FunctionSymbol Symbol { get; }
         FixedList<INamedParameter> Parameters { get; }
+        IBody Body { get; }
     }
 
     [Closed(
@@ -99,13 +100,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
     public partial interface IConcreteMethodDeclaration : IMethodDeclaration, IConcreteInvocableDeclaration
     {
+        new FixedList<INamedParameter> Parameters { get; }
     }
 
     public partial interface IConstructorDeclaration : IMemberDeclaration, IConcreteInvocableDeclaration
     {
-        ISelfParameter ImplicitSelfParameter { get; }
-        new FixedList<IConstructorParameter> Parameters { get; }
         new ConstructorSymbol Symbol { get; }
+        ISelfParameter ImplicitSelfParameter { get; }
     }
 
     public partial interface IFieldDeclaration : IMemberDeclaration, IBinding

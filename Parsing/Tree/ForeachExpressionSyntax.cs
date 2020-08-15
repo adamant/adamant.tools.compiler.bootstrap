@@ -3,7 +3,6 @@ using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
-using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
@@ -17,7 +16,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public bool VariableIsLiveAfterAssignment { get; set; } = true;
 
         public ITypeSyntax? Type { get; }
-        DataType IBindingSyntax.BindingDataType => Symbol.Result.DataType;
         private IExpressionSyntax inExpression;
         public ref IExpressionSyntax InExpression => ref inExpression;
 

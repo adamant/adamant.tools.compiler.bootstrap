@@ -354,6 +354,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
                 Assert.Equal(ListType(Symbol("MyType2")), p2.Type);
             });
         }
+
+        [Fact]
+        public void ParseErrorDuplicateProperties()
+        {
+            const string grammar = "MyNonterminal = Something Something:'Blah';";
+
+            var ex = Assert.Throws<FormatException>(() => Parser.ReadGrammarConfig(grammar));
+
+            Assert.Equal("Rule for MyNonterminal contains duplicate property definitions", ex.Message);
+        }
         #endregion
 
         private static GrammarSymbol Symbol(string text)

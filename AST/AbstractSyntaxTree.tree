@@ -21,16 +21,16 @@ ConcreteInvocableDeclaration: InvocableDeclaration = Body;
 // ---------- Non-Member Declarations
 NonMemberDeclaration: Declaration;
 ClassDeclaration: NonMemberDeclaration = Symbol:'ObjectTypeSymbol' Members:MemberDeclaration*;
-FunctionDeclaration: NonMemberDeclaration = Symbol:'FunctionSymbol' Parameters:NamedParameter*;
+FunctionDeclaration: NonMemberDeclaration = Symbol:'FunctionSymbol' Parameters:NamedParameter* Body;
 
 // ---------- Member Declarations
 MemberDeclaration: Declaration;
 MethodDeclaration: MemberDeclaration = Symbol:'MethodSymbol' SelfParameter Parameters:NamedParameter*;
-AbstractMethodDeclaration: MethodDeclaration;
-ConcreteMethodDeclaration: MethodDeclaration, ConcreteInvocableDeclaration;
-ConstructorDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = ImplicitSelfParameter:SelfParameter Parameters:ConstructorParameter* Symbol:'ConstructorSymbol';
+AbstractMethodDeclaration: MethodDeclaration = SelfParameter Parameters:NamedParameter*;
+ConcreteMethodDeclaration: MethodDeclaration, ConcreteInvocableDeclaration = SelfParameter Parameters:NamedParameter* Body;
+ConstructorDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = Symbol:'ConstructorSymbol' ImplicitSelfParameter:SelfParameter Parameters:ConstructorParameter* Body;
 FieldDeclaration: MemberDeclaration, Binding = Symbol:'FieldSymbol';
-AssociatedFunctionDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = Symbol:'FunctionSymbol' Parameters:NamedParameter*;
+AssociatedFunctionDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = Symbol:'FunctionSymbol' Parameters:NamedParameter* Body;
 
 // ---------- Parameters --------------
 Parameter = Unused:'bool';

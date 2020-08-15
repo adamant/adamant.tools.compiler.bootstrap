@@ -15,7 +15,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         IPromise<BindingSymbol> IBindingSyntax.Symbol => Symbol;
         public ITypeSyntax Type { get; }
         public override IPromise<DataType> DataType { get; }
-        DataType IBindingSyntax.BindingDataType => DataType.Result;
         public IExpressionSyntax? DefaultValue { get; }
 
         public NamedParameterSyntax(

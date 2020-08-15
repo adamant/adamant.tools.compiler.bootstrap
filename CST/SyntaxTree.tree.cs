@@ -72,7 +72,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IBindingSyntax : ISyntax
     {
         bool IsMutableBinding { get; }
-        DataType BindingDataType { get; }
         IPromise<BindingSymbol> Symbol { get; }
     }
 
@@ -154,7 +153,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IClassDeclarationSyntax : INonMemberEntityDeclarationSyntax
     {
         IMutableKeywordToken? MutableModifier { get; }
-        new Name Name { get; }
         new Promise<ObjectTypeSymbol> Symbol { get; }
         FixedList<IMemberDeclarationSyntax> Members { get; }
         ConstructorSymbol? DefaultConstructorSymbol { get; }
@@ -197,12 +195,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface IConcreteMethodDeclarationSyntax : IMethodDeclarationSyntax, IConcreteInvocableDeclarationSyntax
     {
+        new FixedList<INamedParameterSyntax> Parameters { get; }
+        new FixedList<IReachabilityAnnotationSyntax> ReachabilityAnnotations { get; }
     }
 
     public partial interface IConstructorDeclarationSyntax : IMemberDeclarationSyntax, IConcreteInvocableDeclarationSyntax
     {
         ISelfParameterSyntax ImplicitSelfParameter { get; }
-        new FixedList<IConstructorParameterSyntax> Parameters { get; }
         new Promise<ConstructorSymbol> Symbol { get; }
     }
 

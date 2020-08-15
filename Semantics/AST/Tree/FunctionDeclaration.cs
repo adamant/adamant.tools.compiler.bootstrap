@@ -9,12 +9,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
     {
         public new FunctionSymbol Symbol { get; }
         public new FixedList<INamedParameter> Parameters { get; }
+        public IBody Body { get; }
 
-        public FunctionDeclaration(TextSpan span, FunctionSymbol symbol, FixedList<INamedParameter> parameters)
+        public FunctionDeclaration(
+            TextSpan span,
+            FunctionSymbol symbol,
+            FixedList<INamedParameter> parameters,
+            IBody body)
             : base(span, symbol, parameters.ToFixedList<IConstructorParameter>())
         {
             Symbol = symbol;
             Parameters = parameters;
+            Body = body;
         }
     }
 }

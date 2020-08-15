@@ -46,7 +46,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
         {
             var symbol = syn.Symbol.Result;
             var parameters = syn.Parameters.Select(BuildParameter).ToFixedList();
-            return new FunctionDeclaration(syn.Span, symbol, parameters);
+            // TODO build function body
+            IBody body = null!;
+            return new FunctionDeclaration(syn.Span, symbol, parameters, body);
         }
 
         private static INamedParameter BuildParameter(INamedParameterSyntax syn)

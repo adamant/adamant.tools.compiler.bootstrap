@@ -1,10 +1,6 @@
-using System;
 using System.CodeDom.Compiler;
 using System.Diagnostics;
 using System.Collections.Generic;
-using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
@@ -26,21 +22,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
                 case IFunctionDeclaration n:
                     foreach(var child in n.Parameters)
                         yield return child;
+                    yield return n.Body;
                     yield break;
                 case IAbstractMethodDeclaration n:
+                    yield return n.SelfParameter;
+                    foreach(var child in n.Parameters)
+                        yield return child;
                     yield break;
                 case IConcreteMethodDeclaration n:
+                    yield return n.SelfParameter;
+                    foreach(var child in n.Parameters)
+                        yield return child;
+                    yield return n.Body;
                     yield break;
                 case IConstructorDeclaration n:
                     yield return n.ImplicitSelfParameter;
                     foreach(var child in n.Parameters)
                         yield return child;
+                    yield return n.Body;
                     yield break;
                 case IFieldDeclaration n:
                     yield break;
                 case IAssociatedFunctionDeclaration n:
                     foreach(var child in n.Parameters)
                         yield return child;
+                    yield return n.Body;
                     yield break;
                 case INamedParameter n:
                     if(!(n.DefaultValue is null))

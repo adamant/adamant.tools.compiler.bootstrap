@@ -3,21 +3,18 @@
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
-<#  foreach(var usingNamespace in grammar.UsingNamespaces)
-    { #>
+<#  foreach(var usingNamespace in grammar.UsingNamespaces) { #>
 using <#=usingNamespace #>;
 <#  } #>
 using ExhaustiveMatching;
 
 namespace <#=grammar.Namespace #>
 {
-<#  foreach(var rule in grammar.Rules)
-    { #>
+<#  foreach(var rule in grammar.Rules) {#>
 <#=ClosedType(rule) #>    public partial interface <#= TypeName(rule.Nonterminal) #><#= BaseTypes(rule) #>
     {
-<#      foreach(var property in rule.Properties)
-        { #>
-        <#=IsNew(rule, property) ? "new " : "" #><#=TypeName(property.Type) #> <#=property.Name #> { get; }
+<#      foreach(var property in rule.Properties.Where(p => NeedsDeclared(rule, p))) { #>
+        <#=IsNewDefinition(rule, property) ? "new " : "" #><#=TypeName(property.Type) #> <#=property.Name #> { get; }
 <#      } #>
     }
 

@@ -20,18 +20,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             return symbol.IsQuoted ? symbol.Text : $"{grammar.Prefix}{symbol.Text}{grammar.Suffix}";
         }
 
-        private bool IsNew(GrammarRule rule, GrammarProperty property)
+        /// <summary>
+        /// A property needs declared under three conditions:
+        /// 1. there is no definition of the property in the parent
+        /// 2. the single parent definition has a different type
+        /// 3. the property is defined in multiple parents, in that case it is
+        ///    ambitious unless it is redefined in the current interface.
+        /// </summary>
+        private bool NeedsDeclared(GrammarRule rule, GrammarProperty property)
         {
-            return BaseRules(rule)
-                   .SelectMany(r => r.Properties.Where(p => p.Name == property.Name))
-                   .Any();
+            var baseProperties = BaseProperties(rule, property.Name).ToList();
+            return baseProperties.Count != 1 || baseProperties[0].Type != property.Type;
+        }
+
+        /// <summary>
+        /// Something is a new definition if it replaces some parent definition.
+        /// </summary>
+        private bool IsNewDefinition(GrammarRule rule, GrammarProperty property)
+        {
+            return BaseProperties(rule, property.Name).Any();
         }
 
         private string TypeName(GrammarType type)
         {
             var value = TypeName(type.Symbol);
             if (type.IsOptional) value += "?";
-            if (type.IsList) value = $"{grammar.ListType}<{type}>";
+            if (type.IsList) value = $"{grammar.ListType}<{value}>";
             return value;
         }
 
@@ -44,10 +58,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             return " : " + string.Join(", ", parents);
         }
 
-        private IEnumerable<GrammarRule> BaseRules(GrammarRule rule)
+        /// <summary>
+        /// Definitions for the property on the parents of the rule.
+        /// </summary>
+        private IEnumerable<GrammarProperty> BaseProperties(GrammarRule rule, string propertyName)
         {
-            var directParents = grammar.Rules.Where(r => rule.Parents.Contains(r.Nonterminal));
-            return directParents.SelectMany(r => BaseRules(r).Append(r)).Distinct();
+            return grammar.ParentRules(rule).SelectMany(r => PropertyDefinitions(r, propertyName));
+        }
+
+        /// <summary>
+        /// Get the property definitions for a rule. If that rule defines the property itself, that
+        /// is the one definition. When the rule doesn't define the property, base classes are
+        /// recursively searched for definitions. Multiple definitions are returned when multiple
+        /// parents of a rule contain definitions of the property without it being defined on that rule.
+        /// </summary>
+        private IEnumerable<GrammarProperty> PropertyDefinitions(GrammarRule rule, string propertyName)
+        {
+            var property = rule.Properties.SingleOrDefault(p => p.Name == propertyName);
+            if (!(property is null)) return property.Yield();
+
+            return BaseProperties(rule, propertyName);
         }
 
         private FixedList<GrammarRule> ChildRules(GrammarRule rule)

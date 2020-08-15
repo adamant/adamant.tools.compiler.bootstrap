@@ -28,32 +28,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("using System;\r\nusing System.CodeDom.Compiler;\r\nusing System.Diagnostics;\r\nusing S" +
-                    "ystem.Collections.Generic;\r\n");
+            this.Write("using System.CodeDom.Compiler;\r\nusing System.Diagnostics;\r\nusing System.Collectio" +
+                    "ns.Generic;\r\nusing ExhaustiveMatching;\r\n\r\nnamespace ");
             
-            #line 10 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
-  foreach(var usingNamespace in grammar.UsingNamespaces)
-    { 
-            
-            #line default
-            #line hidden
-            this.Write("using ");
-            
-            #line 12 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(usingNamespace));
-            
-            #line default
-            #line hidden
-            this.Write(";\r\n");
-            
-            #line 13 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
-  } 
-            
-            #line default
-            #line hidden
-            this.Write("using ExhaustiveMatching;\r\n\r\nnamespace ");
-            
-            #line 16 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
+            #line 11 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(grammar.Namespace));
             
             #line default
@@ -61,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             this.Write("\r\n{\r\n    [GeneratedCode(\"AdamantCompilerCodeGen\", null)]\r\n    public static class" +
                     " ");
             
-            #line 19 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
+            #line 14 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(TypeName(grammar.BaseType)));
             
             #line default
@@ -69,14 +47,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             this.Write("Extensions\r\n    {\r\n        [DebuggerStepThrough]\r\n        public static IEnumerab" +
                     "le<");
             
-            #line 22 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
+            #line 17 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(TypeName(grammar.BaseType)));
             
             #line default
             #line hidden
             this.Write("> Children(this ");
             
-            #line 22 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
+            #line 17 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(TypeName(grammar.BaseType)));
             
             #line default
@@ -84,89 +62,89 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             this.Write(" node)\r\n        {\r\n            switch(node)\r\n            {\r\n                defau" +
                     "lt:\r\n                    throw ExhaustiveMatch.Failed(node);\r\n");
             
-            #line 28 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
-  foreach(var rule in grammar.Rules.Where(IsLeaf)) { 
+            #line 23 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
+  foreach(var rule in grammar.Rules.Where(grammar.IsLeaf)) { 
             
             #line default
             #line hidden
             this.Write("                case ");
             
-            #line 29 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
+            #line 24 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(TypeName(rule.Nonterminal)));
             
             #line default
             #line hidden
             this.Write(" n:\r\n");
             
-            #line 30 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
-      foreach(var property in rule.Properties.Where(IsNonTerminal)) { 
+            #line 25 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
+      foreach(var property in rule.Properties.Where(grammar.IsNonTerminal)) { 
             
             #line default
             #line hidden
             
-            #line 31 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
+            #line 26 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
           if(property.Type.IsList) { 
             
             #line default
             #line hidden
             this.Write("                    foreach(var child in n.");
             
-            #line 32 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
+            #line 27 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.Name));
             
             #line default
             #line hidden
             this.Write(")\r\n                        yield return child;\r\n");
             
-            #line 34 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
+            #line 29 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
           } else if(property.Type.IsOptional) { 
             
             #line default
             #line hidden
             this.Write("                    if(!(n.");
             
-            #line 35 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
+            #line 30 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.Name));
             
             #line default
             #line hidden
             this.Write(" is null))\r\n                        yield return n.");
             
-            #line 36 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
+            #line 31 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.Name));
             
             #line default
             #line hidden
             this.Write(";\r\n");
             
-            #line 37 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
+            #line 32 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
           } else { 
             
             #line default
             #line hidden
             this.Write("                    yield return n.");
             
-            #line 38 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
+            #line 33 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.Name));
             
             #line default
             #line hidden
             this.Write(";\r\n");
             
-            #line 39 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
+            #line 34 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
           } 
             
             #line default
             #line hidden
             
-            #line 40 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
+            #line 35 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
       } 
             
             #line default
             #line hidden
             this.Write("                    yield break;\r\n");
             
-            #line 42 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
+            #line 37 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
   } 
             
             #line default

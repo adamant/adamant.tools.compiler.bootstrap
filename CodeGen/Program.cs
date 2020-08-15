@@ -33,6 +33,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
                                 ?? throw new InvalidOperationException("null from reading input file");
                 var grammar = Parser.ReadGrammarConfig(inputFile);
 
+                grammar.Validate();
+
                 var treeCode = CodeBuilder.GenerateTree(grammar);
                 WriteIfChanged(treeOutputPath, treeCode);
 

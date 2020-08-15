@@ -21,7 +21,7 @@ UsingDirective = Name:'NamespaceName';
 BodyOrBlock = Statements:Statement*;
 ElseClause;
 BlockOrResult: ElseClause;
-Binding = IsMutableBinding:'bool' BindingDataType:'DataType' Symbol:'IPromise<BindingSymbol>';
+Binding = IsMutableBinding:'bool' Symbol:'IPromise<BindingSymbol>';
 LocalBinding: Binding;
 
 // ---------- Declarations
@@ -38,16 +38,17 @@ NamespaceDeclaration: NonMemberDeclaration = IsGlobalQualified:'bool' DeclaredNa
 // ---------- Non-Member Entity Declarations
 NonMemberEntityDeclaration: EntityDeclaration, NonMemberDeclaration = Name:'Name';
 ClassDeclaration: NonMemberEntityDeclaration = MutableModifier:'IMutableKeywordToken'? Name:'Name' Symbol:'Promise<ObjectTypeSymbol>' Members:MemberDeclaration* DefaultConstructorSymbol:'ConstructorSymbol'?;
-FunctionDeclaration: NonMemberEntityDeclaration, ConcreteInvocableDeclaration = IsExternalFunction:'bool' Name:'Name' Parameters:NamedParameter* ReturnType:Type? Symbol:'Promise<FunctionSymbol>';
+FunctionDeclaration: NonMemberEntityDeclaration, ConcreteInvocableDeclaration = IsExternalFunction:'bool' Name:'Name' Parameters:NamedParameter* ReturnType:Type? ReachabilityAnnotations:ReachabilityAnnotation* Body Symbol:'Promise<FunctionSymbol>';
 
 // ---------- Member Declarations
-MemberDeclaration: EntityDeclaration = DeclaringClass:ClassDeclaration;
+// Note: by declaring the DeclaringClass property type with quotes, it avoids the system assuming it must represent a child syntax node
+MemberDeclaration: EntityDeclaration = DeclaringClass:'IClassDeclarationSyntax';
 MethodDeclaration: MemberDeclaration, InvocableDeclaration = Name:'Name' SelfParameter Parameters:NamedParameter* ReturnType:Type? Symbol:'Promise<MethodSymbol>';
-AbstractMethodDeclaration: MethodDeclaration;
-ConcreteMethodDeclaration: MethodDeclaration, ConcreteInvocableDeclaration;
-ConstructorDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = ImplicitSelfParameter:SelfParameter Parameters:ConstructorParameter* Symbol:'Promise<ConstructorSymbol>';
+AbstractMethodDeclaration: MethodDeclaration = SelfParameter Parameters:NamedParameter* ReturnType:Type? ReachabilityAnnotations:ReachabilityAnnotation*;
+ConcreteMethodDeclaration: MethodDeclaration, ConcreteInvocableDeclaration = SelfParameter Parameters:NamedParameter* ReturnType:Type? ReachabilityAnnotations:ReachabilityAnnotation* Body;
+ConstructorDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = ImplicitSelfParameter:SelfParameter Parameters:ConstructorParameter* ReachabilityAnnotations:ReachabilityAnnotation* Body Symbol:'Promise<ConstructorSymbol>';
 FieldDeclaration: MemberDeclaration, Binding = Name:'Name' Symbol:'Promise<FieldSymbol>' Type;
-AssociatedFunctionDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = Name:'Name' Parameters:NamedParameter* ReturnType:Type? Symbol:'Promise<FunctionSymbol>';
+AssociatedFunctionDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = Name:'Name' Parameters:NamedParameter* ReturnType:Type? ReachabilityAnnotations:ReachabilityAnnotation* Body Symbol:'Promise<FunctionSymbol>';
 
 
 // ---------- Parameters --------------
@@ -89,27 +90,27 @@ Expression;
 AssignableExpression: Expression;
 AssignmentExpression: Expression = Operator:'AssignmentOperator';
 BinaryOperatorExpression: Expression = Operator:'BinaryOperator';
-BlockExpression: Expression, BlockOrResult, BodyOrBlock;
+BlockExpression: Expression, BlockOrResult, BodyOrBlock = Statements:Statement*;
 BoolLiteralExpression: LiteralExpression = Value:'bool';
 BorrowExpression: Expression = ReferencedSymbol:'Promise<BindingSymbol?>';
 BreakExpression: Expression;
 // TODO in the CST, we don't know that this is a field access, it is just a qualified access (not even member because namespaces don't have members)
 FieldAccessExpression: AssignableExpression = AccessOperator:'AccessOperator' Field:NameExpression ReferencedSymbol:'IPromise<FieldSymbol?>';
 ForeachExpression: Expression, LocalBinding = VariableName:'Name' DeclarationNumber:'Promise<int?>' Symbol:'Promise<VariableSymbol>' Type? Block:BlockExpression;
-FunctionInvocationExpression: InvocationExpression, 'IHasContainingLexicalScope' = Namespace:'NamespaceName' FunctionNameSyntax:InvocableName ReferencedSymbol:'Promise<FunctionSymbol?>';
+FunctionInvocationExpression: InvocationExpression, 'IHasContainingLexicalScope' = Namespace:'NamespaceName' FunctionNameSyntax:InvocableName Arguments:Argument* ReferencedSymbol:'Promise<FunctionSymbol?>';
 IfExpression: Expression, ElseClause = ThenBlock:BlockOrResult ElseClause?;
 ImplicitConversionExpression: Expression = Expression DataType:'DataType';
-ImplicitImmutabilityConversionExpression: ImplicitConversionExpression;
-ImplicitNoneConversionExpression: ImplicitConversionExpression = ConvertToType:'OptionalType';
-ImplicitNumericConversionExpression: ImplicitConversionExpression = ConvertToType:'NumericType';
-ImplicitOptionalConversionExpression: ImplicitConversionExpression = ConvertToType:'OptionalType';
+ImplicitImmutabilityConversionExpression: ImplicitConversionExpression = Expression;
+ImplicitNoneConversionExpression: ImplicitConversionExpression = Expression ConvertToType:'OptionalType';
+ImplicitNumericConversionExpression: ImplicitConversionExpression = Expression ConvertToType:'NumericType';
+ImplicitOptionalConversionExpression: ImplicitConversionExpression = Expression ConvertToType:'OptionalType';
 IntegerLiteralExpression: LiteralExpression = Value:'BigInteger';
 InvocationExpression: Expression = Name:'Name' Arguments:Argument*;
 LiteralExpression: Expression;
 LoopExpression: Expression = Block:BlockExpression;
 // TODO in the CST, we don't know that this is a method invocation, it is just a qualified invocation (not even member because namespaces don't have members)
 // TODO remove IHasContainingLexicalScope when not needed because of conversion to FunctionInvocationExpression
-MethodInvocationExpression: InvocationExpression, 'IHasContainingLexicalScope' = MethodNameSyntax:InvocableName ReferencedSymbol:'Promise<MethodSymbol?>';
+MethodInvocationExpression: InvocationExpression, 'IHasContainingLexicalScope' = MethodNameSyntax:InvocableName Arguments:Argument* ReferencedSymbol:'Promise<MethodSymbol?>';
 MoveExpression: Expression = ReferencedSymbol:'Promise<BindingSymbol?>';
 NameExpression: AssignableExpression, 'IHasContainingLexicalScope' = Name:'Name'? ReferencedSymbol:'Promise<BindingSymbol?>';
 NewObjectExpression: Expression = Type:TypeName ConstructorName:InvocableName? Arguments:Argument* ReferencedSymbol:'Promise<ConstructorSymbol?>';

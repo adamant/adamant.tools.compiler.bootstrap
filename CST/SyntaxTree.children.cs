@@ -1,15 +1,6 @@
-using System;
 using System.CodeDom.Compiler;
 using System.Diagnostics;
 using System.Collections.Generic;
-using System.Numerics;
-using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
-using Adamant.Tools.Compiler.Bootstrap.Names;
-using Adamant.Tools.Compiler.Bootstrap.Symbols;
-using Adamant.Tools.Compiler.Bootstrap.Tokens;
-using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.CST
@@ -49,15 +40,36 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                         yield return child;
                     if(!(n.ReturnType is null))
                         yield return n.ReturnType;
+                    foreach(var child in n.ReachabilityAnnotations)
+                        yield return child;
+                    yield return n.Body;
                     yield break;
                 case IAbstractMethodDeclarationSyntax n:
+                    yield return n.SelfParameter;
+                    foreach(var child in n.Parameters)
+                        yield return child;
+                    if(!(n.ReturnType is null))
+                        yield return n.ReturnType;
+                    foreach(var child in n.ReachabilityAnnotations)
+                        yield return child;
                     yield break;
                 case IConcreteMethodDeclarationSyntax n:
+                    yield return n.SelfParameter;
+                    foreach(var child in n.Parameters)
+                        yield return child;
+                    if(!(n.ReturnType is null))
+                        yield return n.ReturnType;
+                    foreach(var child in n.ReachabilityAnnotations)
+                        yield return child;
+                    yield return n.Body;
                     yield break;
                 case IConstructorDeclarationSyntax n:
                     yield return n.ImplicitSelfParameter;
                     foreach(var child in n.Parameters)
                         yield return child;
+                    foreach(var child in n.ReachabilityAnnotations)
+                        yield return child;
+                    yield return n.Body;
                     yield break;
                 case IFieldDeclarationSyntax n:
                     yield return n.Type;
@@ -67,6 +79,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                         yield return child;
                     if(!(n.ReturnType is null))
                         yield return n.ReturnType;
+                    foreach(var child in n.ReachabilityAnnotations)
+                        yield return child;
+                    yield return n.Body;
                     yield break;
                 case INamedParameterSyntax n:
                     yield return n.Type;
@@ -116,6 +131,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                 case IBinaryOperatorExpressionSyntax n:
                     yield break;
                 case IBlockExpressionSyntax n:
+                    foreach(var child in n.Statements)
+                        yield return child;
                     yield break;
                 case IBoolLiteralExpressionSyntax n:
                     yield break;
@@ -133,6 +150,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                     yield break;
                 case IFunctionInvocationExpressionSyntax n:
                     yield return n.FunctionNameSyntax;
+                    foreach(var child in n.Arguments)
+                        yield return child;
                     yield break;
                 case IIfExpressionSyntax n:
                     yield return n.ThenBlock;
@@ -140,12 +159,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                         yield return n.ElseClause;
                     yield break;
                 case IImplicitImmutabilityConversionExpressionSyntax n:
+                    yield return n.Expression;
                     yield break;
                 case IImplicitNoneConversionExpressionSyntax n:
+                    yield return n.Expression;
                     yield break;
                 case IImplicitNumericConversionExpressionSyntax n:
+                    yield return n.Expression;
                     yield break;
                 case IImplicitOptionalConversionExpressionSyntax n:
+                    yield return n.Expression;
                     yield break;
                 case IIntegerLiteralExpressionSyntax n:
                     yield break;
@@ -154,6 +177,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                     yield break;
                 case IMethodInvocationExpressionSyntax n:
                     yield return n.MethodNameSyntax;
+                    foreach(var child in n.Arguments)
+                        yield return child;
                     yield break;
                 case IMoveExpressionSyntax n:
                     yield break;

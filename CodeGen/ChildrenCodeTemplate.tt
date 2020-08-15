@@ -3,14 +3,9 @@
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
-using System;
 using System.CodeDom.Compiler;
 using System.Diagnostics;
 using System.Collections.Generic;
-<#  foreach(var usingNamespace in grammar.UsingNamespaces)
-    { #>
-using <#=usingNamespace #>;
-<#  } #>
 using ExhaustiveMatching;
 
 namespace <#=grammar.Namespace #>
@@ -25,9 +20,9 @@ namespace <#=grammar.Namespace #>
             {
                 default:
                     throw ExhaustiveMatch.Failed(node);
-<#  foreach(var rule in grammar.Rules.Where(IsLeaf)) { #>
+<#  foreach(var rule in grammar.Rules.Where(grammar.IsLeaf)) { #>
                 case <#=TypeName(rule.Nonterminal) #> n:
-<#      foreach(var property in rule.Properties.Where(IsNonTerminal)) { #>
+<#      foreach(var property in rule.Properties.Where(grammar.IsNonTerminal)) { #>
 <#          if(property.Type.IsList) { #>
                     foreach(var child in n.<#=property.Name #>)
                         yield return child;

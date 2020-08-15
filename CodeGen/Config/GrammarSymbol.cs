@@ -1,7 +1,9 @@
 using System;
+using System.Diagnostics;
 
 namespace Adamant.Tools.Compiler.Bootstrap.CodeGen.Config
 {
+    [DebuggerDisplay("{" + nameof(ToString) + ",nq}")]
     public sealed class GrammarSymbol : IEquatable<GrammarSymbol>
     {
         public string Text { get; }
@@ -41,6 +43,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen.Config
         public static bool operator !=(GrammarSymbol? left, GrammarSymbol? right)
         {
             return !Equals(left, right);
+        }
+
+        public override string ToString()
+        {
+            return IsQuoted ? $"'{Text}'" : Text;
         }
     }
 }

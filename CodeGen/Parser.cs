@@ -72,7 +72,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
                 var declaration = equalSplit[0];
                 var (nonterminal, parents) = ParseDeclaration(declaration);
                 var definition = equalSplit.Length == 2 ? equalSplit[1].Trim() : null;
-                var properties = ParseDefinition(definition);
+                var properties = ParseDefinition(definition).ToList();
+                if (properties.Select(p => p.Name).Distinct().Count() != properties.Count)
+                    throw new FormatException($"Rule for {nonterminal} contains duplicate property definitions");
+
                 yield return new GrammarRule(nonterminal, parents, properties);
             }
         }
