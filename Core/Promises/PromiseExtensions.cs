@@ -1,6 +1,6 @@
 using System;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Core
+namespace Adamant.Tools.Compiler.Bootstrap.Core.Promises
 {
     public static class PromiseExtensions
     {

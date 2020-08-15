@@ -1,6 +1,6 @@
 using System;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Core
+namespace Adamant.Tools.Compiler.Bootstrap.Core.Promises
 {
     internal class DerivedPromise<T, S> : IPromise<S>
     {

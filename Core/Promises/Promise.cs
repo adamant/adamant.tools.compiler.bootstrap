@@ -3,7 +3,7 @@ using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Core
+namespace Adamant.Tools.Compiler.Bootstrap.Core.Promises
 {
     [DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
     public class Promise<T> : IPromise<T>

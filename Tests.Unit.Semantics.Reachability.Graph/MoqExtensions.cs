@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Core.Promises;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using Moq.Language;
 using Moq.Language.Flow;

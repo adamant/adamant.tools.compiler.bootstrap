@@ -1,3 +1,5 @@
+using Adamant.Tools.Compiler.Bootstrap.Core.Promises;
+
 namespace Adamant.Tools.Compiler.Bootstrap.Core
 {
     public interface IPromise<out T>
