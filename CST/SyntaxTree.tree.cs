@@ -209,8 +209,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IFieldDeclarationSyntax : IMemberDeclarationSyntax, IBindingSyntax
     {
         new Name Name { get; }
-        new AcyclicPromise<FieldSymbol> Symbol { get; }
         ITypeSyntax Type { get; }
+        new AcyclicPromise<FieldSymbol> Symbol { get; }
     }
 
     public partial interface IAssociatedFunctionDeclarationSyntax : IMemberDeclarationSyntax, IConcreteInvocableDeclarationSyntax

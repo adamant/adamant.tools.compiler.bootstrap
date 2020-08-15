@@ -15,7 +15,8 @@
 ◊using Adamant.Tools.Compiler.Bootstrap.Types;
 
 'ISyntax' = Span:'TextSpan';
-CompilationUnit = File:'CodeFile' ImplicitNamespaceName:'NamespaceName' UsingDirectives:UsingDirective* Declarations:NonMemberDeclaration* AllEntityDeclarations:EntityDeclaration* Diagnostics:'Diagnostic'*;
+// Note: by declaring the AllEntityDeclarations property type with quotes, it avoids the system assuming it must represent a direct child syntax node
+CompilationUnit = File:'CodeFile' ImplicitNamespaceName:'NamespaceName' UsingDirectives:UsingDirective* Declarations:NonMemberDeclaration* AllEntityDeclarations:'FixedList<IEntityDeclarationSyntax>' Diagnostics:'Diagnostic'*;
 UsingDirective = Name:'NamespaceName';
 
 // ---------- Special Parts
@@ -48,7 +49,7 @@ MethodDeclaration: MemberDeclaration, InvocableDeclaration = Name:'Name' SelfPar
 AbstractMethodDeclaration: MethodDeclaration = SelfParameter Parameters:NamedParameter* ReturnType:Type? ReachabilityAnnotations:ReachabilityAnnotation*;
 ConcreteMethodDeclaration: MethodDeclaration, ConcreteInvocableDeclaration = SelfParameter Parameters:NamedParameter* ReturnType:Type? ReachabilityAnnotations:ReachabilityAnnotation* Body;
 ConstructorDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = ImplicitSelfParameter:SelfParameter Parameters:ConstructorParameter* ReachabilityAnnotations:ReachabilityAnnotation* Body Symbol:'AcyclicPromise<ConstructorSymbol>';
-FieldDeclaration: MemberDeclaration, Binding = Name:'Name' Symbol:'AcyclicPromise<FieldSymbol>' Type;
+FieldDeclaration: MemberDeclaration, Binding = Name:'Name' Type Symbol:'AcyclicPromise<FieldSymbol>' ;
 AssociatedFunctionDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = Name:'Name' Parameters:NamedParameter* ReturnType:Type? ReachabilityAnnotations:ReachabilityAnnotation* Body Symbol:'AcyclicPromise<FunctionSymbol>';
 
 

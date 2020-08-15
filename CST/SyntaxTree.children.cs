@@ -20,8 +20,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                         yield return child;
                     foreach(var child in n.Declarations)
                         yield return child;
-                    foreach(var child in n.AllEntityDeclarations)
-                        yield return child;
                     yield break;
                 case IUsingDirectiveSyntax n:
                     yield break;
