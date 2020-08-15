@@ -177,12 +177,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 case IFieldAccessExpressionSyntax exp:
                 {
                     // Value type fields act like local variables
-                    if (!isReferenceType && exp.ContextExpression is ISelfExpressionSyntax) return null;
+                    if (!isReferenceType && exp.Context is ISelfExpressionSyntax) return null;
 
                     // Field access behaves like calling a get method
                     // Note: right now only objects (not values) have fields
-                    var context = Analyze(exp.ContextExpression, graph, scope)!;
-                    UseArgument(context, exp.ContextExpression.Span, graph);
+                    var context = Analyze(exp.Context, graph, scope)!;
+                    UseArgument(context, exp.Context.Span, graph);
                     if (isReferenceType)
                     {
                         var temp = graph.AddFieldAccess(exp)!;
@@ -211,12 +211,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 }
                 case IMethodInvocationExpressionSyntax exp:
                 {
-                    var selfArgument = Analyze(exp.ContextExpression, graph, scope);
+                    var selfArgument = Analyze(exp.Context, graph, scope);
                     var arguments = exp.Arguments.Select(a => Analyze(a.Expression, graph, scope)).ToFixedList();
                     var method = exp.ReferencedSymbol.Result ?? throw new InvalidOperationException();
                     var parameterDataTypes = method.ParameterDataTypes;
                     if (!(selfArgument is null))
-                        UseArgument(selfArgument, exp.ContextExpression.Span, graph);
+                        UseArgument(selfArgument, exp.Context.Span, graph);
                     UseArguments(arguments, exp.Arguments, parameterDataTypes, graph);
                     if (!(referenceType is null))
                         return CaptureArguments(exp, arguments.Prepend(selfArgument), graph);
@@ -452,9 +452,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     var variable = graph.TryGetVariableFor(exp.ReferencedSymbol.Result!);
                     if (!(variable is null)) return variable;
 
-                    if (!isReferenceType && exp.ContextExpression is ISelfExpressionSyntax) return null;
+                    if (!isReferenceType && exp.Context is ISelfExpressionSyntax) return null;
 
-                    var context = Analyze(exp.ContextExpression, graph, scope);
+                    var context = Analyze(exp.Context, graph, scope);
                     if (!isReferenceType)
                     {
                         graph.Drop(context);

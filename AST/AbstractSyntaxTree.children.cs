@@ -1,6 +1,6 @@
 using System.CodeDom.Compiler;
-using System.Diagnostics;
 using System.Collections.Generic;
+using System.Diagnostics;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST

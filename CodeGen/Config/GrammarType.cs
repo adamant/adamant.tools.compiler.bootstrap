@@ -7,14 +7,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen.Config
     public sealed class GrammarType : IEquatable<GrammarType>
     {
         public GrammarSymbol Symbol { get; }
+        public bool IsRef { get; }
         public bool IsOptional { get; }
         public bool IsList { get; }
 
-        public GrammarType(GrammarSymbol symbol, bool isOptional, bool isList)
+        public GrammarType(GrammarSymbol symbol, bool isRef, bool isOptional, bool isList)
         {
             Symbol = symbol;
             IsOptional = isOptional;
             IsList = isList;
+            IsRef = isRef;
         }
 
         public bool Equals(GrammarType? other)
@@ -22,6 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen.Config
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
             return Symbol.Equals(other.Symbol)
+                   && IsRef == other.IsRef
                    && IsOptional == other.IsOptional
                    && IsList == other.IsList;
         }
@@ -35,7 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen.Config
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Symbol, IsOptional, IsList);
+            return HashCode.Combine(Symbol, IsRef, IsOptional, IsList);
         }
 
         public static bool operator ==(GrammarType? left, GrammarType? right)
@@ -51,8 +54,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen.Config
         public override string ToString()
         {
             var type = Symbol.ToString();
-            if (IsList) type += "*";
+            if (IsRef) type = "&" + type;
             if (IsOptional) type += "?";
+            if (IsList) type += "*";
             return type;
         }
     }

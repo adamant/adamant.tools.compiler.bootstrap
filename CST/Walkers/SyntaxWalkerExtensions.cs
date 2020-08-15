@@ -133,7 +133,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Walkers
                     walker.Walk(returnExpression.ReturnValue, arg);
                     break;
                 case IMethodInvocationExpressionSyntax methodInvocationExpression:
-                    walker.Walk(methodInvocationExpression.ContextExpression, arg);
+                    walker.Walk(methodInvocationExpression.Context, arg);
                     walker.Walk(methodInvocationExpression.MethodNameSyntax, arg);
                     foreach (var argument in methodInvocationExpression.Arguments)
                         walker.Walk(argument, arg);
@@ -163,7 +163,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Walkers
                     walker.Walk(whileExpression.Block, arg);
                     break;
                 case IFieldAccessExpressionSyntax memberAccessExpression:
-                    walker.Walk(memberAccessExpression.ContextExpression, arg);
+                    walker.Walk(memberAccessExpression.Context, arg);
                     walker.Walk(memberAccessExpression.Field, arg);
                     break;
                 case IBreakExpressionSyntax breakExpression:

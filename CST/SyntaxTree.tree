@@ -49,7 +49,7 @@ MethodDeclaration: MemberDeclaration, InvocableDeclaration = Name:'Name' SelfPar
 AbstractMethodDeclaration: MethodDeclaration = SelfParameter Parameters:NamedParameter* ReturnType:Type? ReachabilityAnnotations:ReachabilityAnnotation*;
 ConcreteMethodDeclaration: MethodDeclaration, ConcreteInvocableDeclaration = SelfParameter Parameters:NamedParameter* ReturnType:Type? ReachabilityAnnotations:ReachabilityAnnotation* Body;
 ConstructorDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = ImplicitSelfParameter:SelfParameter Parameters:ConstructorParameter* ReachabilityAnnotations:ReachabilityAnnotation* Body Symbol:'AcyclicPromise<ConstructorSymbol>';
-FieldDeclaration: MemberDeclaration, Binding = Name:'Name' Type Symbol:'AcyclicPromise<FieldSymbol>' ;
+FieldDeclaration: MemberDeclaration, Binding = Name:'Name' Type Symbol:'AcyclicPromise<FieldSymbol>' &Initializer:Expression?;
 AssociatedFunctionDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = Name:'Name' Parameters:NamedParameter* ReturnType:Type? ReachabilityAnnotations:ReachabilityAnnotation* Body Symbol:'AcyclicPromise<FunctionSymbol>';
 
 
@@ -70,7 +70,7 @@ CanReachAnnotation: ReachabilityAnnotation = CanReach:NameExpression*;
 
 // ---------- Function Parts
 InvocableName = Name:'Name';
-Argument;
+Argument = &Expression;
 Body: BodyOrBlock = Statements:BodyStatement*;
 
 
@@ -82,25 +82,25 @@ CapabilityType: Type = ReferentType:Type Capability:'ReferenceCapability';
 
 // ---------- Statements
 Statement;
-ResultStatement: Statement, BlockOrResult;
+ResultStatement: Statement, BlockOrResult = &Expression;
 BodyStatement: Statement;
-VariableDeclarationStatement: BodyStatement, LocalBinding = NameSpan:'TextSpan' Name:'Name' DeclarationNumber:'Promise<int?>' Symbol:'Promise<VariableSymbol>' Type? InferMutableType:'bool';
-ExpressionStatement: BodyStatement;
+VariableDeclarationStatement: BodyStatement, LocalBinding = NameSpan:'TextSpan' Name:'Name' DeclarationNumber:'Promise<int?>' Type? InferMutableType:'bool' Symbol:'Promise<VariableSymbol>' &Initializer:Expression?;
+ExpressionStatement: BodyStatement = &Expression;
 
 // ---------- Expressions
 Expression;
 AssignableExpression: Expression;
-AssignmentExpression: Expression = Operator:'AssignmentOperator';
-BinaryOperatorExpression: Expression = Operator:'BinaryOperator';
+AssignmentExpression: Expression = &LeftOperand:AssignableExpression Operator:'AssignmentOperator' &RightOperand:Expression;
+BinaryOperatorExpression: Expression = &LeftOperand:Expression Operator:'BinaryOperator' &RightOperand:Expression;
 BlockExpression: Expression, BlockOrResult, BodyOrBlock = Statements:Statement*;
 BoolLiteralExpression: LiteralExpression = Value:'bool';
-BorrowExpression: Expression = ReferencedSymbol:'Promise<BindingSymbol?>';
-BreakExpression: Expression;
+BorrowExpression: Expression = &Referent:Expression ReferencedSymbol:'Promise<BindingSymbol?>';
+BreakExpression: Expression = &Value:Expression?;
 // TODO in the CST, we don't know that this is a field access, it is just a qualified access (not even member because namespaces don't have members)
-FieldAccessExpression: AssignableExpression = AccessOperator:'AccessOperator' Field:NameExpression ReferencedSymbol:'IPromise<FieldSymbol?>';
-ForeachExpression: Expression, LocalBinding = VariableName:'Name' DeclarationNumber:'Promise<int?>' Symbol:'Promise<VariableSymbol>' Type? Block:BlockExpression;
+FieldAccessExpression: AssignableExpression = &Context:Expression AccessOperator:'AccessOperator' Field:NameExpression ReferencedSymbol:'IPromise<FieldSymbol?>';
+ForeachExpression: Expression, LocalBinding = VariableName:'Name' DeclarationNumber:'Promise<int?>' &InExpression:Expression Type? Symbol:'Promise<VariableSymbol>' Block:BlockExpression;
 FunctionInvocationExpression: InvocationExpression, 'IHasContainingLexicalScope' = Namespace:'NamespaceName' FunctionNameSyntax:InvocableName Arguments:Argument* ReferencedSymbol:'Promise<FunctionSymbol?>';
-IfExpression: Expression, ElseClause = ThenBlock:BlockOrResult ElseClause?;
+IfExpression: Expression, ElseClause = &Condition:Expression ThenBlock:BlockOrResult ElseClause?;
 ImplicitConversionExpression: Expression = Expression DataType:'DataType';
 ImplicitImmutabilityConversionExpression: ImplicitConversionExpression = Expression;
 ImplicitNoneConversionExpression: ImplicitConversionExpression = Expression ConvertToType:'OptionalType';
@@ -112,16 +112,16 @@ LiteralExpression: Expression;
 LoopExpression: Expression = Block:BlockExpression;
 // TODO in the CST, we don't know that this is a method invocation, it is just a qualified invocation (not even member because namespaces don't have members)
 // TODO remove IHasContainingLexicalScope when not needed because of conversion to FunctionInvocationExpression
-MethodInvocationExpression: InvocationExpression, 'IHasContainingLexicalScope' = MethodNameSyntax:InvocableName Arguments:Argument* ReferencedSymbol:'Promise<MethodSymbol?>';
-MoveExpression: Expression = ReferencedSymbol:'Promise<BindingSymbol?>';
+MethodInvocationExpression: InvocationExpression, 'IHasContainingLexicalScope' = &Context:Expression MethodNameSyntax:InvocableName Arguments:Argument* ReferencedSymbol:'Promise<MethodSymbol?>';
+MoveExpression: Expression = &Referent:Expression ReferencedSymbol:'Promise<BindingSymbol?>';
 NameExpression: AssignableExpression, 'IHasContainingLexicalScope' = Name:'Name'? ReferencedSymbol:'Promise<BindingSymbol?>';
 NewObjectExpression: Expression = Type:TypeName ConstructorName:InvocableName? Arguments:Argument* ReferencedSymbol:'Promise<ConstructorSymbol?>';
 NextExpression: Expression;
 NoneLiteralExpression: LiteralExpression;
-ReturnExpression: Expression;
+ReturnExpression: Expression = &ReturnValue:Expression?;
 SelfExpression: Expression = IsImplicit:'bool' ReferencedSymbol:'Promise<SelfParameterSymbol?>';
-ShareExpression: Expression = ReferencedSymbol:'Promise<BindingSymbol?>';
+ShareExpression: Expression = &Referent:Expression ReferencedSymbol:'Promise<BindingSymbol?>';
 StringLiteralExpression: LiteralExpression = Value:'string';
-UnaryOperatorExpression: Expression = Fixity:'UnaryOperatorFixity' Operator:'UnaryOperator';
-UnsafeExpression: Expression;
-WhileExpression: Expression = Block:BlockExpression;
+UnaryOperatorExpression: Expression = Fixity:'UnaryOperatorFixity' Operator:'UnaryOperator' &Operand:Expression;
+UnsafeExpression: Expression = &Expression;
+WhileExpression: Expression = &Condition:Expression Block:BlockExpression;

@@ -30,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
         {
             
             #line 6 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\TreeCodeTemplate.tt"
-  foreach(var usingNamespace in grammar.UsingNamespaces) { 
+  foreach(var usingNamespace in OrderedNamespaces()) { 
             
             #line default
             #line hidden
@@ -48,76 +48,76 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             
             #line default
             #line hidden
-            this.Write("using ExhaustiveMatching;\r\n\r\nnamespace ");
+            this.Write("\r\nnamespace ");
             
-            #line 11 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\TreeCodeTemplate.tt"
+            #line 10 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\TreeCodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(grammar.Namespace));
             
             #line default
             #line hidden
             this.Write("\r\n{\r\n");
             
-            #line 13 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\TreeCodeTemplate.tt"
+            #line 12 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\TreeCodeTemplate.tt"
   foreach(var rule in grammar.Rules) {
             
             #line default
             #line hidden
             
-            #line 14 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\TreeCodeTemplate.tt"
+            #line 13 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\TreeCodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(ClosedType(rule)));
             
             #line default
             #line hidden
             this.Write("    public partial interface ");
             
-            #line 14 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\TreeCodeTemplate.tt"
+            #line 13 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\TreeCodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(TypeName(rule.Nonterminal)));
             
             #line default
             #line hidden
             
-            #line 14 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\TreeCodeTemplate.tt"
+            #line 13 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\TreeCodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(BaseTypes(rule)));
             
             #line default
             #line hidden
             this.Write("\r\n    {\r\n");
             
-            #line 16 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\TreeCodeTemplate.tt"
+            #line 15 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\TreeCodeTemplate.tt"
       foreach(var property in rule.Properties.Where(p => NeedsDeclared(rule, p))) { 
             
             #line default
             #line hidden
             this.Write("        ");
             
-            #line 17 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\TreeCodeTemplate.tt"
+            #line 16 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\TreeCodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(IsNewDefinition(rule, property) ? "new " : ""));
             
             #line default
             #line hidden
             
-            #line 17 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\TreeCodeTemplate.tt"
+            #line 16 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\TreeCodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(TypeName(property.Type)));
             
             #line default
             #line hidden
             this.Write(" ");
             
-            #line 17 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\TreeCodeTemplate.tt"
+            #line 16 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\TreeCodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.Name));
             
             #line default
             #line hidden
             this.Write(" { get; }\r\n");
             
-            #line 18 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\TreeCodeTemplate.tt"
+            #line 17 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\TreeCodeTemplate.tt"
       } 
             
             #line default
             #line hidden
             this.Write("    }\r\n\r\n");
             
-            #line 21 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\TreeCodeTemplate.tt"
+            #line 20 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\TreeCodeTemplate.tt"
   } 
             
             #line default

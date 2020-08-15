@@ -3,10 +3,9 @@
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
-<#  foreach(var usingNamespace in grammar.UsingNamespaces) { #>
+<#  foreach(var usingNamespace in OrderedNamespaces()) { #>
 using <#=usingNamespace #>;
 <#  } #>
-using ExhaustiveMatching;
 
 namespace <#=grammar.Namespace #>
 {

@@ -8,8 +8,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class FieldAccessExpressionSyntax : ExpressionSyntax, IFieldAccessExpressionSyntax
     {
-        private IExpressionSyntax contextExpression;
-        public ref IExpressionSyntax ContextExpression => ref contextExpression;
+        private IExpressionSyntax context;
+        public ref IExpressionSyntax Context => ref context;
 
         public AccessOperator AccessOperator { get; }
         public INameExpressionSyntax Field { get; }
@@ -17,12 +17,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public FieldAccessExpressionSyntax(
             TextSpan span,
-            IExpressionSyntax contextExpression,
+            IExpressionSyntax context,
             AccessOperator accessOperator,
             INameExpressionSyntax field)
             : base(span)
         {
-            this.contextExpression = contextExpression;
+            this.context = context;
             AccessOperator = accessOperator;
             Field = field;
         }
@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public override string ToString()
         {
-            return $"{ContextExpression.ToGroupedString(ExpressionPrecedence)}.{Field}";
+            return $"{Context.ToGroupedString(ExpressionPrecedence)}.{Field}";
         }
     }
 }

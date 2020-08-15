@@ -8,6 +8,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     /// </remarks>
     public partial interface IArgumentSyntax
     {
-        ref IExpressionSyntax Expression { get; }
     }
 }

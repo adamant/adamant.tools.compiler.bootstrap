@@ -15,6 +15,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             this.grammar = grammar;
         }
 
+        private IEnumerable<string> OrderedNamespaces()
+        {
+            return grammar.UsingNamespaces
+                          .Append("System.Diagnostics.CodeAnalysis")
+                          .Append("ExhaustiveMatching")
+                          .Distinct()
+                          .OrderBy(v => v, NamespaceComparer.Instance);
+        }
+
         private string TypeName(GrammarSymbol symbol)
         {
             return symbol.IsQuoted ? symbol.Text : $"{grammar.Prefix}{symbol.Text}{grammar.Suffix}";
@@ -44,6 +53,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
         private string TypeName(GrammarType type)
         {
             var value = TypeName(type.Symbol);
+            if (type.IsRef)
+            {
+                value = "ref " + value;
+                if (type.IsOptional) value = "[DisallowNull] " + value;
+            }
             if (type.IsOptional) value += "?";
             if (type.IsList) value = $"{grammar.ListType}<{value}>";
             return value;

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Promises;
@@ -211,6 +212,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         new Name Name { get; }
         ITypeSyntax Type { get; }
         new AcyclicPromise<FieldSymbol> Symbol { get; }
+        [DisallowNull] ref IExpressionSyntax? Initializer { get; }
     }
 
     public partial interface IAssociatedFunctionDeclarationSyntax : IMemberDeclarationSyntax, IConcreteInvocableDeclarationSyntax
@@ -293,6 +295,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface IArgumentSyntax : ISyntax
     {
+        ref IExpressionSyntax Expression { get; }
     }
 
     public partial interface IBodySyntax : IBodyOrBlockSyntax
@@ -334,6 +337,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface IResultStatementSyntax : IStatementSyntax, IBlockOrResultSyntax
     {
+        ref IExpressionSyntax Expression { get; }
     }
 
     [Closed(
@@ -348,13 +352,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         TextSpan NameSpan { get; }
         Name Name { get; }
         Promise<int?> DeclarationNumber { get; }
-        new Promise<VariableSymbol> Symbol { get; }
         ITypeSyntax? Type { get; }
         bool InferMutableType { get; }
+        new Promise<VariableSymbol> Symbol { get; }
+        [DisallowNull] ref IExpressionSyntax? Initializer { get; }
     }
 
     public partial interface IExpressionStatementSyntax : IBodyStatementSyntax
     {
+        ref IExpressionSyntax Expression { get; }
     }
 
     [Closed(
@@ -392,12 +398,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface IAssignmentExpressionSyntax : IExpressionSyntax
     {
+        ref IAssignableExpressionSyntax LeftOperand { get; }
         AssignmentOperator Operator { get; }
+        ref IExpressionSyntax RightOperand { get; }
     }
 
     public partial interface IBinaryOperatorExpressionSyntax : IExpressionSyntax
     {
+        ref IExpressionSyntax LeftOperand { get; }
         BinaryOperator Operator { get; }
+        ref IExpressionSyntax RightOperand { get; }
     }
 
     public partial interface IBlockExpressionSyntax : IExpressionSyntax, IBlockOrResultSyntax, IBodyOrBlockSyntax
@@ -411,15 +421,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface IBorrowExpressionSyntax : IExpressionSyntax
     {
+        ref IExpressionSyntax Referent { get; }
         Promise<BindingSymbol?> ReferencedSymbol { get; }
     }
 
     public partial interface IBreakExpressionSyntax : IExpressionSyntax
     {
+        [DisallowNull] ref IExpressionSyntax? Value { get; }
     }
 
     public partial interface IFieldAccessExpressionSyntax : IAssignableExpressionSyntax
     {
+        ref IExpressionSyntax Context { get; }
         AccessOperator AccessOperator { get; }
         INameExpressionSyntax Field { get; }
         IPromise<FieldSymbol?> ReferencedSymbol { get; }
@@ -429,8 +442,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     {
         Name VariableName { get; }
         Promise<int?> DeclarationNumber { get; }
-        new Promise<VariableSymbol> Symbol { get; }
+        ref IExpressionSyntax InExpression { get; }
         ITypeSyntax? Type { get; }
+        new Promise<VariableSymbol> Symbol { get; }
         IBlockExpressionSyntax Block { get; }
     }
 
@@ -443,6 +457,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface IIfExpressionSyntax : IExpressionSyntax, IElseClauseSyntax
     {
+        ref IExpressionSyntax Condition { get; }
         IBlockOrResultSyntax ThenBlock { get; }
         IElseClauseSyntax? ElseClause { get; }
     }
@@ -507,12 +522,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface IMethodInvocationExpressionSyntax : IInvocationExpressionSyntax, IHasContainingLexicalScope
     {
+        ref IExpressionSyntax Context { get; }
         IInvocableNameSyntax MethodNameSyntax { get; }
         Promise<MethodSymbol?> ReferencedSymbol { get; }
     }
 
     public partial interface IMoveExpressionSyntax : IExpressionSyntax
     {
+        ref IExpressionSyntax Referent { get; }
         Promise<BindingSymbol?> ReferencedSymbol { get; }
     }
 
@@ -540,6 +557,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface IReturnExpressionSyntax : IExpressionSyntax
     {
+        [DisallowNull] ref IExpressionSyntax? ReturnValue { get; }
     }
 
     public partial interface ISelfExpressionSyntax : IExpressionSyntax
@@ -550,6 +568,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface IShareExpressionSyntax : IExpressionSyntax
     {
+        ref IExpressionSyntax Referent { get; }
         Promise<BindingSymbol?> ReferencedSymbol { get; }
     }
 
@@ -562,14 +581,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     {
         UnaryOperatorFixity Fixity { get; }
         UnaryOperator Operator { get; }
+        ref IExpressionSyntax Operand { get; }
     }
 
     public partial interface IUnsafeExpressionSyntax : IExpressionSyntax
     {
+        ref IExpressionSyntax Expression { get; }
     }
 
     public partial interface IWhileExpressionSyntax : IExpressionSyntax
     {
+        ref IExpressionSyntax Condition { get; }
         IBlockExpressionSyntax Block { get; }
     }
 

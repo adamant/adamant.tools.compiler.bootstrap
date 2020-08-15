@@ -4,8 +4,8 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 using System.CodeDom.Compiler;
-using System.Diagnostics;
 using System.Collections.Generic;
+using System.Diagnostics;
 using ExhaustiveMatching;
 
 namespace <#=grammar.Namespace #>

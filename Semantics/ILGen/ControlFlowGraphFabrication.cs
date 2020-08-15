@@ -375,7 +375,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IMethodInvocationExpressionSyntax exp:
                 {
                     var method = exp.ReferencedSymbol.Result ?? throw new InvalidOperationException();
-                    var target = ConvertToOperand(exp.ContextExpression);
+                    var target = ConvertToOperand(exp.Context);
                     var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
                     currentBlock!.Add(new CallVirtualInstruction(target, method, args, exp.Span, CurrentScope));
                 }
@@ -605,7 +605,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 break;
                 case IFieldAccessExpressionSyntax exp:
                 {
-                    var context = ConvertToOperand(exp.ContextExpression);
+                    var context = ConvertToOperand(exp.Context);
                     var field = exp.ReferencedSymbol.Result ?? throw new InvalidOperationException();
                     currentBlock!.Add(new FieldAccessInstruction(resultPlace, context, field, exp.Span, CurrentScope));
                 }
@@ -620,9 +620,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IMethodInvocationExpressionSyntax exp:
                 {
                     var methodName = exp.ReferencedSymbol.Result ?? throw new InvalidOperationException();
-                    var target = ConvertToOperand(exp.ContextExpression);
+                    var target = ConvertToOperand(exp.Context);
                     var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
-                    if (exp.ContextExpression.DataType is ReferenceType)
+                    if (exp.Context.DataType is ReferenceType)
                         currentBlock!.Add(new CallVirtualInstruction(resultPlace, target, methodName, args, exp.Span, CurrentScope));
                     else
                         currentBlock!.Add(CallInstruction.ForMethod(resultPlace, target, methodName, args, exp.Span, CurrentScope));
@@ -726,7 +726,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     throw new NotImplementedException($"ConvertToPlaceWithoutSideEffects({expression.GetType().Name}) Not Implemented.");
                 case IFieldAccessExpressionSyntax exp:
                 {
-                    var context = ConvertToOperand(exp.ContextExpression);
+                    var context = ConvertToOperand(exp.Context);
                     var field = exp.ReferencedSymbol.Result ?? throw new InvalidOperationException();
                     return new FieldPlace(context, field, exp.Span);
                 }

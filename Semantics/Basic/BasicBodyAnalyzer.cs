@@ -542,8 +542,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IFieldAccessExpressionSyntax exp:
                 {
                     // Don't wrap the self expression in a share expression for field access
-                    var isSelfField = exp.ContextExpression is ISelfExpressionSyntax;
-                    var contextType = InferType(ref exp.ContextExpression, !isSelfField);
+                    var isSelfField = exp.Context is ISelfExpressionSyntax;
+                    var contextType = InferType(ref exp.Context, !isSelfField);
                     var member = exp.Field;
                     var contextSymbol = LookupSymbolForType(contextType);
                     // TODO Deal with no context symbol
@@ -703,8 +703,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     throw ExhaustiveMatch.Failed(expression);
                 case IFieldAccessExpressionSyntax exp:
                     // Don't wrap the self expression in a share expression for field access
-                    var isSelfField = exp.ContextExpression is ISelfExpressionSyntax;
-                    var contextType = InferType(ref exp.ContextExpression, !isSelfField);
+                    var isSelfField = exp.Context is ISelfExpressionSyntax;
+                    var contextType = InferType(ref exp.Context, !isSelfField);
                     var member = exp.Field;
                     var contextSymbol = LookupSymbolForType(contextType);
                     // TODO Deal with no context symbol
@@ -728,7 +728,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             // * Namespaced function invocation
             // * Method invocation
             // First we need to distinguish those.
-            var contextName = MethodContextAsName(methodInvocation.ContextExpression);
+            var contextName = MethodContextAsName(methodInvocation.Context);
             if (contextName != null)
             {
                 var contextSymbols = methodInvocation.ContainingLexicalScope.Lookup(contextName.Segments[0]).Select(p => p.Result);
@@ -757,7 +757,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             }
 
             var argumentTypes = methodInvocation.Arguments.Select(argument => InferType(ref argument.Expression)).ToFixedList();
-            var contextType = InferType(ref methodInvocation.ContextExpression, false);
+            var contextType = InferType(ref methodInvocation.Context, false);
             // If it is unknown, we already reported an error
             if (contextType == DataType.Unknown)
             {
@@ -782,10 +782,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     methodInvocation.ReferencedSymbol.Fulfill(methodSymbol);
 
                     var selfParamType = methodSymbol.SelfDataType;
-                    InsertImplicitActionIfNeeded(ref methodInvocation.ContextExpression, selfParamType, implicitBorrowAllowed: true);
+                    InsertImplicitActionIfNeeded(ref methodInvocation.Context, selfParamType, implicitBorrowAllowed: true);
 
-                    InsertImplicitConversionIfNeeded(ref methodInvocation.ContextExpression, selfParamType);
-                    CheckArgumentTypeCompatibility(selfParamType, methodInvocation.ContextExpression);
+                    InsertImplicitConversionIfNeeded(ref methodInvocation.Context, selfParamType);
+                    CheckArgumentTypeCompatibility(selfParamType, methodInvocation.Context);
 
                     foreach (var (arg, type) in methodInvocation.Arguments
                                                                 .Zip(methodSymbol.ParameterDataTypes))
@@ -817,9 +817,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             {
                 IFieldAccessExpressionSyntax memberAccess =>
                 // if implicit self
-                memberAccess.ContextExpression is null
+                memberAccess.Context is null
                     ? null
-                    : MethodContextAsName(memberAccess.ContextExpression)?.Qualify(memberAccess.Field.Name!),
+                    : MethodContextAsName(memberAccess.Context)?.Qualify(memberAccess.Field.Name!),
                 INameExpressionSyntax nameExpression => nameExpression.Name!,
                 _ => null
             };

@@ -280,6 +280,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
         }
 
         [Fact]
+        public void ParsesSimpleReferenceProperty()
+        {
+            const string grammar = "MyNonterminal = &MyProperty;";
+            var config = Parser.ReadGrammarConfig(grammar);
+
+            var rule = Assert.Single(config.Rules);
+            var property = Assert.Single(rule.Properties);
+            Assert.Equal("MyProperty", property.Name);
+            Assert.Equal(RefType(Symbol("MyProperty")), property.Type);
+        }
+
+        [Fact]
         public void ParsesTypedProperty()
         {
             const string grammar = "MyNonterminal = MyProperty:MyType;";
@@ -316,7 +328,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
         }
 
         [Fact]
-        public void ParsesOptionalTypeProperty()
+        public void ParsesOptionalTypedProperty()
         {
             const string grammar = "MyNonterminal = MyProperty:MyType?;";
             var config = Parser.ReadGrammarConfig(grammar);
@@ -325,6 +337,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
             var property = Assert.Single(rule.Properties);
             Assert.Equal("MyProperty", property.Name);
             Assert.Equal(OptionalType(Symbol("MyType")), property.Type);
+        }
+
+        [Fact]
+        public void ParsesListOfOptionalTypedProperty()
+        {
+            const string grammar = "MyNonterminal = MyProperty:MyType?*;";
+            var config = Parser.ReadGrammarConfig(grammar);
+
+            var rule = Assert.Single(config.Rules);
+            var property = Assert.Single(rule.Properties);
+            Assert.Equal("MyProperty", property.Name);
+            Assert.Equal(new GrammarType(Symbol("MyType"), false, true, true), property.Type);
+        }
+
+        [Fact]
+        public void ParsesReferenceTypedProperty()
+        {
+            const string grammar = "MyNonterminal = &MyProperty:MyType;";
+            var config = Parser.ReadGrammarConfig(grammar);
+
+            var rule = Assert.Single(config.Rules);
+            var property = Assert.Single(rule.Properties);
+            Assert.Equal("MyProperty", property.Name);
+            Assert.Equal(RefType(Symbol("MyType")), property.Type);
         }
 
         [Fact]
@@ -378,17 +414,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
 
         private static GrammarType Type(GrammarSymbol symbol)
         {
-            return new GrammarType(symbol, false, false);
+            return new GrammarType(symbol, false, false, false);
         }
 
         private static GrammarType OptionalType(GrammarSymbol symbol)
         {
-            return new GrammarType(symbol, true, false);
+            return new GrammarType(symbol, false, true, false);
         }
 
         private static GrammarType ListType(GrammarSymbol symbol)
         {
-            return new GrammarType(symbol, false, true);
+            return new GrammarType(symbol, false, false, true);
+        }
+
+        private static GrammarType RefType(GrammarSymbol symbol)
+        {
+            return new GrammarType(symbol, true, false, false);
         }
 
         private static FixedList<T> FixedList<T>(params T[] values)

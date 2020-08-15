@@ -5,6 +5,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     /// </summary>
     public partial interface IMoveExpressionSyntax
     {
-        ref IExpressionSyntax Referent { get; }
     }
 }

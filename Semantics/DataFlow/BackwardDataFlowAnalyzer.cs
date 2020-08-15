@@ -59,7 +59,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
                     WalkNonNull(exp.InExpression, isLValue);
                     return;
                 case IFieldAccessExpressionSyntax exp:
-                    WalkNonNull(exp.ContextExpression, isLValue);
+                    WalkNonNull(exp.Context, isLValue);
                     // Don't walk the field name, it shouldn't be treated as a variable
                     return;
                 case ITypeSyntax _:

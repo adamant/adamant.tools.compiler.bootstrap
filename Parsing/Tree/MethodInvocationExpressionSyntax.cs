@@ -29,20 +29,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             }
         }
 
-        private IExpressionSyntax contextExpression;
-        public ref IExpressionSyntax ContextExpression => ref contextExpression;
+        private IExpressionSyntax context;
+        public ref IExpressionSyntax Context => ref context;
         public IInvocableNameSyntax MethodNameSyntax { get; }
         public Promise<MethodSymbol?> ReferencedSymbol { get; } = new Promise<MethodSymbol?>();
 
         public MethodInvocationExpressionSyntax(
             TextSpan span,
-            IExpressionSyntax contextExpression,
+            IExpressionSyntax context,
             Name name,
             IInvocableNameSyntax methodNameSyntax,
             FixedList<IArgumentSyntax> arguments)
             : base(span, name, arguments)
         {
-            this.contextExpression = contextExpression;
+            this.context = context;
             MethodNameSyntax = methodNameSyntax;
         }
 
@@ -50,7 +50,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public override string ToString()
         {
-            return $"{ContextExpression.ToGroupedString(ExpressionPrecedence)}.{Name}({string.Join(", ", Arguments)})";
+            return $"{Context.ToGroupedString(ExpressionPrecedence)}.{Name}({string.Join(", ", Arguments)})";
         }
     }
 }

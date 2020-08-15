@@ -28,8 +28,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("using System.CodeDom.Compiler;\r\nusing System.Diagnostics;\r\nusing System.Collectio" +
-                    "ns.Generic;\r\nusing ExhaustiveMatching;\r\n\r\nnamespace ");
+            this.Write("using System.CodeDom.Compiler;\r\nusing System.Collections.Generic;\r\nusing System.D" +
+                    "iagnostics;\r\nusing ExhaustiveMatching;\r\n\r\nnamespace ");
             
             #line 11 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\ChildrenCodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(grammar.Namespace));

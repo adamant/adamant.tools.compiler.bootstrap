@@ -87,9 +87,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             var properties = definition.SplitOrEmpty(' ').Where(v => !string.IsNullOrWhiteSpace(v));
             foreach (var property in properties)
             {
-                var isList = property.EndsWith('*');
-                var trimmedProperty = isList ? property[..^1] : property;
-                var isOptional = property.EndsWith('?');
+                var trimmedProperty = property;
+
+                var isRef = trimmedProperty.StartsWith('&');
+                trimmedProperty = isRef ? trimmedProperty[1..] : trimmedProperty;
+                var isList = trimmedProperty.EndsWith('*');
+                trimmedProperty = isList ? trimmedProperty[..^1] : trimmedProperty;
+                var isOptional = trimmedProperty.EndsWith('?');
                 trimmedProperty = isOptional ? trimmedProperty[..^1] : trimmedProperty;
                 var parts = trimmedProperty.Split(':').Select(p => p.Trim()).ToArray();
 
@@ -98,14 +102,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
                     case 1:
                     {
                         var name = parts[0];
-                        yield return new GrammarProperty(name, new GrammarType(new GrammarSymbol(name), isOptional, isList));
+                        var grammarType = new GrammarType(ParseSymbol(name), isRef, isOptional, isList);
+                        yield return new GrammarProperty(name, grammarType);
                     }
                     break;
                     case 2:
                     {
                         var name = parts[0];
                         var type = parts[1];
-                        yield return new GrammarProperty(name, new GrammarType(ParseSymbol(type), isOptional, isList));
+                        var grammarType = new GrammarType(ParseSymbol(type), isRef, isOptional, isList);
+                        yield return new GrammarProperty(name, grammarType);
                     }
                     break;
                     default:

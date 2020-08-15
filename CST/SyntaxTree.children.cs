@@ -1,6 +1,6 @@
 using System.CodeDom.Compiler;
-using System.Diagnostics;
 using System.Collections.Generic;
+using System.Diagnostics;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.CST
@@ -71,6 +71,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                     yield break;
                 case IFieldDeclarationSyntax n:
                     yield return n.Type;
+                    if(!(n.Initializer is null))
+                        yield return n.Initializer;
                     yield break;
                 case IAssociatedFunctionDeclarationSyntax n:
                     foreach(var child in n.Parameters)
@@ -103,6 +105,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                 case IInvocableNameSyntax n:
                     yield break;
                 case IArgumentSyntax n:
+                    yield return n.Expression;
                     yield break;
                 case IBodySyntax n:
                     foreach(var child in n.Statements)
@@ -117,16 +120,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                     yield return n.ReferentType;
                     yield break;
                 case IResultStatementSyntax n:
+                    yield return n.Expression;
                     yield break;
                 case IVariableDeclarationStatementSyntax n:
                     if(!(n.Type is null))
                         yield return n.Type;
+                    if(!(n.Initializer is null))
+                        yield return n.Initializer;
                     yield break;
                 case IExpressionStatementSyntax n:
+                    yield return n.Expression;
                     yield break;
                 case IAssignmentExpressionSyntax n:
+                    yield return n.LeftOperand;
+                    yield return n.RightOperand;
                     yield break;
                 case IBinaryOperatorExpressionSyntax n:
+                    yield return n.LeftOperand;
+                    yield return n.RightOperand;
                     yield break;
                 case IBlockExpressionSyntax n:
                     foreach(var child in n.Statements)
@@ -135,13 +146,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                 case IBoolLiteralExpressionSyntax n:
                     yield break;
                 case IBorrowExpressionSyntax n:
+                    yield return n.Referent;
                     yield break;
                 case IBreakExpressionSyntax n:
+                    if(!(n.Value is null))
+                        yield return n.Value;
                     yield break;
                 case IFieldAccessExpressionSyntax n:
+                    yield return n.Context;
                     yield return n.Field;
                     yield break;
                 case IForeachExpressionSyntax n:
+                    yield return n.InExpression;
                     if(!(n.Type is null))
                         yield return n.Type;
                     yield return n.Block;
@@ -152,6 +168,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                         yield return child;
                     yield break;
                 case IIfExpressionSyntax n:
+                    yield return n.Condition;
                     yield return n.ThenBlock;
                     if(!(n.ElseClause is null))
                         yield return n.ElseClause;
@@ -174,11 +191,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                     yield return n.Block;
                     yield break;
                 case IMethodInvocationExpressionSyntax n:
+                    yield return n.Context;
                     yield return n.MethodNameSyntax;
                     foreach(var child in n.Arguments)
                         yield return child;
                     yield break;
                 case IMoveExpressionSyntax n:
+                    yield return n.Referent;
                     yield break;
                 case INameExpressionSyntax n:
                     yield break;
@@ -194,18 +213,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                 case INoneLiteralExpressionSyntax n:
                     yield break;
                 case IReturnExpressionSyntax n:
+                    if(!(n.ReturnValue is null))
+                        yield return n.ReturnValue;
                     yield break;
                 case ISelfExpressionSyntax n:
                     yield break;
                 case IShareExpressionSyntax n:
+                    yield return n.Referent;
                     yield break;
                 case IStringLiteralExpressionSyntax n:
                     yield break;
                 case IUnaryOperatorExpressionSyntax n:
+                    yield return n.Operand;
                     yield break;
                 case IUnsafeExpressionSyntax n:
+                    yield return n.Expression;
                     yield break;
                 case IWhileExpressionSyntax n:
+                    yield return n.Condition;
                     yield return n.Block;
                     yield break;
             }
