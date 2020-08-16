@@ -15,7 +15,9 @@ LocalBinding: Binding;
 // ---------- Declarations
 // Note: in the AST all declarations are entities because there are no namespace declarations
 Declaration = Symbol:'Symbol';
-InvocableDeclaration: Declaration = Parameters:ConstructorParameter*;
+/// A declaration that could contain executable code (i.e. invocable declaration or field declaration)
+ExecutableDeclaration: Declaration;
+InvocableDeclaration: ExecutableDeclaration = Parameters:ConstructorParameter*;
 ConcreteInvocableDeclaration: InvocableDeclaration = Body;
 
 // ---------- Non-Member Declarations
@@ -29,7 +31,7 @@ MethodDeclaration: MemberDeclaration = Symbol:'MethodSymbol' SelfParameter Param
 AbstractMethodDeclaration: MethodDeclaration = SelfParameter Parameters:NamedParameter*;
 ConcreteMethodDeclaration: MethodDeclaration, ConcreteInvocableDeclaration = SelfParameter Parameters:NamedParameter* Body;
 ConstructorDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = Symbol:'ConstructorSymbol' ImplicitSelfParameter:SelfParameter Parameters:ConstructorParameter* Body;
-FieldDeclaration: MemberDeclaration, Binding = Symbol:'FieldSymbol';
+FieldDeclaration: MemberDeclaration, ExecutableDeclaration, Binding = Symbol:'FieldSymbol';
 AssociatedFunctionDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = Symbol:'FunctionSymbol' Parameters:NamedParameter* Body;
 
 // ---------- Parameters --------------

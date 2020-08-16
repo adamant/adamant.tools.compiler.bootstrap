@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     }
 
     [Closed(
-        typeof(IInvocableDeclaration),
+        typeof(IExecutableDeclaration),
         typeof(INonMemberDeclaration),
         typeof(IMemberDeclaration))]
     public partial interface IDeclaration : IAbstractSyntax
@@ -41,8 +41,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     }
 
     [Closed(
+        typeof(IInvocableDeclaration),
+        typeof(IFieldDeclaration))]
+    public partial interface IExecutableDeclaration : IDeclaration
+    {
+    }
+
+    [Closed(
         typeof(IConcreteInvocableDeclaration))]
-    public partial interface IInvocableDeclaration : IDeclaration
+    public partial interface IInvocableDeclaration : IExecutableDeclaration
     {
         FixedList<IConstructorParameter> Parameters { get; }
     }
@@ -110,7 +117,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         ISelfParameter ImplicitSelfParameter { get; }
     }
 
-    public partial interface IFieldDeclaration : IMemberDeclaration, IBinding
+    public partial interface IFieldDeclaration : IMemberDeclaration, IExecutableDeclaration, IBinding
     {
         new FieldSymbol Symbol { get; }
     }

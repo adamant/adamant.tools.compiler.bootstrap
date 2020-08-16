@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -115,24 +116,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             var package = new ASTBuilder().BuildPackage(entities);
 
+            var executableDeclarations = package.Declarations.OfType<IExecutableDeclaration>().ToFixedSet();
+
             // From this point forward, analysis focuses on callable bodies
             // TODO what about field initializers?
-            var invocables = entities.OfType<IConcreteInvocableDeclarationSyntax>().ToFixedList();
+            var invocableSyntaxes = entities.OfType<IConcreteInvocableDeclarationSyntax>().ToFixedList();
 
-            ShadowChecker.Check(invocables, diagnostics);
+            ShadowChecker.Check(invocableSyntaxes, diagnostics);
 
-            DataFlowAnalysis.Check(DefiniteAssignmentAnalyzer.Instance, invocables, symbolTreeBuilder, diagnostics);
+            DataFlowAnalysis.Check(DefiniteAssignmentAnalyzer.Instance, invocableSyntaxes, symbolTreeBuilder, diagnostics);
 
-            DataFlowAnalysis.Check(BindingMutabilityAnalyzer.Instance, invocables, symbolTreeBuilder, diagnostics);
+            DataFlowAnalysis.Check(BindingMutabilityAnalyzer.Instance, invocableSyntaxes, symbolTreeBuilder, diagnostics);
 
-            DataFlowAnalysis.Check(UseOfMovedValueAnalyzer.Instance, invocables, symbolTreeBuilder, diagnostics);
+            DataFlowAnalysis.Check(UseOfMovedValueAnalyzer.Instance, invocableSyntaxes, symbolTreeBuilder, diagnostics);
 
             // TODO use DataFlowAnalysis to check for unused variables and report use of variables starting with `_`
 
             // Compute variable liveness needed by reachability analyzer
-            DataFlowAnalysis.Check(LivenessAnalyzer.Instance, invocables, symbolTreeBuilder, diagnostics);
+            DataFlowAnalysis.Check(LivenessAnalyzer.Instance, invocableSyntaxes, symbolTreeBuilder, diagnostics);
 
-            ReachabilityAnalyzer.Analyze(invocables, diagnostics);
+            ReachabilityAnalyzer.Analyze(invocableSyntaxes, diagnostics);
 
             // TODO remove live variables if SaveLivenessAnalysis is false
 

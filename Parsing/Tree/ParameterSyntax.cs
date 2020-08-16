@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Promises;
@@ -20,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             : base(span)
         {
             Name = name;
-            Unused = name?.Text.StartsWith("_", StringComparison.Ordinal) ?? false;
+            Unused = name?.Text.StartsWith('_') ?? false;
         }
     }
 }
