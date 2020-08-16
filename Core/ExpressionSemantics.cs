@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace Adamant.Tools.Compiler.Bootstrap.CST
+namespace Adamant.Tools.Compiler.Bootstrap.Core
 {
     /// <summary>
     /// The semantics of the value of an expression

@@ -5,6 +5,7 @@
 ◊using System.Numerics;
 ◊using Adamant.Tools.Compiler.Bootstrap.Core;
 ◊using Adamant.Tools.Compiler.Bootstrap.Core.Operators;
+◊using Adamant.Tools.Compiler.Bootstrap.Core.Promises;
 ◊using Adamant.Tools.Compiler.Bootstrap.Framework;
 ◊using Adamant.Tools.Compiler.Bootstrap.Symbols;
 ◊using Adamant.Tools.Compiler.Bootstrap.Types;
@@ -25,8 +26,8 @@ LocalBinding: Binding = Symbol:'NamedBindingSymbol';
 Declaration = File:'CodeFile' Symbol:'Symbol';
 /// A declaration that could contain executable code (i.e. invocable declaration or field declaration)
 ExecutableDeclaration: Declaration;
-InvocableDeclaration: ExecutableDeclaration = Parameters:ConstructorParameter*;
-ConcreteInvocableDeclaration: InvocableDeclaration = Body;
+InvocableDeclaration: Declaration = Symbol:'InvocableSymbol' Parameters:ConstructorParameter*;
+ConcreteInvocableDeclaration: InvocableDeclaration, ExecutableDeclaration = Body;
 
 // ---------- Non-Member Declarations
 NonMemberDeclaration: Declaration;
@@ -34,7 +35,7 @@ ClassDeclaration: NonMemberDeclaration = Symbol:'ObjectTypeSymbol' Members:Membe
 FunctionDeclaration: NonMemberDeclaration, ConcreteInvocableDeclaration = Symbol:'FunctionSymbol' Parameters:NamedParameter* Body;
 
 // ---------- Member Declarations
-MemberDeclaration: Declaration;
+MemberDeclaration: Declaration = DeclaringClass:'IClassDeclaration';
 MethodDeclaration: MemberDeclaration = Symbol:'MethodSymbol' SelfParameter Parameters:NamedParameter*;
 AbstractMethodDeclaration: MethodDeclaration = SelfParameter Parameters:NamedParameter*;
 ConcreteMethodDeclaration: MethodDeclaration, ConcreteInvocableDeclaration = SelfParameter Parameters:NamedParameter* Body;
@@ -59,11 +60,11 @@ Body: BodyOrBlock = Statements:BodyStatement*;
 Statement;
 ResultStatement: Statement, BlockOrResult = Expression;
 BodyStatement: Statement;
-VariableDeclarationStatement: BodyStatement, LocalBinding = NameSpan:'TextSpan' Symbol:'VariableSymbol' Initializer:Expression?;
+VariableDeclarationStatement: BodyStatement, LocalBinding = NameSpan:'TextSpan' Symbol:'VariableSymbol' Initializer:Expression? VariableIsLiveAfter:'Promise<bool>';
 ExpressionStatement: BodyStatement = Expression;
 
 // ---------- Expressions
-Expression = DataType:'DataType';
+Expression = DataType:'DataType' Semantics:'ExpressionSemantics';
 AssignableExpression: Expression;
 BlockExpression: Expression, BlockOrResult, BodyOrBlock = Statements:Statement*;
 NewObjectExpression: Expression =  ReferencedSymbol:'ConstructorSymbol' Arguments:Expression*;
@@ -85,7 +86,7 @@ UnaryOperatorExpression: Expression = Fixity:'UnaryOperatorFixity' Operator:'Una
 IfExpression: Expression, ElseClause = Condition:Expression ThenBlock:BlockOrResult ElseClause?;
 LoopExpression: Expression = Block:BlockExpression;
 WhileExpression: Expression = Condition:Expression Block:BlockExpression;
-ForeachExpression: Expression, LocalBinding = Symbol:'VariableSymbol' InExpression:Expression Block:BlockExpression;
+ForeachExpression: Expression, LocalBinding = Symbol:'VariableSymbol' InExpression:Expression Block:BlockExpression VariableIsLiveAfterAssignment:'Promise<bool>';
 BreakExpression: Expression = Value:Expression?;
 NextExpression: Expression;
 ReturnExpression: Expression = Value:Expression?;
@@ -103,7 +104,7 @@ FunctionInvocationExpression: InvocationExpression = ReferencedSymbol:'FunctionS
 MethodInvocationExpression: InvocationExpression = Context:Expression ReferencedSymbol:'MethodSymbol' Arguments:Expression*;
 
 // ---------- Variable Expressions
-NameExpression: AssignableExpression = ReferencedSymbol:'NamedBindingSymbol';
+NameExpression: AssignableExpression = ReferencedSymbol:'NamedBindingSymbol' VariableIsLiveAfter:'Promise<bool>';
 SelfExpression: Expression = ReferencedSymbol:'SelfParameterSymbol' IsImplicit:'bool';
 FieldAccessExpression: AssignableExpression = Context:Expression AccessOperator:'AccessOperator' ReferencedSymbol:'FieldSymbol';
 BorrowExpression: Expression = ReferencedSymbol:'BindingSymbol' Referent:Expression;

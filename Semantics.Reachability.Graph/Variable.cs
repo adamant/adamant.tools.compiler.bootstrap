@@ -1,5 +1,5 @@
 using System;
-using Adamant.Tools.Compiler.Bootstrap.CST;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 
@@ -26,13 +26,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                    ?? throw new ArgumentException("Must be a reference type", nameof(symbol));
         }
 
-        internal static Variable? ForField(ReachabilityGraph graph, IFieldDeclarationSyntax field)
+        internal static Variable? ForField(ReachabilityGraph graph, IFieldDeclaration field)
         {
             // Non-reference types don't participate in reachability (yet)
-            var referenceType = field.Symbol.Result.DataType.Known().UnderlyingReferenceType();
+            var referenceType = field.Symbol.DataType.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
 
-            var variable = new Variable(graph, field.Symbol.Result);
+            var variable = new Variable(graph, field.Symbol);
             variable.AddReference(Reference.ToNewFieldObject(graph, field));
 
             return variable;

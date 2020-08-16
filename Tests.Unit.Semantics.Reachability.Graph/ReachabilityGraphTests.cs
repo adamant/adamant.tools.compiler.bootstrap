@@ -1,4 +1,4 @@
-using Adamant.Tools.Compiler.Bootstrap.CST;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph;
@@ -17,8 +17,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Reachability.Gra
         public void AddParameterWithValueType()
         {
             var graph = new ReachabilityGraph();
-            var mockParameter = new Mock<IBindingParameterSyntax>();
-            mockParameter.Setup(p => p.DataType).Returns(DataType.Bool);
+            var mockParameter = new Mock<IBindingParameter>();
+            var fakeFuncSymbol = new FunctionSymbol(new PackageSymbol("my.package"), "func", FixedList<DataType>.Empty, DataType.Void);
+            var fakeVariableSymbol = new VariableSymbol(fakeFuncSymbol, "var_name", null, false, DataType.Bool);
+            mockParameter.Setup(p => p.Symbol).Returns(fakeVariableSymbol);
 
             var localVariable = graph.AddParameter(mockParameter.Object);
 
@@ -37,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Reachability.Gra
         public void AddNewObjectWithValueType()
         {
             var graph = new ReachabilityGraph();
-            var mockExpression = new Mock<INewObjectExpressionSyntax>();
+            var mockExpression = new Mock<INewObjectExpression>();
             mockExpression.Setup(e => e.DataType).Returns(DataType.Int);
 
             var temp = graph.AddObject(mockExpression.Object);
@@ -51,7 +53,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Reachability.Gra
         public void AddNewObject()
         {
             var graph = new ReachabilityGraph();
-            var mockExpression = new Mock<INewObjectExpressionSyntax>();
+            var mockExpression = new Mock<INewObjectExpression>();
             // TODO this type should be Isolated or Owned
             var fakeReferenceType = new ObjectType(NamespaceName.Global, "Fake", false, ReferenceCapability.Shared);
             mockExpression.Setup(e => e.DataType).Returns(fakeReferenceType);
@@ -72,7 +74,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Reachability.Gra
         public void AssignTempToVariable()
         {
             var graph = new ReachabilityGraph();
-            var mockExpression = new Mock<INewObjectExpressionSyntax>();
+            var mockExpression = new Mock<INewObjectExpression>();
             // TODO this type should be Isolated or Owned
             var fakeReferenceType = new ObjectType(NamespaceName.Global, "Fake", false, ReferenceCapability.Shared);
             mockExpression.Setup(e => e.DataType).Returns(fakeReferenceType);

@@ -1,3 +1,4 @@
+using System;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -14,11 +15,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
             CodeFile file,
             TextSpan span,
             ObjectTypeSymbol symbol,
-            FixedList<IMemberDeclaration> members)
+            Func<IClassDeclaration, FixedList<IMemberDeclaration>> buildMembers)
             : base(file, span, symbol)
         {
             Symbol = symbol;
-            Members = members;
+            Members = buildMembers(this);
+        }
+
+        public override string ToString()
+        {
+            return $"class {Symbol.ContainingSymbol}.{Symbol.Name} {{ … }}";
         }
     }
 }

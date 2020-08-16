@@ -1,5 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using Adamant.Tools.Compiler.Bootstrap.CST;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 {
@@ -12,19 +12,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     {
         public bool IsContext { get; }
 
-        internal Object(ReachabilityGraph graph, bool isContext, IParameterSyntax parameter, Reference? originOfMutability)
+        internal Object(ReachabilityGraph graph, bool isContext, IParameter parameter, Reference? originOfMutability)
             : base(graph, parameter, originOfMutability)
         {
             IsContext = isContext;
         }
 
-        internal Object(ReachabilityGraph graph, bool isContext, IExpressionSyntax originSyntax, Reference? originOfMutability)
+        internal Object(ReachabilityGraph graph, bool isContext, IExpression originSyntax, Reference? originOfMutability)
             : base(graph, originSyntax, originOfMutability)
         {
             IsContext = isContext;
         }
 
-        internal Object(ReachabilityGraph graph, IFieldDeclarationSyntax field, Reference? originOfMutability)
+        internal Object(ReachabilityGraph graph, IFieldDeclaration field, Reference? originOfMutability)
             : base(graph, field, originOfMutability)
         {
             IsContext = false;

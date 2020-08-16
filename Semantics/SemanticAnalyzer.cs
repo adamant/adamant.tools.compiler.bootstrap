@@ -116,26 +116,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             var package = new ASTBuilder().BuildPackage(entities);
 
+            // From this point forward, analysis focuses on executable declarations (i.e. invocables and field initializers)
             var executableDeclarations = package.Declarations.OfType<IExecutableDeclaration>().ToFixedSet();
 
             ShadowChecker.Check(executableDeclarations, diagnostics);
 
-            // From this point forward, analysis focuses on callable bodies
-            // TODO what about field initializers?
-            var invocableSyntaxes = entities.OfType<IConcreteInvocableDeclarationSyntax>().ToFixedList();
+            DataFlowAnalysis.Check(DefiniteAssignmentAnalyzer.Instance, executableDeclarations, symbolTreeBuilder, diagnostics);
 
-            DataFlowAnalysis.Check(DefiniteAssignmentAnalyzer.Instance, invocableSyntaxes, symbolTreeBuilder, diagnostics);
+            DataFlowAnalysis.Check(BindingMutabilityAnalyzer.Instance, executableDeclarations, symbolTreeBuilder, diagnostics);
 
-            DataFlowAnalysis.Check(BindingMutabilityAnalyzer.Instance, invocableSyntaxes, symbolTreeBuilder, diagnostics);
-
-            DataFlowAnalysis.Check(UseOfMovedValueAnalyzer.Instance, invocableSyntaxes, symbolTreeBuilder, diagnostics);
+            DataFlowAnalysis.Check(UseOfMovedValueAnalyzer.Instance, executableDeclarations, symbolTreeBuilder, diagnostics);
 
             // TODO use DataFlowAnalysis to check for unused variables and report use of variables starting with `_`
 
             // Compute variable liveness needed by reachability analyzer
-            DataFlowAnalysis.Check(LivenessAnalyzer.Instance, invocableSyntaxes, symbolTreeBuilder, diagnostics);
+            DataFlowAnalysis.Check(LivenessAnalyzer.Instance, executableDeclarations, symbolTreeBuilder, diagnostics);
 
-            ReachabilityAnalyzer.Analyze(invocableSyntaxes, diagnostics);
+            ReachabilityAnalyzer.Analyze(executableDeclarations, symbolTreeBuilder, diagnostics);
 
             // TODO remove live variables if SaveLivenessAnalysis is false
 

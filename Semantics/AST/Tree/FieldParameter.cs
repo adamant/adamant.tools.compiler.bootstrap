@@ -18,5 +18,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
             ReferencedSymbol = referencedSymbol;
             DefaultValue = defaultValue;
         }
+
+        public override string ToString()
+        {
+            var defaultValue = DefaultValue != null ? " = " + DefaultValue : "";
+            return $".{ReferencedSymbol.Name}{defaultValue}";
+        }
     }
 }

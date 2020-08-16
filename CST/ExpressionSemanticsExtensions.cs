@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.CST

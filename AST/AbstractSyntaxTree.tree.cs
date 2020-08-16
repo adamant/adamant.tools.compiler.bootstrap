@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Operators;
+using Adamant.Tools.Compiler.Bootstrap.Core.Promises;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Types;
@@ -64,6 +65,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
     [Closed(
         typeof(IExecutableDeclaration),
+        typeof(IInvocableDeclaration),
         typeof(INonMemberDeclaration),
         typeof(IMemberDeclaration))]
     public partial interface IDeclaration : IAbstractSyntax
@@ -73,7 +75,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     }
 
     [Closed(
-        typeof(IInvocableDeclaration),
+        typeof(IConcreteInvocableDeclaration),
         typeof(IFieldDeclaration))]
     public partial interface IExecutableDeclaration : IDeclaration
     {
@@ -81,8 +83,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
     [Closed(
         typeof(IConcreteInvocableDeclaration))]
-    public partial interface IInvocableDeclaration : IExecutableDeclaration
+    public partial interface IInvocableDeclaration : IDeclaration
     {
+        new InvocableSymbol Symbol { get; }
         FixedList<IConstructorParameter> Parameters { get; }
     }
 
@@ -91,7 +94,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(IConcreteMethodDeclaration),
         typeof(IConstructorDeclaration),
         typeof(IAssociatedFunctionDeclaration))]
-    public partial interface IConcreteInvocableDeclaration : IInvocableDeclaration
+    public partial interface IConcreteInvocableDeclaration : IInvocableDeclaration, IExecutableDeclaration
     {
         IBody Body { get; }
     }
@@ -122,6 +125,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(IAssociatedFunctionDeclaration))]
     public partial interface IMemberDeclaration : IDeclaration
     {
+        IClassDeclaration DeclaringClass { get; }
     }
 
     [Closed(
@@ -231,6 +235,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         TextSpan NameSpan { get; }
         new VariableSymbol Symbol { get; }
         IExpression? Initializer { get; }
+        Promise<bool> VariableIsLiveAfter { get; }
     }
 
     public partial interface IExpressionStatement : IBodyStatement
@@ -263,6 +268,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public partial interface IExpression : IAbstractSyntax
     {
         DataType DataType { get; }
+        ExpressionSemantics Semantics { get; }
     }
 
     [Closed(
@@ -359,6 +365,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         new VariableSymbol Symbol { get; }
         IExpression InExpression { get; }
         IBlockExpression Block { get; }
+        Promise<bool> VariableIsLiveAfterAssignment { get; }
     }
 
     public partial interface IBreakExpression : IExpression
@@ -427,6 +434,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public partial interface INameExpression : IAssignableExpression
     {
         NamedBindingSymbol ReferencedSymbol { get; }
+        Promise<bool> VariableIsLiveAfter { get; }
     }
 
     public partial interface ISelfExpression : IExpression

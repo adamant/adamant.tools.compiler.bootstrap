@@ -1,5 +1,5 @@
 using System;
-using Adamant.Tools.Compiler.Bootstrap.CST;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 
@@ -22,10 +22,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             Symbol = symbol;
         }
 
-        internal static CallerVariable CreateForParameterWithObject(ReachabilityGraph graph, IBindingParameterSyntax parameter)
+        internal static CallerVariable CreateForParameterWithObject(ReachabilityGraph graph, IBindingParameter parameter)
         {
             var reference = Reference.ToNewParameterContextObject(graph, parameter);
-            var callerVariable = new CallerVariable(graph, parameter.Symbol.Result);
+            var callerVariable = new CallerVariable(graph, parameter.Symbol);
             callerVariable.AddReference(reference);
             return callerVariable;
         }

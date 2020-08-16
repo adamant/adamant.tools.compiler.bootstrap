@@ -58,9 +58,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Poisoned = true;
         }
 
-        // Useful for debugging
-        public abstract override string ToString();
-
         protected abstract OperatorPrecedence ExpressionPrecedence { get; }
 
         public string ToGroupedString(OperatorPrecedence surroundingPrecedence)

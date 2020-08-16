@@ -1,5 +1,5 @@
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.CST;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     public abstract class HeapPlace : MemoryPlace
     {
         private Access? currentAccess;
-        public ISyntax OriginSyntax { get; }
+        public IAbstractSyntax OriginSyntax { get; }
         /// <summary>
         /// This is the root reference that provides mutability from which
         /// all the others must directly or indirectly borrow.
@@ -28,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         protected HeapPlace(
             ReachabilityGraph graph,
-            ISyntax originSyntax,
+            IAbstractSyntax originSyntax,
             Reference? originOfMutability)
             : base(graph)
         {

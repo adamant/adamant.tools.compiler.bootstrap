@@ -1,5 +1,5 @@
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
 
@@ -14,11 +14,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
         #endregion
 
         public IBackwardDataFlowAnalysis<VariableFlags> BeginAnalysis(
-            IConcreteInvocableDeclarationSyntax invocable,
+            IExecutableDeclaration declaration,
             ISymbolTree symbolTree,
             Diagnostics _)
         {
-            return new LivenessAnalysis(invocable, symbolTree);
+            return new LivenessAnalysis(declaration, symbolTree);
         }
     }
 }

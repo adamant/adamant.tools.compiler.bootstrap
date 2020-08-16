@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
@@ -11,70 +11,73 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.DefiniteAssignmen
     // TODO check definite assignment of fields in constructors
     internal class DefiniteAssignmentAnalysis : IForwardDataFlowAnalysis<VariableFlags>
     {
-        private readonly IConcreteInvocableDeclarationSyntax invocable;
+        private readonly IExecutableDeclaration declaration;
         private readonly ISymbolTree symbolTree;
         private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
 
         public DefiniteAssignmentAnalysis(
-            IConcreteInvocableDeclarationSyntax invocable,
+            IExecutableDeclaration declaration,
             ISymbolTree symbolTree,
             Diagnostics diagnostics)
         {
-            this.invocable = invocable;
+            this.declaration = declaration;
             this.symbolTree = symbolTree;
-            this.file = invocable.File;
+            this.file = declaration.File;
             this.diagnostics = diagnostics;
         }
 
         public VariableFlags StartState()
         {
-            var definitelyAssigned = new VariableFlags(invocable, symbolTree, false);
-            // All parameters are assigned
-            var namedParameters = invocable.Parameters.OfType<INamedParameterSyntax>();
-            var parameterSymbols = namedParameters.Select(p => p.Symbol.Result);
-            definitelyAssigned = definitelyAssigned.Set(parameterSymbols, true);
+            var definitelyAssigned = new VariableFlags(declaration, symbolTree, false);
+            if (declaration is IInvocableDeclaration invocable)
+            {
+                // All parameters are assigned
+                var namedParameters = invocable.Parameters.OfType<INamedParameter>();
+                var parameterSymbols = namedParameters.Select(p => p.Symbol);
+                definitelyAssigned = definitelyAssigned.Set(parameterSymbols, true);
+            }
             return definitelyAssigned;
         }
 
         public VariableFlags Assignment(
-            IAssignmentExpressionSyntax assignmentExpression,
+            IAssignmentExpression assignmentExpression,
             VariableFlags definitelyAssigned)
         {
             return assignmentExpression.LeftOperand switch
             {
-                INameExpressionSyntax identifier =>
-                    definitelyAssigned.Set(identifier.ReferencedSymbol.Result!, true),
-                IFieldAccessExpressionSyntax _ => definitelyAssigned,
+                INameExpression identifier =>
+                    definitelyAssigned.Set(identifier.ReferencedSymbol, true),
+                IFieldAccessExpression _ => definitelyAssigned,
                 _ => throw new NotImplementedException("Complex assignments not yet implemented")
             };
         }
 
         public VariableFlags IdentifierName(
-            INameExpressionSyntax nameExpression,
+            INameExpression nameExpression,
             VariableFlags definitelyAssigned)
         {
-            if (definitelyAssigned[nameExpression.ReferencedSymbol.Result!] == false)
+            if (definitelyAssigned[nameExpression.ReferencedSymbol] == false)
                 diagnostics.Add(SemanticError.VariableMayNotHaveBeenAssigned(file,
-                    nameExpression.Span, nameExpression.Name ?? throw new InvalidOperationException()));
+                    nameExpression.Span, nameExpression.ReferencedSymbol.Name));
 
             return definitelyAssigned;
         }
 
         public VariableFlags VariableDeclaration(
-            IVariableDeclarationStatementSyntax variableDeclaration,
+            IVariableDeclarationStatement variableDeclaration,
             VariableFlags definitelyAssigned)
         {
             if (variableDeclaration.Initializer is null)
                 return definitelyAssigned;
-            return definitelyAssigned.Set(variableDeclaration.Symbol.Result, true);
+            return definitelyAssigned.Set(variableDeclaration.Symbol, true);
         }
 
         public VariableFlags VariableDeclaration(
-            IForeachExpressionSyntax foreachExpression,
+            IForeachExpression foreachExpression,
             VariableFlags definitelyAssigned)
         {
-            return definitelyAssigned.Set(foreachExpression.Symbol.Result, true);
+            return definitelyAssigned.Set(foreachExpression.Symbol, true);
         }
     }
 }

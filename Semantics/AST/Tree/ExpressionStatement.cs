@@ -12,5 +12,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
         {
             Expression = expression;
         }
+
+        public override string ToString()
+        {
+            return Expression + ";";
+        }
     }
 }

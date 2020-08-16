@@ -21,5 +21,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
             Symbol = symbol;
             DefaultValue = defaultValue;
         }
+
+        public override string ToString()
+        {
+            var mutable = Symbol.IsMutableBinding ? "mut " : "";
+            var defaultValue = DefaultValue != null ? " = " + DefaultValue : "";
+            var declarationNumber = Symbol.DeclarationNumber is null ? "" : "#" + Symbol.DeclarationNumber;
+            return $"{mutable}{Symbol.Name}{declarationNumber}: {Symbol.DataType}{defaultValue}";
+        }
     }
 }

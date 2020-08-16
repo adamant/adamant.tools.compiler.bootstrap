@@ -36,7 +36,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         // A null name means this syntax was generated as an assumed missing name and the name is unknown
         public Name? Name { get; }
         public Promise<NamedBindingSymbol?> ReferencedSymbol { get; } = new Promise<NamedBindingSymbol?>();
-        public bool VariableIsLiveAfter { get; set; } = true;
 
         public NameExpressionSyntax(TextSpan span, Name? name)
             : base(span)

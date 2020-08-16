@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.CST;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
 
@@ -41,9 +41,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         }
 
         // TODO encapsulate these in the graph class
-        public static Reference ToNewParameterObject(ReachabilityGraph graph, IParameterSyntax parameter)
+        public static Reference ToNewParameterObject(ReachabilityGraph graph, IBindingParameter parameter)
         {
-            var referenceType = parameter.DataType.Known().UnderlyingReferenceType()
+            var referenceType = parameter.Symbol.DataType.Known().UnderlyingReferenceType()
                                 ?? throw new ArgumentException("Must be a parameter with a reference type", nameof(parameter));
 
             var referenceCapability = referenceType.ReferenceCapability;
@@ -55,9 +55,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return reference;
         }
 
-        public static Reference ToNewParameterContextObject(ReachabilityGraph graph, IParameterSyntax parameter)
+        public static Reference ToNewParameterContextObject(ReachabilityGraph graph, IBindingParameter parameter)
         {
-            var referenceType = parameter.DataType.Known().UnderlyingReferenceType()
+            var referenceType = parameter.Symbol.DataType.Known().UnderlyingReferenceType()
                 ?? throw new ArgumentException("Must be a parameter with a reference type",
                                                 nameof(parameter));
 
@@ -70,7 +70,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return reference;
         }
 
-        public static Reference ToNewContextObject(ReachabilityGraph graph, IExpressionSyntax expression)
+        public static Reference ToNewContextObject(ReachabilityGraph graph, IExpression expression)
         {
             var referenceType = expression.DataType.Known().UnderlyingReferenceType()
                                 ?? throw new ArgumentException("Must be a parameter with a reference type",
@@ -85,22 +85,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return reference;
         }
 
-        public static Reference ToNewObject(ReachabilityGraph graph, INewObjectExpressionSyntax expression)
+        public static Reference ToNewObject(ReachabilityGraph graph, INewObjectExpression expression)
         {
             return ToExpressionObject(graph, expression);
         }
 
-        public static Reference ToNewInvocationReturnedObject(ReachabilityGraph graph, IInvocationExpressionSyntax expression)
+        public static Reference ToNewInvocationReturnedObject(ReachabilityGraph graph, IInvocationExpression expression)
         {
             return ToExpressionObject(graph, expression);
         }
 
-        internal static Reference ToFieldAccess(ReachabilityGraph graph, IFieldAccessExpressionSyntax expression)
+        internal static Reference ToFieldAccess(ReachabilityGraph graph, IFieldAccessExpression expression)
         {
             return ToExpressionObject(graph, expression);
         }
 
-        private static Reference ToExpressionObject(ReachabilityGraph graph, IExpressionSyntax expression)
+        private static Reference ToExpressionObject(ReachabilityGraph graph, IExpression expression)
         {
             var referenceType = expression.DataType.Known().UnderlyingReferenceType()
                                 ?? throw new ArgumentException("Must be a parameter with a reference type",
@@ -115,9 +115,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return reference;
         }
 
-        public static Reference ToNewFieldObject(ReachabilityGraph graph, IFieldDeclarationSyntax field)
+        public static Reference ToNewFieldObject(ReachabilityGraph graph, IFieldDeclaration field)
         {
-            var referenceType = field.Symbol.Result.DataType.Known().UnderlyingReferenceType()
+            var referenceType = field.Symbol.DataType.Known().UnderlyingReferenceType()
                                 ?? throw new ArgumentException("Must be a parameter with a reference type",
                                     nameof(field));
 

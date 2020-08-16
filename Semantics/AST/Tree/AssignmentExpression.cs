@@ -1,6 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Operators;
+using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
@@ -11,12 +12,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
         public AssignmentOperator Operator { get; }
         public IExpression RightOperand { get; }
 
-        public AssignmentExpression(TextSpan span, DataType dataType, IAssignableExpression leftOperand, AssignmentOperator @operator, IExpression rightOperand)
-            : base(span, dataType)
+        public AssignmentExpression(
+            TextSpan span,
+            DataType dataType,
+            ExpressionSemantics semantics,
+            IAssignableExpression leftOperand,
+            AssignmentOperator @operator,
+            IExpression rightOperand)
+            : base(span, dataType, semantics)
         {
             LeftOperand = leftOperand;
             Operator = @operator;
             RightOperand = rightOperand;
+        }
+
+        protected override OperatorPrecedence ExpressionPrecedence => OperatorPrecedence.Assignment;
+
+        public override string ToString()
+        {
+            return $"{LeftOperand.ToGroupedString(ExpressionPrecedence)} {Operator.ToSymbolString()} {RightOperand.ToGroupedString(ExpressionPrecedence)}";
         }
     }
 }

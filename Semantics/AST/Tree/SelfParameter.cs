@@ -13,5 +13,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
         {
             Symbol = symbol;
         }
+
+        public override string ToString()
+        {
+            var value = "self";
+            if (Symbol.IsMutableBinding) value = "mut " + value;
+            return value;
+        }
     }
 }

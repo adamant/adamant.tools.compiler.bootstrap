@@ -1,14 +1,14 @@
-using Adamant.Tools.Compiler.Bootstrap.CST;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 {
     public class TempValue : StackPlace
     {
-        private readonly IExpressionSyntax expression;
+        private readonly IExpression expression;
         public ReferenceType ReferenceType { get; }
 
-        private TempValue(ReachabilityGraph graph, IExpressionSyntax expression, ReferenceType referenceType)
+        private TempValue(ReachabilityGraph graph, IExpression expression, ReferenceType referenceType)
             : base(graph)
         {
             this.expression = expression;
@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         }
 
         // TODO encapsulate this in the graph class
-        public static TempValue? ForNewContextObject(ReachabilityGraph graph, IExpressionSyntax expression)
+        public static TempValue? ForNewContextObject(ReachabilityGraph graph, IExpression expression)
         {
             var referenceType = expression.DataType.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return temp;
         }
 
-        internal static TempValue? ForNewObject(ReachabilityGraph graph, INewObjectExpressionSyntax expression)
+        internal static TempValue? ForNewObject(ReachabilityGraph graph, INewObjectExpression expression)
         {
             var referenceType = expression.DataType.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
@@ -39,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         }
 
         // TODO encapsulate this in the graph class
-        internal static TempValue? ForNewInvocationReturnedObject(ReachabilityGraph graph, IInvocationExpressionSyntax expression)
+        internal static TempValue? ForNewInvocationReturnedObject(ReachabilityGraph graph, IInvocationExpression expression)
         {
             var referenceType = expression.DataType.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
@@ -52,7 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         internal static TempValue? ForFieldAccess(
             ReachabilityGraph graph,
-            IFieldAccessExpressionSyntax expression)
+            IFieldAccessExpression expression)
         {
             var referenceType = expression.DataType.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
@@ -64,7 +64,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         }
 
         // TODO encapsulate this in the graph class
-        public static TempValue? For(ReachabilityGraph graph, IExpressionSyntax expression, DataType? type = null)
+        public static TempValue? For(ReachabilityGraph graph, IExpression expression, DataType? type = null)
         {
             type ??= expression.DataType.Known();
             var referenceType = type.UnderlyingReferenceType();

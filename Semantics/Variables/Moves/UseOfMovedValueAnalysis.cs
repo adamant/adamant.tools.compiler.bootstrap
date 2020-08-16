@@ -1,6 +1,6 @@
 using System;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
@@ -18,43 +18,50 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Moves
     /// </summary>
     public class UseOfMovedValueAnalysis : IForwardDataFlowAnalysis<VariableFlags>
     {
-        private readonly IConcreteInvocableDeclarationSyntax invocable;
+        private readonly IExecutableDeclaration declaration;
         private readonly ISymbolTree symbolTree;
         private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
 
-        public UseOfMovedValueAnalysis(IConcreteInvocableDeclarationSyntax invocable, ISymbolTree symbolTree, Diagnostics diagnostics)
+        public UseOfMovedValueAnalysis(
+            IExecutableDeclaration declaration,
+            ISymbolTree symbolTree,
+            Diagnostics diagnostics)
         {
-            this.invocable = invocable;
+            this.declaration = declaration;
             this.symbolTree = symbolTree;
-            file = invocable.File;
+            file = declaration.File;
             this.diagnostics = diagnostics;
         }
 
         public VariableFlags StartState()
         {
             // All variables start without possibly having their values moved out of them
-            return new VariableFlags(invocable, symbolTree, false);
+            return new VariableFlags(declaration, symbolTree, false);
         }
 
-        public VariableFlags Assignment(IAssignmentExpressionSyntax assignmentExpression, VariableFlags possiblyMoved)
+        public VariableFlags Assignment(
+            IAssignmentExpression assignmentExpression,
+            VariableFlags possiblyMoved)
         {
             switch (assignmentExpression.LeftOperand)
             {
-                case INameExpressionSyntax identifierName:
+                case INameExpression identifierName:
                     // We are assigning into this variable so it definitely has a value now
-                    var symbol = identifierName.ReferencedSymbol.Result ?? throw new InvalidOperationException();
+                    var symbol = identifierName.ReferencedSymbol;
                     return possiblyMoved.Set(symbol, false);
-                case IFieldAccessExpressionSyntax _:
+                case IFieldAccessExpression _:
                     return possiblyMoved;
                 default:
                     throw new NotImplementedException("Complex assignments not yet implemented");
             }
         }
 
-        public VariableFlags IdentifierName(INameExpressionSyntax nameExpression, VariableFlags possiblyMoved)
+        public VariableFlags IdentifierName(
+            INameExpression nameExpression,
+            VariableFlags possiblyMoved)
         {
-            var symbol = nameExpression.ReferencedSymbol.Result ?? throw new InvalidOperationException();
+            var symbol = nameExpression.ReferencedSymbol;
             if (possiblyMoved[symbol] == true)
                 diagnostics.Add(SemanticError.UseOfPossiblyMovedValue(file, nameExpression.Span));
 
@@ -72,7 +79,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Moves
                 case ExpressionSemantics.Void:
                 case ExpressionSemantics.Never:
                 case ExpressionSemantics.CreateReference:
-                case null: // If it were move or copy, that would have been set to the ExpressionSemantics
+                    // If it were move or copy, that would have been set to the ExpressionSemantics
                     // Not moving value
                     return possiblyMoved;
                 default:
@@ -81,7 +88,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Moves
         }
 
         public VariableFlags VariableDeclaration(
-            IVariableDeclarationStatementSyntax variableDeclaration,
+            IVariableDeclarationStatement variableDeclaration,
             VariableFlags possiblyMoved)
         {
             // No affect on state since it should already be false
@@ -89,7 +96,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Moves
         }
 
         public VariableFlags VariableDeclaration(
-            IForeachExpressionSyntax foreachExpression,
+            IForeachExpression foreachExpression,
             VariableFlags possiblyMoved)
         {
             // No affect on state since it should already be false

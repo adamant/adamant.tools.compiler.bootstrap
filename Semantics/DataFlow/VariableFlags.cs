@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.CST;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
@@ -14,9 +14,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
         private readonly FixedDictionary<BindingSymbol, int> symbolMap;
         private readonly BitArray flags;
 
-        public VariableFlags(IConcreteInvocableDeclarationSyntax invocable, ISymbolTree symbolTree, bool defaultValue)
+        public VariableFlags(IExecutableDeclaration declaration, ISymbolTree symbolTree, bool defaultValue)
         {
-            var invocableSymbol = invocable.Symbol.Result;
+            var invocableSymbol = declaration.Symbol;
             symbolMap = symbolTree.Children(invocableSymbol).Cast<BindingSymbol>().Enumerate().ToFixedDictionary();
             flags = new BitArray(symbolMap.Count, defaultValue);
         }

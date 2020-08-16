@@ -38,61 +38,76 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
         private static IClassDeclaration BuildClass(IClassDeclarationSyntax syn)
         {
             var symbol = syn.Symbol.Result;
-            var members = syn.Members.Select(BuildMember).ToFixedList();
-            return new ClassDeclaration(syn.File, syn.Span, symbol, members);
+
+            FixedList<IMemberDeclaration> BuildMembers(IClassDeclaration c)
+                => syn.Members.Select(m => BuildMember(c, m)).ToFixedList();
+
+            return new ClassDeclaration(syn.File, syn.Span, symbol, BuildMembers);
         }
 
-        private static IMemberDeclaration BuildMember(IMemberDeclarationSyntax member)
+        private static IMemberDeclaration BuildMember(
+            IClassDeclaration declaringClass,
+            IMemberDeclarationSyntax member)
         {
             return member switch
             {
-                IAssociatedFunctionDeclarationSyntax syn => BuildAssociatedFunction(syn),
-                IAbstractMethodDeclarationSyntax syn => BuildAbstractMethod(syn),
-                IConcreteMethodDeclarationSyntax syn => BuildConcreteMethod(syn),
-                IConstructorDeclarationSyntax syn => BuildConstructor(syn),
-                IFieldDeclarationSyntax syn => BuildField(syn),
+                IAssociatedFunctionDeclarationSyntax syn => BuildAssociatedFunction(declaringClass, syn),
+                IAbstractMethodDeclarationSyntax syn => BuildAbstractMethod(declaringClass, syn),
+                IConcreteMethodDeclarationSyntax syn => BuildConcreteMethod(declaringClass, syn),
+                IConstructorDeclarationSyntax syn => BuildConstructor(declaringClass, syn),
+                IFieldDeclarationSyntax syn => BuildField(declaringClass, syn),
                 _ => throw ExhaustiveMatch.Failed(member)
             };
         }
 
-        private static IAssociatedFunctionDeclaration BuildAssociatedFunction(IAssociatedFunctionDeclarationSyntax syn)
+        private static IAssociatedFunctionDeclaration BuildAssociatedFunction(
+            IClassDeclaration declaringClass,
+            IAssociatedFunctionDeclarationSyntax syn)
         {
             var symbol = syn.Symbol.Result;
             var parameters = syn.Parameters.Select(BuildParameter).ToFixedList();
             IBody body = BuildBody(syn.Body);
-            return new AssociatedFunctionDeclaration(syn.File, syn.Span, symbol, parameters, body);
+            return new AssociatedFunctionDeclaration(syn.File, syn.Span, declaringClass, symbol, parameters, body);
         }
 
-        private static IAbstractMethodDeclaration BuildAbstractMethod(IAbstractMethodDeclarationSyntax syn)
+        private static IAbstractMethodDeclaration BuildAbstractMethod(
+            IClassDeclaration declaringClass,
+            IAbstractMethodDeclarationSyntax syn)
         {
             var symbol = syn.Symbol.Result;
             var selfParameter = BuildParameter(syn.SelfParameter);
             var parameters = syn.Parameters.Select(BuildParameter).ToFixedList();
-            return new AbstractMethodDeclaration(syn.File, syn.Span, symbol, selfParameter, parameters);
+            return new AbstractMethodDeclaration(syn.File, syn.Span, declaringClass, symbol, selfParameter, parameters);
         }
 
-        private static IConcreteMethodDeclaration BuildConcreteMethod(IConcreteMethodDeclarationSyntax syn)
+        private static IConcreteMethodDeclaration BuildConcreteMethod(
+            IClassDeclaration declaringClass,
+            IConcreteMethodDeclarationSyntax syn)
         {
             var symbol = syn.Symbol.Result;
             var selfParameter = BuildParameter(syn.SelfParameter);
             var parameters = syn.Parameters.Select(BuildParameter).ToFixedList();
             IBody body = BuildBody(syn.Body);
-            return new ConcreteMethodDeclaration(syn.File, syn.Span, symbol, selfParameter, parameters, body);
+            return new ConcreteMethodDeclaration(syn.File, syn.Span, declaringClass, symbol, selfParameter, parameters, body);
         }
 
-        private static IConstructorDeclaration BuildConstructor(IConstructorDeclarationSyntax syn)
+        private static IConstructorDeclaration BuildConstructor(
+            IClassDeclaration declaringClass,
+            IConstructorDeclarationSyntax syn)
         {
             var symbol = syn.Symbol.Result;
             var selfParameter = BuildParameter(syn.ImplicitSelfParameter);
             var parameters = syn.Parameters.Select(BuildParameter).ToFixedList();
             IBody body = BuildBody(syn.Body);
-            return new ConstructorDeclaration(syn.File, syn.Span, symbol, selfParameter, parameters, body);
+            return new ConstructorDeclaration(syn.File, syn.Span, declaringClass, symbol, selfParameter, parameters, body);
         }
 
-        private static IFieldDeclaration BuildField(IFieldDeclarationSyntax syn)
+        private static IFieldDeclaration BuildField(
+            IClassDeclaration declaringClass,
+            IFieldDeclarationSyntax syn)
         {
             var symbol = syn.Symbol.Result;
-            return new FieldDeclaration(syn.File, syn.Span, symbol);
+            return new FieldDeclaration(syn.File, syn.Span, declaringClass, symbol);
         }
 
         private static IFunctionDeclaration BuildFunction(IFunctionDeclarationSyntax syn)
@@ -234,10 +249,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
         private static IAssignmentExpression BuildAssignmentExpression(IAssignmentExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
+            var semantics = syn.Semantics.Assigned();
             var leftOperand = BuildAssignableExpression(syn.LeftOperand);
             var @operator = syn.Operator;
             var rightOperand = BuildExpression(syn.RightOperand);
-            return new AssignmentExpression(syn.Span, type, leftOperand, @operator, rightOperand);
+            return new AssignmentExpression(syn.Span, type, semantics, leftOperand, @operator, rightOperand);
         }
 
         private static IAssignableExpression BuildAssignableExpression(IAssignableExpressionSyntax expression)
@@ -253,74 +269,83 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
         private static IBinaryOperatorExpression BuildBinaryOperatorExpression(IBinaryOperatorExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
+            var semantics = syn.Semantics.Assigned();
             var leftOperand = BuildExpression(syn.LeftOperand);
             var @operator = syn.Operator;
             var rightOperand = BuildExpression(syn.RightOperand);
-            return new BinaryOperatorExpression(syn.Span, type, leftOperand, @operator, rightOperand);
+            return new BinaryOperatorExpression(syn.Span, type, semantics, leftOperand, @operator, rightOperand);
         }
 
         private static IBlockExpression BuildBlockExpression(IBlockExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
+            var semantics = syn.Semantics.Assigned();
             var statements = syn.Statements.Select(BuildStatement).ToFixedList();
-            return new BlockExpression(syn.Span, type, statements);
+            return new BlockExpression(syn.Span, type, semantics, statements);
         }
 
         private static IBoolLiteralExpression BuildBoolLiteralExpression(IBoolLiteralExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
+            var semantics = syn.Semantics.Assigned();
             var value = syn.Value;
-            return new BoolLiteralExpression(syn.Span, type, value);
+            return new BoolLiteralExpression(syn.Span, type, semantics, value);
         }
 
         private static IBorrowExpression BuildBorrowExpression(IBorrowExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
+            var semantics = syn.Semantics.Assigned();
             var referencedSymbol = syn.ReferencedSymbol.Result ?? throw new InvalidOperationException();
             var referent = BuildExpression(syn.Referent);
-            return new BorrowExpression(syn.Span, type, referencedSymbol, referent);
+            return new BorrowExpression(syn.Span, type, semantics, referencedSymbol, referent);
         }
 
         private static IBreakExpression BuildBreakExpression(IBreakExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
+            var semantics = syn.Semantics.Assigned();
             var value = BuildExpression(syn.Value);
-            return new BreakExpression(syn.Span, type, value);
+            return new BreakExpression(syn.Span, type, semantics, value);
         }
 
         private static IFieldAccessExpression BuildFieldAccessExpression(IFieldAccessExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
+            var semantics = syn.Semantics.Assigned();
             var context = BuildExpression(syn.Context);
             var accessOperator = syn.AccessOperator;
             var referencedSymbol = syn.ReferencedSymbol.Result ?? throw new InvalidOperationException();
-            return new FieldAccessExpression(syn.Span, type, context, accessOperator, referencedSymbol);
+            return new FieldAccessExpression(syn.Span, type, semantics, context, accessOperator, referencedSymbol);
         }
 
         private static IForeachExpression BuildForeachExpression(IForeachExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
+            var semantics = syn.Semantics.Assigned();
             var symbol = syn.Symbol.Result;
             var inExpression = BuildExpression(syn.InExpression);
             var block = BuildBlockExpression(syn.Block);
-            return new ForeachExpression(syn.Span, type, symbol, inExpression, block);
+            return new ForeachExpression(syn.Span, type, semantics, symbol, inExpression, block);
         }
 
         private static IFunctionInvocationExpression BuildFunctionInvocationExpression(IFunctionInvocationExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
+            var semantics = syn.Semantics.Assigned();
             var referencedSymbol = syn.ReferencedSymbol.Result ?? throw new InvalidOperationException();
             FixedList<IExpression> arguments = syn.Arguments.Select(a => BuildExpression(a.Expression)).ToFixedList();
-            return new FunctionInvocationExpression(syn.Span, type, referencedSymbol, arguments);
+            return new FunctionInvocationExpression(syn.Span, type, semantics, referencedSymbol, arguments);
         }
 
         private static IIfExpression BuildIfExpression(IIfExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
+            var semantics = syn.Semantics.Assigned();
             var condition = BuildExpression(syn.Condition);
             var thenBlock = BuildBlockOrResult(syn.ThenBlock);
             var elseClause = BuildElseClause(syn.ElseClause);
-            return new IfExpression(syn.Span, type, condition, thenBlock, elseClause);
+            return new IfExpression(syn.Span, type, semantics, condition, thenBlock, elseClause);
         }
 
         [return: NotNullIfNotNull("syn")]
@@ -339,146 +364,164 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
             IImplicitImmutabilityConversionExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
+            var semantics = syn.Semantics.Assigned();
             var expression = BuildExpression(syn.Expression);
             var convertToType = syn.ConvertToType;
-            return new ImplicitImmutabilityConversion(syn.Span, type, expression, convertToType);
-
+            return new ImplicitImmutabilityConversion(syn.Span, type, semantics, expression, convertToType);
         }
 
         private static IImplicitNoneConversionExpression BuildImplicitNoneConversionExpression(IImplicitNoneConversionExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
+            var semantics = syn.Semantics.Assigned();
             var expression = BuildExpression(syn.Expression);
             var convertToType = syn.ConvertToType;
-            return new ImplicitNoneConversionExpression(syn.Span, type, expression, convertToType);
+            return new ImplicitNoneConversionExpression(syn.Span, type, semantics, expression, convertToType);
         }
 
         private static IImplicitNumericConversionExpression BuildImplicitNumericConversionExpression(IImplicitNumericConversionExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
+            var semantics = syn.Semantics.Assigned();
             var expression = BuildExpression(syn.Expression);
             var convertToType = syn.ConvertToType;
-            return new ImplicitNumericConversionExpression(syn.Span, type, expression, convertToType);
+            return new ImplicitNumericConversionExpression(syn.Span, type, semantics, expression, convertToType);
         }
 
         private static IImplicitOptionalConversionExpression BuildImplicitOptionalConversionExpression(IImplicitOptionalConversionExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
+            var semantics = syn.Semantics.Assigned();
             var expression = BuildExpression(syn.Expression);
             var convertToType = syn.ConvertToType;
-            return new ImplicitOptionalConversionExpression(syn.Span, type, expression, convertToType);
+            return new ImplicitOptionalConversionExpression(syn.Span, type, semantics, expression, convertToType);
         }
 
         private static IIntegerLiteralExpression BuildIntegerLiteralExpression(IIntegerLiteralExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
+            var semantics = syn.Semantics.Assigned();
             var value = syn.Value;
-            return new IntegerLiteralExpression(syn.Span, type, value);
+            return new IntegerLiteralExpression(syn.Span, type, semantics, value);
         }
 
         private static INoneLiteralExpression BuildNoneLiteralExpression(INoneLiteralExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
-            return new NoneLiteralExpression(syn.Span, type);
+            var semantics = syn.Semantics.Assigned();
+            return new NoneLiteralExpression(syn.Span, type, semantics);
         }
 
         private static IStringLiteralExpression BuildStringLiteralExpression(IStringLiteralExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
+            var semantics = syn.Semantics.Assigned();
             var value = syn.Value;
-            return new StringLiteralExpression(syn.Span, type, value);
+            return new StringLiteralExpression(syn.Span, type, semantics, value);
         }
 
         private static ILoopExpression BuildLoopExpression(ILoopExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
+            var semantics = syn.Semantics.Assigned();
             var block = BuildBlockExpression(syn.Block);
-            return new LoopExpression(syn.Span, type, block);
+            return new LoopExpression(syn.Span, type, semantics, block);
         }
 
         private static IMethodInvocationExpression BuildMethodInvocationExpression(IMethodInvocationExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
+            var semantics = syn.Semantics.Assigned();
             var context = BuildExpression(syn.Context);
             var referencedSymbol = syn.ReferencedSymbol.Result ?? throw new InvalidOperationException();
             FixedList<IExpression> arguments = syn.Arguments.Select(a => BuildExpression(a.Expression)).ToFixedList();
-            return new MethodInvocationExpression(syn.Span, type, context, referencedSymbol, arguments);
+            return new MethodInvocationExpression(syn.Span, type, semantics, context, referencedSymbol, arguments);
         }
 
         private static IMoveExpression BuildMoveExpression(IMoveExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
+            var semantics = syn.Semantics.Assigned();
             var referencedSymbol = syn.ReferencedSymbol.Result ?? throw new InvalidOperationException();
             var referent = BuildExpression(syn.Referent);
-            return new MoveExpression(syn.Span, type, referencedSymbol, referent);
+            return new MoveExpression(syn.Span, type, semantics, referencedSymbol, referent);
         }
 
         private static INameExpression BuildNameExpression(INameExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
+            var semantics = syn.Semantics.Assigned();
             var referencedSymbol = syn.ReferencedSymbol.Result ?? throw new InvalidOperationException();
-            return new NameExpression(syn.Span, type, referencedSymbol);
+            return new NameExpression(syn.Span, type, semantics, referencedSymbol);
         }
 
         private static INewObjectExpression BuildNewObjectExpression(INewObjectExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
+            var semantics = syn.Semantics.Assigned();
             var referencedSymbol = syn.ReferencedSymbol.Result ?? throw new InvalidOperationException();
             FixedList<IExpression> arguments = syn.Arguments.Select(a => BuildExpression(a.Expression)).ToFixedList();
-            return new NewObjectExpression(syn.Span, type, referencedSymbol, arguments);
+            return new NewObjectExpression(syn.Span, type, semantics, referencedSymbol, arguments);
         }
 
         private static INextExpression BuildNextExpression(INextExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
-            return new NextExpression(syn.Span, type);
+            var semantics = syn.Semantics.Assigned();
+            return new NextExpression(syn.Span, type, semantics);
         }
 
         private static IReturnExpression BuildReturnExpression(IReturnExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
+            var semantics = syn.Semantics.Assigned();
             var value = BuildExpression(syn.Value);
-            return new ReturnExpression(syn.Span, type, value);
+            return new ReturnExpression(syn.Span, type, semantics, value);
         }
 
         private static ISelfExpression BuildSelfExpression(ISelfExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
+            var semantics = syn.Semantics.Assigned();
             var referencedSymbol = syn.ReferencedSymbol.Result ?? throw new InvalidOperationException();
             var isImplicit = syn.IsImplicit;
-            return new SelfExpression(syn.Span, type, referencedSymbol, isImplicit);
+            return new SelfExpression(syn.Span, type, semantics, referencedSymbol, isImplicit);
         }
 
         private static IShareExpression BuildShareExpression(IShareExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
+            var semantics = syn.Semantics.Assigned();
             var referencedSymbol = syn.ReferencedSymbol.Result ?? throw new InvalidOperationException();
             var referent = BuildExpression(syn.Referent);
-            return new ShareExpression(syn.Span, type, referencedSymbol, referent);
+            return new ShareExpression(syn.Span, type, semantics, referencedSymbol, referent);
         }
 
         private static IUnaryOperatorExpression BuildUnaryOperatorExpression(IUnaryOperatorExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
+            var semantics = syn.Semantics.Assigned();
             var fixity = syn.Fixity;
             var @operator = syn.Operator;
             var operand = BuildExpression(syn.Operand);
-            return new UnaryOperatorExpression(syn.Span, type, fixity, @operator, operand);
+            return new UnaryOperatorExpression(syn.Span, type, semantics, fixity, @operator, operand);
         }
 
         private static IUnsafeExpression BuildUnsafeExpression(IUnsafeExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
+            var semantics = syn.Semantics.Assigned();
             var expression = BuildExpression(syn.Expression);
-            return new UnsafeExpression(syn.Span, type, expression);
+            return new UnsafeExpression(syn.Span, type, semantics, expression);
         }
 
         private static IWhileExpression BuildWhileExpression(IWhileExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
+            var semantics = syn.Semantics.Assigned();
             var condition = BuildExpression(syn.Condition);
             var block = BuildBlockExpression(syn.Block);
-            return new WhileExpression(syn.Span, type, condition, block);
+            return new WhileExpression(syn.Span, type, semantics, condition, block);
         }
     }
 }

@@ -1,5 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Core.Promises;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
@@ -11,6 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
         BindingSymbol IBinding.Symbol => Symbol;
         NamedBindingSymbol ILocalBinding.Symbol => Symbol;
         public IExpression? Initializer { get; }
+        public Promise<bool> VariableIsLiveAfter { get; } = new Promise<bool>();
 
         public VariableDeclarationStatement(
             TextSpan span,
@@ -22,6 +24,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
             NameSpan = nameSpan;
             Symbol = symbol;
             Initializer = initializer;
+        }
+
+        public override string ToString()
+        {
+            var binding = Symbol.IsMutableBinding ? "var" : "let";
+            var declarationNumber = Symbol.DeclarationNumber is null ? "" : "#" + Symbol.DeclarationNumber;
+            var initializer = Initializer != null ? " = " + Initializer : "";
+            return $"{binding} {Symbol.Name}{declarationNumber}: {Symbol.DataType}{initializer};";
         }
     }
 }

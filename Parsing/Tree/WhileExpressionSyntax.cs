@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public override string ToString()
         {
-            return $"while {condition} {Block}";
+            return $"while {Condition} {Block}";
         }
     }
 }

@@ -1,5 +1,5 @@
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
 
@@ -14,11 +14,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.BindingMutability
         #endregion
 
         public IForwardDataFlowAnalysis<VariableFlags> BeginAnalysis(
-            IConcreteInvocableDeclarationSyntax invocable,
+            IExecutableDeclaration declaration,
             ISymbolTree symbolTree,
             Diagnostics diagnostics)
         {
-            return new BindingMutabilityAnalysis(invocable, symbolTree, diagnostics);
+            return new BindingMutabilityAnalysis(declaration, symbolTree, diagnostics);
         }
     }
 }

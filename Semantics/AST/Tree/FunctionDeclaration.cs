@@ -2,6 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
+using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
 {
@@ -22,6 +23,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
             Symbol = symbol;
             Parameters = parameters;
             Body = body;
+        }
+
+        public override string ToString()
+        {
+            var returnType = Symbol.ReturnDataType != DataType.Void ? " -> " + Symbol.ReturnDataType : "";
+            return $"fn {Symbol.ContainingSymbol}.{Symbol.Name}({string.Join(", ", Parameters)}){returnType} {Body}";
         }
     }
 }

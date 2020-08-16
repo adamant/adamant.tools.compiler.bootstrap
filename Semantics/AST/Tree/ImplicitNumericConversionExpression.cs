@@ -11,11 +11,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
         public ImplicitNumericConversionExpression(
             TextSpan span,
             DataType dataType,
+            ExpressionSemantics semantics,
             IExpression expression,
             NumericType convertToType)
-            : base(span, dataType, expression)
+            : base(span, dataType, semantics, expression)
         {
             ConvertToType = convertToType;
+        }
+
+        public override string ToString()
+        {
+            return $"{{Expression.ToGroupedString(OperatorPrecedence.Min)}} ⟦as {ConvertToType}⟧";
         }
     }
 }

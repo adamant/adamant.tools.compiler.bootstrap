@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.CST;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Types;
@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         private bool recomputingCurrentAccess = false;
         private readonly Dictionary<BindingSymbol, CallerVariable> callerVariables = new Dictionary<BindingSymbol, CallerVariable>();
         private readonly Dictionary<BindingSymbol, Variable> variables = new Dictionary<BindingSymbol, Variable>();
-        private readonly Dictionary<ISyntax, Object> objects = new Dictionary<ISyntax, Object>();
+        private readonly Dictionary<IAbstractSyntax, Object> objects = new Dictionary<IAbstractSyntax, Object>();
         private readonly HashSet<TempValue> tempValues = new HashSet<TempValue>();
 
         internal IReadOnlyCollection<CallerVariable> CallerVariables => callerVariables.Values;
@@ -52,15 +52,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         #region Add/Remove Methods
         /// <returns>The added local variable for the parameter</returns>
-        public Variable? AddParameter(IBindingParameterSyntax parameter)
+        public Variable? AddParameter(IBindingParameter parameter)
         {
             // Non-reference types don't participate in reachability (yet)
-            var referenceType = parameter.DataType.Known().UnderlyingReferenceType();
+            var referenceType = parameter.Symbol.DataType.Known().UnderlyingReferenceType();
             if (referenceType is null)
                 return null;
 
             CallerVariable? callerVariable = null;
-            var localVariable = new Variable(this, parameter.Symbol.Result);
+            var localVariable = new Variable(this, parameter.Symbol);
 
             var capability = referenceType.ReferenceCapability;
             switch (capability)
@@ -121,9 +121,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return localVariable;
         }
 
-        public Variable? AddField(IFieldDeclarationSyntax fieldDeclaration)
+        public Variable? AddField(IFieldDeclaration fieldDeclaration)
         {
-            var referenceType = fieldDeclaration.Symbol.Result.DataType.Known().UnderlyingReferenceType();
+            var referenceType = fieldDeclaration.Symbol.DataType.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
 
             var variable = Variable.ForField(this, fieldDeclaration);
@@ -141,28 +141,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return variable;
         }
 
-        public TempValue? AddObject(INewObjectExpressionSyntax exp)
+        public TempValue? AddObject(INewObjectExpression exp)
         {
             var temp = TempValue.ForNewObject(this, exp);
             Add(temp);
             return temp;
         }
 
-        public TempValue? AddFunctionCall(IInvocationExpressionSyntax exp)
+        public TempValue? AddFunctionCall(IInvocationExpression exp)
         {
             var temp = TempValue.ForNewInvocationReturnedObject(this, exp);
             Add(temp);
             return temp;
         }
 
-        public TempValue? AddFieldAccess(IFieldAccessExpressionSyntax fieldAccess)
+        public TempValue? AddFieldAccess(IFieldAccessExpression fieldAccess)
         {
             var temp = TempValue.ForFieldAccess(this, fieldAccess);
             Add(temp);
             return temp;
         }
 
-        public TempValue? AddReturnValue(IExpressionSyntax expression, DataType type)
+        public TempValue? AddReturnValue(IExpression expression, DataType type)
         {
             var temp = TempValue.For(this, expression, type);
             Add(temp);

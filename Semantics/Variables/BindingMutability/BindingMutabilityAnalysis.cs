@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
@@ -14,42 +14,45 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.BindingMutability
     /// </summary>
     public class BindingMutabilityAnalysis : IForwardDataFlowAnalysis<VariableFlags>
     {
-        private readonly IConcreteInvocableDeclarationSyntax invocable;
+        private readonly IExecutableDeclaration declaration;
         private readonly ISymbolTree symbolTree;
         private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
 
-        public BindingMutabilityAnalysis(IConcreteInvocableDeclarationSyntax invocable, ISymbolTree symbolTree, Diagnostics diagnostics)
+        public BindingMutabilityAnalysis(IExecutableDeclaration declaration, ISymbolTree symbolTree, Diagnostics diagnostics)
         {
-            this.invocable = invocable;
+            this.declaration = declaration;
             this.symbolTree = symbolTree;
-            file = invocable.File;
+            file = declaration.File;
             this.diagnostics = diagnostics;
         }
 
         public VariableFlags StartState()
         {
             // All variables start definitely unassigned
-            var definitelyUnassigned = new VariableFlags(invocable, symbolTree, true);
-            // All parameters are assigned
-            var namedParameters = invocable.Parameters.OfType<INamedParameterSyntax>();
-            var parameterSymbols = namedParameters.Select(p => p.Symbol.Result);
-            definitelyUnassigned = definitelyUnassigned.Set(parameterSymbols, false);
+            var definitelyUnassigned = new VariableFlags(declaration, symbolTree, true);
+            if (declaration is IInvocableDeclaration invocable)
+            {
+                // All parameters are assigned
+                var namedParameters = invocable.Parameters.OfType<INamedParameter>();
+                var parameterSymbols = namedParameters.Select(p => p.Symbol);
+                definitelyUnassigned = definitelyUnassigned.Set(parameterSymbols, false);
+            }
             return definitelyUnassigned;
         }
 
         public VariableFlags Assignment(
-            IAssignmentExpressionSyntax assignmentExpression,
+            IAssignmentExpression assignmentExpression,
             VariableFlags definitelyUnassigned)
         {
             switch (assignmentExpression.LeftOperand)
             {
-                case INameExpressionSyntax identifier:
-                    var symbol = identifier.ReferencedSymbol.Result ?? throw new InvalidOperationException("Identifier doesn't have referenced symbol");
+                case INameExpression identifier:
+                    var symbol = identifier.ReferencedSymbol;
                     if (!symbol.IsMutableBinding && definitelyUnassigned[symbol] == false)
-                        diagnostics.Add(SemanticError.VariableMayAlreadyBeAssigned(file, identifier.Span, identifier.Name ?? throw new InvalidOperationException()));
+                        diagnostics.Add(SemanticError.VariableMayAlreadyBeAssigned(file, identifier.Span, identifier.ReferencedSymbol.Name));
                     return definitelyUnassigned.Set(symbol, false);
-                case IFieldAccessExpressionSyntax _:
+                case IFieldAccessExpression _:
                     return definitelyUnassigned;
                 default:
                     throw new NotImplementedException("Complex assignments not yet implemented");
@@ -57,26 +60,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.BindingMutability
         }
 
         public VariableFlags IdentifierName(
-            INameExpressionSyntax nameExpression,
+            INameExpression nameExpression,
             VariableFlags definitelyUnassigned)
         {
             return definitelyUnassigned;
         }
 
         public VariableFlags VariableDeclaration(
-            IVariableDeclarationStatementSyntax variableDeclaration,
+            IVariableDeclarationStatement variableDeclaration,
             VariableFlags definitelyUnassigned)
         {
             if (variableDeclaration.Initializer is null)
                 return definitelyUnassigned;
-            return definitelyUnassigned.Set(variableDeclaration.Symbol.Result, false);
+            return definitelyUnassigned.Set(variableDeclaration.Symbol, false);
         }
 
         public VariableFlags VariableDeclaration(
-            IForeachExpressionSyntax foreachExpression,
+            IForeachExpression foreachExpression,
             VariableFlags definitelyUnassigned)
         {
-            return definitelyUnassigned.Set(foreachExpression.Symbol.Result, false);
+            return definitelyUnassigned.Set(foreachExpression.Symbol, false);
         }
     }
 }
