@@ -1,16 +1,7 @@
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.CST
+namespace Adamant.Tools.Compiler.Bootstrap.Core.Operators
 {
-    public enum AssignmentOperator
-    {
-        Simple,
-        Plus,
-        Minus,
-        Asterisk,
-        Slash
-    }
-
     public static class AssignmentOperatorExtensions
     {
         public static string ToSymbolString(this AssignmentOperator @operator)

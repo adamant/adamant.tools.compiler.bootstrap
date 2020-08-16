@@ -1,8 +1,9 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Core.Operators;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Types;
-using UnaryOperator = Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.UnaryOperator;
+using UnaryOperator = Adamant.Tools.Compiler.Bootstrap.Core.Operators.UnaryOperator;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
 {

@@ -2,9 +2,9 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Core.Operators;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax;
@@ -298,16 +298,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     }
                 case IReturnExpressionSyntax exp:
                 {
-                    if (exp.ReturnValue != null)
+                    if (exp.Value != null)
                     {
                         var expectedReturnType = returnType ?? throw new InvalidOperationException("Return statement in constructor");
-                        InferType(ref exp.ReturnValue, false);
+                        InferType(ref exp.Value, false);
                         // If we return ownership, there can be an implicit move
                         // otherwise there could be an implicit share or borrow
-                        InsertImplicitActionIfNeeded(ref exp.ReturnValue, expectedReturnType, implicitBorrowAllowed: false);
-                        var actualType = InsertImplicitConversionIfNeeded(ref exp.ReturnValue, expectedReturnType);
+                        InsertImplicitActionIfNeeded(ref exp.Value, expectedReturnType, implicitBorrowAllowed: false);
+                        var actualType = InsertImplicitConversionIfNeeded(ref exp.Value, expectedReturnType);
                         if (!expectedReturnType.IsAssignableFrom(actualType))
-                            diagnostics.Add(TypeError.CannotConvert(file, exp.ReturnValue, actualType, expectedReturnType));
+                            diagnostics.Add(TypeError.CannotConvert(file, exp.Value, actualType, expectedReturnType));
                     }
                     else if (returnType == DataType.Never)
                         diagnostics.Add(TypeError.CantReturnFromNeverFunction(file, exp.Span));

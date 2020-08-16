@@ -5,6 +5,7 @@
     <AssemblyName>Adamant.Tools.Compiler.Bootstrap.CST</AssemblyName>
     <RootNamespace>Adamant.Tools.Compiler.Bootstrap.CST</RootNamespace>
     <Nullable>enable</Nullable>
+    <DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

@@ -232,7 +232,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     return AnalyzeBlock(exp, graph, scope);
                 case IReturnExpressionSyntax exp:
                 {
-                    var temp = Analyze(exp.ReturnValue, graph, scope);
+                    var temp = Analyze(exp.Value, graph, scope);
                     if (!(temp is null))
                     {
                         // TODO make a deep copy of the graph so the existing graph is intact
@@ -243,7 +243,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                         // Exit the function, releasing all temps and variables except the returned value
                         graph.ExitFunction(returnValue);
                         if (returnValue.PossibleReferents.Any(r => !r.IsAllocated))
-                            diagnostics.Add(BorrowError.ValueDoesNotLiveLongEnough(file, exp.ReturnValue!.Span));
+                            diagnostics.Add(BorrowError.ValueDoesNotLiveLongEnough(file, exp.Value!.Span));
                     }
                     return null;
                 }

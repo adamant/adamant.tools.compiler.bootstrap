@@ -1,20 +1,47 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Core.Operators;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
+using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     [Closed(
+        typeof(IBodyOrBlock),
+        typeof(IElseClause),
         typeof(IBinding),
         typeof(IDeclaration),
         typeof(IParameter),
-        typeof(IBody),
+        typeof(IStatement),
         typeof(IExpression))]
     public partial interface IAbstractSyntax
     {
         TextSpan Span { get; }
+    }
+
+    [Closed(
+        typeof(IBody),
+        typeof(IBlockExpression))]
+    public partial interface IBodyOrBlock : IAbstractSyntax
+    {
+        FixedList<IStatement> Statements { get; }
+    }
+
+    [Closed(
+        typeof(IBlockOrResult),
+        typeof(IIfExpression))]
+    public partial interface IElseClause : IAbstractSyntax
+    {
+    }
+
+    [Closed(
+        typeof(IResultStatement),
+        typeof(IBlockExpression))]
+    public partial interface IBlockOrResult : IElseClause
+    {
     }
 
     [Closed(
@@ -26,7 +53,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     }
 
     [Closed(
-        typeof(IBindingParameter))]
+        typeof(IBindingParameter),
+        typeof(IVariableDeclarationStatement),
+        typeof(IForeachExpression))]
     public partial interface ILocalBinding : IBinding
     {
     }
@@ -170,12 +199,262 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         IExpression? DefaultValue { get; }
     }
 
-    public partial interface IBody : IAbstractSyntax
+    public partial interface IBody : IBodyOrBlock
+    {
+        new FixedList<IBodyStatement> Statements { get; }
+    }
+
+    [Closed(
+        typeof(IResultStatement),
+        typeof(IBodyStatement))]
+    public partial interface IStatement : IAbstractSyntax
     {
     }
 
+    public partial interface IResultStatement : IStatement, IBlockOrResult
+    {
+        IExpression Expression { get; }
+    }
+
+    [Closed(
+        typeof(IVariableDeclarationStatement),
+        typeof(IExpressionStatement))]
+    public partial interface IBodyStatement : IStatement
+    {
+    }
+
+    public partial interface IVariableDeclarationStatement : IBodyStatement, ILocalBinding
+    {
+        TextSpan NameSpan { get; }
+        new VariableSymbol Symbol { get; }
+        IExpression? Initializer { get; }
+    }
+
+    public partial interface IExpressionStatement : IBodyStatement
+    {
+        IExpression Expression { get; }
+    }
+
+    [Closed(
+        typeof(IAssignableExpression),
+        typeof(IBlockExpression),
+        typeof(INewObjectExpression),
+        typeof(IUnsafeExpression),
+        typeof(ILiteralExpression),
+        typeof(IAssignmentExpression),
+        typeof(IBinaryOperatorExpression),
+        typeof(IUnaryOperatorExpression),
+        typeof(IIfExpression),
+        typeof(ILoopExpression),
+        typeof(IWhileExpression),
+        typeof(IForeachExpression),
+        typeof(IBreakExpression),
+        typeof(INextExpression),
+        typeof(IReturnExpression),
+        typeof(IImplicitConversionExpression),
+        typeof(IInvocationExpression),
+        typeof(ISelfExpression),
+        typeof(IBorrowExpression),
+        typeof(IMoveExpression),
+        typeof(IShareExpression))]
     public partial interface IExpression : IAbstractSyntax
     {
+        DataType DataType { get; }
+    }
+
+    [Closed(
+        typeof(INameExpression),
+        typeof(IFieldAccessExpression))]
+    public partial interface IAssignableExpression : IExpression
+    {
+    }
+
+    public partial interface IBlockExpression : IExpression, IBlockOrResult, IBodyOrBlock
+    {
+    }
+
+    public partial interface INewObjectExpression : IExpression
+    {
+        ConstructorSymbol ReferencedSymbol { get; }
+        FixedList<IExpression> Arguments { get; }
+    }
+
+    public partial interface IUnsafeExpression : IExpression
+    {
+        IExpression Expression { get; }
+    }
+
+    [Closed(
+        typeof(IBoolLiteralExpression),
+        typeof(IIntegerLiteralExpression),
+        typeof(INoneLiteralExpression),
+        typeof(IStringLiteralExpression))]
+    public partial interface ILiteralExpression : IExpression
+    {
+    }
+
+    public partial interface IBoolLiteralExpression : ILiteralExpression
+    {
+        bool Value { get; }
+    }
+
+    public partial interface IIntegerLiteralExpression : ILiteralExpression
+    {
+        BigInteger Value { get; }
+    }
+
+    public partial interface INoneLiteralExpression : ILiteralExpression
+    {
+    }
+
+    public partial interface IStringLiteralExpression : ILiteralExpression
+    {
+        string Value { get; }
+    }
+
+    public partial interface IAssignmentExpression : IExpression
+    {
+        IAssignableExpression LeftOperand { get; }
+        AssignmentOperator Operator { get; }
+        IExpression RightOperand { get; }
+    }
+
+    public partial interface IBinaryOperatorExpression : IExpression
+    {
+        IExpression LeftOperand { get; }
+        BinaryOperator Operator { get; }
+        IExpression RightOperand { get; }
+    }
+
+    public partial interface IUnaryOperatorExpression : IExpression
+    {
+        UnaryOperatorFixity Fixity { get; }
+        UnaryOperator Operator { get; }
+        IExpression Operand { get; }
+    }
+
+    public partial interface IIfExpression : IExpression, IElseClause
+    {
+        IExpression Condition { get; }
+        IBlockOrResult ThenBlock { get; }
+        IElseClause? ElseClause { get; }
+    }
+
+    public partial interface ILoopExpression : IExpression
+    {
+        IBlockExpression Block { get; }
+    }
+
+    public partial interface IWhileExpression : IExpression
+    {
+        IExpression Condition { get; }
+        IBlockExpression Block { get; }
+    }
+
+    public partial interface IForeachExpression : IExpression, ILocalBinding
+    {
+        new VariableSymbol Symbol { get; }
+        IExpression InExpression { get; }
+        IBlockExpression Block { get; }
+    }
+
+    public partial interface IBreakExpression : IExpression
+    {
+        IExpression? Value { get; }
+    }
+
+    public partial interface INextExpression : IExpression
+    {
+    }
+
+    public partial interface IReturnExpression : IExpression
+    {
+        IExpression? Value { get; }
+    }
+
+    [Closed(
+        typeof(IImplicitImmutabilityConversionExpression),
+        typeof(IImplicitNoneConversionExpression),
+        typeof(IImplicitNumericConversionExpression),
+        typeof(IImplicitOptionalConversionExpression))]
+    public partial interface IImplicitConversionExpression : IExpression
+    {
+        IExpression Expression { get; }
+    }
+
+    public partial interface IImplicitImmutabilityConversionExpression : IImplicitConversionExpression
+    {
+        ObjectType ConvertToType { get; }
+    }
+
+    public partial interface IImplicitNoneConversionExpression : IImplicitConversionExpression
+    {
+        OptionalType ConvertToType { get; }
+    }
+
+    public partial interface IImplicitNumericConversionExpression : IImplicitConversionExpression
+    {
+        NumericType ConvertToType { get; }
+    }
+
+    public partial interface IImplicitOptionalConversionExpression : IImplicitConversionExpression
+    {
+        OptionalType ConvertToType { get; }
+    }
+
+    [Closed(
+        typeof(IFunctionInvocationExpression),
+        typeof(IMethodInvocationExpression))]
+    public partial interface IInvocationExpression : IExpression
+    {
+        FixedList<IExpression> Arguments { get; }
+    }
+
+    public partial interface IFunctionInvocationExpression : IInvocationExpression
+    {
+        FunctionSymbol ReferencedSymbol { get; }
+    }
+
+    public partial interface IMethodInvocationExpression : IInvocationExpression
+    {
+        IExpression Context { get; }
+        MethodSymbol ReferencedSymbol { get; }
+    }
+
+    public partial interface INameExpression : IAssignableExpression
+    {
+        BindingSymbol ReferencedSymbol { get; }
+    }
+
+    public partial interface ISelfExpression : IExpression
+    {
+        SelfParameterSymbol ReferencedSymbol { get; }
+        bool IsImplicit { get; }
+    }
+
+    public partial interface IFieldAccessExpression : IAssignableExpression
+    {
+        IExpression Context { get; }
+        AccessOperator AccessOperator { get; }
+        FieldSymbol ReferencedSymbol { get; }
+    }
+
+    public partial interface IBorrowExpression : IExpression
+    {
+        BindingSymbol ReferencedSymbol { get; }
+        IExpression Referent { get; }
+    }
+
+    public partial interface IMoveExpression : IExpression
+    {
+        BindingSymbol ReferencedSymbol { get; }
+        IExpression Referent { get; }
+    }
+
+    public partial interface IShareExpression : IExpression
+    {
+        BindingSymbol ReferencedSymbol { get; }
+        IExpression Referent { get; }
     }
 
 }

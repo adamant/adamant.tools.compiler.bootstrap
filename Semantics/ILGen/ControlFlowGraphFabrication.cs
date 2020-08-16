@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Core.Operators;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Operands;
@@ -419,11 +419,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 break;
                 case IReturnExpressionSyntax exp:
                 {
-                    if (exp.ReturnValue is null)
+                    if (exp.Value is null)
                         currentBlock!.End(new ReturnVoidInstruction(exp.Span, CurrentScope));
                     else
                     {
-                        var returnValue = ConvertToOperand(exp.ReturnValue);
+                        var returnValue = ConvertToOperand(exp.Value);
                         currentBlock!.End(new ReturnValueInstruction(returnValue, exp.Span, CurrentScope));
                     }
 

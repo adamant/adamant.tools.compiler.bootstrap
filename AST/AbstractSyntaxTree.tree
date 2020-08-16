@@ -2,11 +2,19 @@
 ◊base 'IAbstractSyntax';
 ◊prefix I;
 ◊list FixedList;
+◊using System.Numerics;
 ◊using Adamant.Tools.Compiler.Bootstrap.Core;
+◊using Adamant.Tools.Compiler.Bootstrap.Core.Operators;
 ◊using Adamant.Tools.Compiler.Bootstrap.Framework;
 ◊using Adamant.Tools.Compiler.Bootstrap.Symbols;
+◊using Adamant.Tools.Compiler.Bootstrap.Types;
 
 'IAbstractSyntax' = Span:'TextSpan';
+
+// ---------- Special Parts
+BodyOrBlock = Statements:Statement*;
+ElseClause;
+BlockOrResult: ElseClause;
 
 // ---------- Bindings
 Binding = Symbol:'BindingSymbol';
@@ -44,9 +52,60 @@ NamedParameter: Parameter, ConstructorParameter, BindingParameter = Symbol:'Vari
 SelfParameter: Parameter, BindingParameter = Symbol:'SelfParameterSymbol';
 FieldParameter: Parameter, ConstructorParameter = ReferencedSymbol:'FieldSymbol' DefaultValue:Expression?;
 
-
 // ---------- Function Parts
-Body;
+Body: BodyOrBlock = Statements:BodyStatement*;
+
+// ---------- Statements
+Statement;
+ResultStatement: Statement, BlockOrResult = Expression;
+BodyStatement: Statement;
+VariableDeclarationStatement: BodyStatement, LocalBinding = NameSpan:'TextSpan' Symbol:'VariableSymbol' Initializer:Expression?;
+ExpressionStatement: BodyStatement = Expression;
 
 // ---------- Expressions
-Expression;
+Expression = DataType:'DataType';
+AssignableExpression: Expression;
+BlockExpression: Expression, BlockOrResult, BodyOrBlock = Statements:Statement*;
+NewObjectExpression: Expression =  ReferencedSymbol:'ConstructorSymbol' Arguments:Expression*;
+UnsafeExpression: Expression = Expression;
+
+// ---------- Literal Expressions
+LiteralExpression: Expression;
+BoolLiteralExpression: LiteralExpression = Value:'bool';
+IntegerLiteralExpression: LiteralExpression = Value:'BigInteger';
+NoneLiteralExpression: LiteralExpression;
+StringLiteralExpression: LiteralExpression = Value:'string';
+
+// ---------- Operator Expressions
+AssignmentExpression: Expression = LeftOperand:AssignableExpression Operator:'AssignmentOperator' RightOperand:Expression;
+BinaryOperatorExpression: Expression = LeftOperand:Expression Operator:'BinaryOperator' RightOperand:Expression;
+UnaryOperatorExpression: Expression = Fixity:'UnaryOperatorFixity' Operator:'UnaryOperator' Operand:Expression;
+
+// ---------- Control Flow Expressions
+IfExpression: Expression, ElseClause = Condition:Expression ThenBlock:BlockOrResult ElseClause?;
+LoopExpression: Expression = Block:BlockExpression;
+WhileExpression: Expression = Condition:Expression Block:BlockExpression;
+ForeachExpression: Expression, LocalBinding = Symbol:'VariableSymbol' InExpression:Expression Block:BlockExpression;
+BreakExpression: Expression = Value:Expression?;
+NextExpression: Expression;
+ReturnExpression: Expression = Value:Expression?;
+
+// ---------- Implicit Conversion Expressions
+ImplicitConversionExpression: Expression = Expression DataType:'DataType';
+ImplicitImmutabilityConversionExpression: ImplicitConversionExpression = Expression ConvertToType:'ObjectType';
+ImplicitNoneConversionExpression: ImplicitConversionExpression = Expression ConvertToType:'OptionalType';
+ImplicitNumericConversionExpression: ImplicitConversionExpression = Expression ConvertToType:'NumericType';
+ImplicitOptionalConversionExpression: ImplicitConversionExpression = Expression ConvertToType:'OptionalType';
+
+// ---------- Invocation Expressions
+InvocationExpression: Expression = Arguments:Expression*;
+FunctionInvocationExpression: InvocationExpression = ReferencedSymbol:'FunctionSymbol' Arguments:Expression*;
+MethodInvocationExpression: InvocationExpression = Context:Expression ReferencedSymbol:'MethodSymbol' Arguments:Expression*;
+
+// ---------- Variable Expressions
+NameExpression: AssignableExpression = ReferencedSymbol:'BindingSymbol';
+SelfExpression: Expression = ReferencedSymbol:'SelfParameterSymbol' IsImplicit:'bool';
+FieldAccessExpression: AssignableExpression = Context:Expression AccessOperator:'AccessOperator' ReferencedSymbol:'FieldSymbol';
+BorrowExpression: Expression = ReferencedSymbol:'BindingSymbol' Referent:Expression;
+MoveExpression: Expression = ReferencedSymbol:'BindingSymbol' Referent:Expression;
+ShareExpression: Expression = ReferencedSymbol:'BindingSymbol' Referent:Expression;

@@ -1,13 +1,7 @@
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.CST
+namespace Adamant.Tools.Compiler.Bootstrap.Core.Operators
 {
-    public enum AccessOperator
-    {
-        Standard,
-        Conditional,
-    }
-
     public static class AccessOperatorExtensions
     {
         public static string ToSymbolString(this AccessOperator @operator)

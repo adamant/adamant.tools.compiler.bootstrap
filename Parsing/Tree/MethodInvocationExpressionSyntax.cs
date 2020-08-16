@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         private IExpressionSyntax context;
         public ref IExpressionSyntax Context => ref context;
         public IInvocableNameSyntax MethodNameSyntax { get; }
-        public Promise<MethodSymbol?> ReferencedSymbol { get; } = new Promise<MethodSymbol?>();
+        public new Promise<MethodSymbol?> ReferencedSymbol { get; }
 
         public MethodInvocationExpressionSyntax(
             TextSpan span,
@@ -40,10 +40,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name name,
             IInvocableNameSyntax methodNameSyntax,
             FixedList<IArgumentSyntax> arguments)
-            : base(span, name, arguments)
+            : base(span, name, arguments, new Promise<MethodSymbol?>())
         {
             this.context = context;
             MethodNameSyntax = methodNameSyntax;
+            ReferencedSymbol = (Promise<MethodSymbol?>)base.ReferencedSymbol;
         }
 
         protected override OperatorPrecedence ExpressionPrecedence => OperatorPrecedence.Primary;

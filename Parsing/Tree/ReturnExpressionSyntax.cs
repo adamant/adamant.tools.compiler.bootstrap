@@ -8,29 +8,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class ReturnExpressionSyntax : ExpressionSyntax, IReturnExpressionSyntax
     {
-        private IExpressionSyntax? returnValue;
+        private IExpressionSyntax? value;
         [DisallowNull]
-        public ref IExpressionSyntax? ReturnValue
+        public ref IExpressionSyntax? Value
         {
             [DebuggerStepThrough]
-            get => ref returnValue;
+            get => ref value;
         }
 
         public ReturnExpressionSyntax(
             TextSpan span,
-            IExpressionSyntax? returnValue)
+            IExpressionSyntax? value)
             : base(span, ExpressionSemantics.Never)
         {
-            this.returnValue = returnValue;
+            this.value = value;
         }
 
         protected override OperatorPrecedence ExpressionPrecedence => OperatorPrecedence.Min;
 
         public override string ToString()
         {
-            if (ReturnValue != null)
-                return $"return {ReturnValue}";
-            return "return";
+            return Value is null ? "return" : $"return {Value}";
         }
     }
 }

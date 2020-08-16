@@ -1,14 +1,7 @@
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
+namespace Adamant.Tools.Compiler.Bootstrap.Core.Operators
 {
-    public enum UnaryOperator
-    {
-        Not,
-        Minus,
-        Plus,
-    }
-
     public static class UnaryOperatorExtensions
     {
         public static string ToSymbolString(this UnaryOperator @operator)

@@ -33,17 +33,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public NamespaceName Namespace { get; }
         public IInvocableNameSyntax FunctionNameSyntax { get; }
-        public Promise<FunctionSymbol?> ReferencedSymbol { get; } = new Promise<FunctionSymbol?>();
+        public new Promise<FunctionSymbol?> ReferencedSymbol { get; }
 
         public FunctionInvocationExpressionSyntax(
             TextSpan span,
             Name name,
             IInvocableNameSyntax functionNameSyntax,
             FixedList<IArgumentSyntax> arguments)
-            : base(span, name, arguments)
+            : base(span, name, arguments, new Promise<FunctionSymbol?>())
         {
             Namespace = NamespaceName.Global;
             FunctionNameSyntax = functionNameSyntax;
+            ReferencedSymbol = (Promise<FunctionSymbol?>)base.ReferencedSymbol;
         }
 
         public IEnumerable<IPromise<FunctionSymbol>> LookupInContainingScope()

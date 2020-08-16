@@ -131,6 +131,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                 case IExpressionStatementSyntax n:
                     yield return n.Expression;
                     yield break;
+                case IBlockExpressionSyntax n:
+                    foreach(var child in n.Statements)
+                        yield return child;
+                    yield break;
+                case INewObjectExpressionSyntax n:
+                    yield return n.Type;
+                    if(!(n.ConstructorName is null))
+                        yield return n.ConstructorName;
+                    foreach(var child in n.Arguments)
+                        yield return child;
+                    yield break;
+                case IUnsafeExpressionSyntax n:
+                    yield return n.Expression;
+                    yield break;
+                case IBoolLiteralExpressionSyntax n:
+                    yield break;
+                case IIntegerLiteralExpressionSyntax n:
+                    yield break;
+                case INoneLiteralExpressionSyntax n:
+                    yield break;
+                case IStringLiteralExpressionSyntax n:
+                    yield break;
                 case IAssignmentExpressionSyntax n:
                     yield return n.LeftOperand;
                     yield return n.RightOperand;
@@ -139,22 +161,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                     yield return n.LeftOperand;
                     yield return n.RightOperand;
                     yield break;
-                case IBlockExpressionSyntax n:
-                    foreach(var child in n.Statements)
-                        yield return child;
+                case IUnaryOperatorExpressionSyntax n:
+                    yield return n.Operand;
                     yield break;
-                case IBoolLiteralExpressionSyntax n:
+                case IIfExpressionSyntax n:
+                    yield return n.Condition;
+                    yield return n.ThenBlock;
+                    if(!(n.ElseClause is null))
+                        yield return n.ElseClause;
                     yield break;
-                case IBorrowExpressionSyntax n:
-                    yield return n.Referent;
+                case ILoopExpressionSyntax n:
+                    yield return n.Block;
                     yield break;
-                case IBreakExpressionSyntax n:
-                    if(!(n.Value is null))
-                        yield return n.Value;
-                    yield break;
-                case IFieldAccessExpressionSyntax n:
-                    yield return n.Context;
-                    yield return n.Field;
+                case IWhileExpressionSyntax n:
+                    yield return n.Condition;
+                    yield return n.Block;
                     yield break;
                 case IForeachExpressionSyntax n:
                     yield return n.InExpression;
@@ -162,16 +183,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                         yield return n.Type;
                     yield return n.Block;
                     yield break;
-                case IFunctionInvocationExpressionSyntax n:
-                    yield return n.FunctionNameSyntax;
-                    foreach(var child in n.Arguments)
-                        yield return child;
+                case IBreakExpressionSyntax n:
+                    if(!(n.Value is null))
+                        yield return n.Value;
                     yield break;
-                case IIfExpressionSyntax n:
-                    yield return n.Condition;
-                    yield return n.ThenBlock;
-                    if(!(n.ElseClause is null))
-                        yield return n.ElseClause;
+                case INextExpressionSyntax n:
+                    yield break;
+                case IReturnExpressionSyntax n:
+                    if(!(n.Value is null))
+                        yield return n.Value;
                     yield break;
                 case IImplicitImmutabilityConversionExpressionSyntax n:
                     yield return n.Expression;
@@ -185,10 +205,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                 case IImplicitOptionalConversionExpressionSyntax n:
                     yield return n.Expression;
                     yield break;
-                case IIntegerLiteralExpressionSyntax n:
-                    yield break;
-                case ILoopExpressionSyntax n:
-                    yield return n.Block;
+                case IFunctionInvocationExpressionSyntax n:
+                    yield return n.FunctionNameSyntax;
+                    foreach(var child in n.Arguments)
+                        yield return child;
                     yield break;
                 case IMethodInvocationExpressionSyntax n:
                     yield return n.Context;
@@ -196,42 +216,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                     foreach(var child in n.Arguments)
                         yield return child;
                     yield break;
-                case IMoveExpressionSyntax n:
-                    yield return n.Referent;
-                    yield break;
                 case INameExpressionSyntax n:
-                    yield break;
-                case INewObjectExpressionSyntax n:
-                    yield return n.Type;
-                    if(!(n.ConstructorName is null))
-                        yield return n.ConstructorName;
-                    foreach(var child in n.Arguments)
-                        yield return child;
-                    yield break;
-                case INextExpressionSyntax n:
-                    yield break;
-                case INoneLiteralExpressionSyntax n:
-                    yield break;
-                case IReturnExpressionSyntax n:
-                    if(!(n.ReturnValue is null))
-                        yield return n.ReturnValue;
                     yield break;
                 case ISelfExpressionSyntax n:
                     yield break;
-                case IShareExpressionSyntax n:
+                case IFieldAccessExpressionSyntax n:
+                    yield return n.Context;
+                    yield return n.Field;
+                    yield break;
+                case IBorrowExpressionSyntax n:
                     yield return n.Referent;
                     yield break;
-                case IStringLiteralExpressionSyntax n:
+                case IMoveExpressionSyntax n:
+                    yield return n.Referent;
                     yield break;
-                case IUnaryOperatorExpressionSyntax n:
-                    yield return n.Operand;
-                    yield break;
-                case IUnsafeExpressionSyntax n:
-                    yield return n.Expression;
-                    yield break;
-                case IWhileExpressionSyntax n:
-                    yield return n.Condition;
-                    yield return n.Block;
+                case IShareExpressionSyntax n:
+                    yield return n.Referent;
                     yield break;
             }
         }

@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax
         public Name Name { get; }
         public FixedList<IArgumentSyntax> Arguments { get; }
         public Promise<FunctionSymbol?> ReferencedSymbol { get; } = new Promise<FunctionSymbol?>();
-
+        IPromise<InvocableSymbol?> IInvocationExpressionSyntax.ReferencedSymbol => ReferencedSymbol;
 
         private DataType? dataType;
         [DisallowNull]
