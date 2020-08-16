@@ -13,6 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public Name VariableName { get; }
         public Promise<int?> DeclarationNumber { get; } = new Promise<int?>();
         public Promise<VariableSymbol> Symbol { get; } = new Promise<VariableSymbol>();
+        IPromise<NamedBindingSymbol> ILocalBindingSyntax.Symbol => Symbol;
         IPromise<BindingSymbol> IBindingSyntax.Symbol => Symbol;
         public bool VariableIsLiveAfterAssignment { get; set; } = true;
 

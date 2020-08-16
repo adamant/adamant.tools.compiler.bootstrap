@@ -70,7 +70,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     [Closed(
         typeof(ILocalBindingSyntax),
-        typeof(IFieldDeclarationSyntax))]
+        typeof(IFieldDeclarationSyntax),
+        typeof(IBindingParameterSyntax))]
     public partial interface IBindingSyntax : ISyntax
     {
         bool IsMutableBinding { get; }
@@ -78,11 +79,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     }
 
     [Closed(
-        typeof(IBindingParameterSyntax),
+        typeof(INamedParameterSyntax),
         typeof(IVariableDeclarationStatementSyntax),
         typeof(IForeachExpressionSyntax))]
     public partial interface ILocalBindingSyntax : IBindingSyntax
     {
+        new IPromise<NamedBindingSymbol> Symbol { get; }
     }
 
     [Closed(
@@ -246,11 +248,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     [Closed(
         typeof(INamedParameterSyntax),
         typeof(ISelfParameterSyntax))]
-    public partial interface IBindingParameterSyntax : IParameterSyntax, ILocalBindingSyntax
+    public partial interface IBindingParameterSyntax : IParameterSyntax, IBindingSyntax
     {
     }
 
-    public partial interface INamedParameterSyntax : IParameterSyntax, IConstructorParameterSyntax, IBindingParameterSyntax
+    public partial interface INamedParameterSyntax : IParameterSyntax, IConstructorParameterSyntax, IBindingParameterSyntax, ILocalBindingSyntax
     {
         new Name Name { get; }
         Promise<int?> DeclarationNumber { get; }
@@ -562,7 +564,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface INameExpressionSyntax : IAssignableExpressionSyntax, IHasContainingLexicalScope
     {
         Name? Name { get; }
-        Promise<BindingSymbol?> ReferencedSymbol { get; }
+        Promise<NamedBindingSymbol?> ReferencedSymbol { get; }
     }
 
     public partial interface ISelfExpressionSyntax : IExpressionSyntax

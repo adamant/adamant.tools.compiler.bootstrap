@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.AST;
+using Adamant.Tools.Compiler.Bootstrap.AST.Walkers;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.CST;
-using Adamant.Tools.Compiler.Bootstrap.CST.Walkers;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Shadowing
@@ -11,69 +11,63 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Shadowing
     /// <summary>
     /// Enforces rules disallowing local variable shadowing
     /// </summary>
-    internal class ShadowChecker : SyntaxWalker<BindingScope>
+    internal class ShadowChecker : AbstractSyntaxWalker<BindingScope>
     {
-        private readonly IConcreteInvocableDeclarationSyntax invocableDeclaration;
+        private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
 
-        private ShadowChecker(IConcreteInvocableDeclarationSyntax invocableDeclaration, Diagnostics diagnostics)
+        private ShadowChecker(CodeFile file, Diagnostics diagnostics)
         {
-            this.invocableDeclaration = invocableDeclaration;
+            this.file = file;
             this.diagnostics = diagnostics;
         }
 
-        public static void Check(IEnumerable<IInvocableDeclarationSyntax> invocableDeclarations, Diagnostics diagnostics)
+        public static void Check(IEnumerable<IExecutableDeclaration> declarations, Diagnostics diagnostics)
         {
-            foreach (var invocableDeclaration in invocableDeclarations.OfType<IConcreteInvocableDeclarationSyntax>())
-                new ShadowChecker(invocableDeclaration, diagnostics).Walk(invocableDeclaration, EmptyBindingScope.Instance);
+            foreach (var declaration in declarations)
+                new ShadowChecker(declaration.File, diagnostics).Walk(declaration, EmptyBindingScope.Instance);
         }
 
-        protected override void WalkNonNull(ISyntax syntax, BindingScope bindingScope)
+        protected override void WalkNonNull(IAbstractSyntax syntax, BindingScope bindingScope)
         {
             switch (syntax)
             {
-                case IConcreteInvocableDeclarationSyntax syn:
-                    foreach (var parameter in syn.Parameters.OfType<INamedParameterSyntax>())
+                case IConcreteInvocableDeclaration syn:
+                    foreach (var parameter in syn.Parameters.OfType<INamedParameter>())
                         bindingScope = new VariableBindingScope(bindingScope, parameter);
                     break;
-                case IBodyOrBlockSyntax syn:
+                case IFieldDeclaration syn:
+                    WalkChildren(syn, bindingScope);
+                    break;
+                case IBodyOrBlock syn:
                     foreach (var statement in syn.Statements)
                     {
                         WalkNonNull(statement, bindingScope);
                         // Each variable declaration establishes a new binding scope
-                        if (statement is IVariableDeclarationStatementSyntax variableDeclaration)
+                        if (statement is IVariableDeclarationStatement variableDeclaration)
                             bindingScope = new VariableBindingScope(bindingScope, variableDeclaration);
                     }
                     return;
-                case IVariableDeclarationStatementSyntax syn:
+                case IVariableDeclarationStatement syn:
                 {
                     WalkChildren(syn, bindingScope);
-                    if (bindingScope.Lookup(syn.Name, out var binding))
-                    {
-                        if (binding.MutableBinding)
-                            diagnostics.Add(SemanticError.CantRebindMutableBinding(invocableDeclaration.File,
-                                syn.NameSpan));
-                        else if (syn.IsMutableBinding)
-                            diagnostics.Add(SemanticError.CantRebindAsMutableBinding(invocableDeclaration.File,
-                                syn.NameSpan));
-                    }
+                    if (!bindingScope.Lookup(syn.Symbol.Name, out var binding)) return;
+                    if (binding.MutableBinding)
+                        diagnostics.Add(SemanticError.CantRebindMutableBinding(file, syn.NameSpan));
+                    else if (syn.Symbol.IsMutableBinding)
+                        diagnostics.Add(SemanticError.CantRebindAsMutableBinding(file, syn.NameSpan));
                     return;
                 }
-                case INameExpressionSyntax syn:
+                case INameExpression syn:
                 {
-                    // If unknown, nothing to check
-                    if (syn.Name is null) return;
                     // This checks for cases where a variable was shadowed, but then used later
-                    if (!bindingScope.Lookup(syn.Name, out var binding)) return;
+                    if (!bindingScope.Lookup(syn.ReferencedSymbol.Name, out var binding)) return;
                     if (binding.WasShadowedBy.Any())
-                        diagnostics.Add(SemanticError.CantShadow(invocableDeclaration.File, binding.WasShadowedBy[^1].NameSpan, syn.Span));
+                        diagnostics.Add(SemanticError.CantShadow(file, binding.WasShadowedBy[^1].NameSpan, syn.Span));
                     return;
                 }
-                case IDeclarationSyntax _:
+                case IDeclaration _:
                     throw new InvalidOperationException($"Can't shadow check declaration of type {syntax.GetType().Name}");
-                case ITypeSyntax _:
-                    // ignore since they can't have shadowed variables
-                    return;
             }
 
             WalkChildren(syntax, bindingScope);

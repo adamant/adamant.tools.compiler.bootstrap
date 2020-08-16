@@ -1,5 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using Adamant.Tools.Compiler.Bootstrap.CST;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Shadowing
@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Shadowing
 
         public VariableBindingScope(
             BindingScope containingScope,
-            INamedParameterSyntax parameter)
+            INamedParameter parameter)
         {
             ContainingScope = containingScope;
             VariableBinding = new VariableBinding(parameter);
@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Shadowing
         }
 
         public VariableBindingScope(BindingScope containingScope,
-            IVariableDeclarationStatementSyntax variableDeclaration)
+            IVariableDeclarationStatement variableDeclaration)
         {
             ContainingScope = containingScope;
             VariableBinding = new VariableBinding(variableDeclaration);

@@ -5,9 +5,8 @@ using ExhaustiveMatching;
 namespace Adamant.Tools.Compiler.Bootstrap.Symbols
 {
     [Closed(
-        typeof(VariableSymbol),
-        typeof(SelfParameterSymbol),
-        typeof(FieldSymbol))]
+        typeof(NamedBindingSymbol),
+        typeof(SelfParameterSymbol))]
     public abstract class BindingSymbol : Symbol
     {
         public override PackageSymbol? Package { get; }

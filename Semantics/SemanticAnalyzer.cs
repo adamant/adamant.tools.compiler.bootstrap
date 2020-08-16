@@ -118,11 +118,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             var executableDeclarations = package.Declarations.OfType<IExecutableDeclaration>().ToFixedSet();
 
+            ShadowChecker.Check(executableDeclarations, diagnostics);
+
             // From this point forward, analysis focuses on callable bodies
             // TODO what about field initializers?
             var invocableSyntaxes = entities.OfType<IConcreteInvocableDeclarationSyntax>().ToFixedList();
-
-            ShadowChecker.Check(invocableSyntaxes, diagnostics);
 
             DataFlowAnalysis.Check(DefiniteAssignmentAnalyzer.Instance, invocableSyntaxes, symbolTreeBuilder, diagnostics);
 

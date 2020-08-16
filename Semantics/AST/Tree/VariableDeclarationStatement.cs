@@ -9,6 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
         public TextSpan NameSpan { get; }
         public VariableSymbol Symbol { get; }
         BindingSymbol IBinding.Symbol => Symbol;
+        NamedBindingSymbol ILocalBinding.Symbol => Symbol;
         public IExpression? Initializer { get; }
 
         public VariableDeclarationStatement(

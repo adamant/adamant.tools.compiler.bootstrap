@@ -9,8 +9,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
         public new FieldSymbol Symbol { get; }
         BindingSymbol IBinding.Symbol => Symbol;
 
-        public FieldDeclaration(TextSpan span, FieldSymbol symbol)
-            : base(span, symbol)
+        public FieldDeclaration(CodeFile file, TextSpan span, FieldSymbol symbol)
+            : base(file, span, symbol)
         {
             Symbol = symbol;
         }

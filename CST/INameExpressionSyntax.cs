@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     /// </summary>
     public partial interface INameExpressionSyntax
     {
-        IEnumerable<IPromise<BindingSymbol>> LookupInContainingScope();
+        IEnumerable<IPromise<NamedBindingSymbol>> LookupInContainingScope();
         bool VariableIsLiveAfter { get; set; }
     }
 }

@@ -13,12 +13,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
         public IBody Body { get; }
 
         public ConcreteMethodDeclaration(
+            CodeFile file,
             TextSpan span,
             MethodSymbol symbol,
             ISelfParameter selfParameter,
             FixedList<INamedParameter> parameters,
             IBody body)
-            : base(span, symbol, parameters.ToFixedList<IConstructorParameter>())
+            : base(file, span, symbol, parameters.ToFixedList<IConstructorParameter>())
         {
             Symbol = symbol;
             Parameters = parameters;

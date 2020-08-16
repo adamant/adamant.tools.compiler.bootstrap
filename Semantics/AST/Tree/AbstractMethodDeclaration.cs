@@ -12,11 +12,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
         public new FixedList<INamedParameter> Parameters { get; }
 
         public AbstractMethodDeclaration(
+            CodeFile file,
             TextSpan span,
             MethodSymbol symbol,
             ISelfParameter selfParameter,
             FixedList<INamedParameter> parameters)
-            : base(span, symbol, parameters.ToFixedList<IConstructorParameter>())
+            : base(file, span, symbol, parameters.ToFixedList<IConstructorParameter>())
         {
             Symbol = symbol;
             SelfParameter = selfParameter;

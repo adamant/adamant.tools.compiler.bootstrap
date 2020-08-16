@@ -6,12 +6,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
 {
     internal abstract class Declaration : AbstractSyntax, IDeclaration
     {
+        public CodeFile File { get; }
         public Symbol Symbol { get; }
 
-        protected Declaration(TextSpan span, Symbol symbol)
+        protected Declaration(CodeFile file, TextSpan span, Symbol symbol)
             : base(span)
         {
             Symbol = symbol;
+            File = file;
         }
     }
 }

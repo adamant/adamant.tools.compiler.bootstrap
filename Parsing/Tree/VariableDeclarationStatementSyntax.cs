@@ -15,6 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public Promise<int?> DeclarationNumber { get; } = new Promise<int?>();
         public Promise<VariableSymbol> Symbol { get; } = new Promise<VariableSymbol>();
         IPromise<BindingSymbol> IBindingSyntax.Symbol => Symbol;
+        IPromise<NamedBindingSymbol> ILocalBindingSyntax.Symbol => Symbol;
         public TextSpan NameSpan { [DebuggerStepThrough] get; }
         public ITypeSyntax? Type { [DebuggerStepThrough] get; }
         public bool InferMutableType { [DebuggerStepThrough] get; }

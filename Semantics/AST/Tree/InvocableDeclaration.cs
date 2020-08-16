@@ -9,8 +9,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
     {
         public FixedList<IConstructorParameter> Parameters { get; }
 
-        protected InvocableDeclaration(TextSpan span, Symbol symbol, FixedList<IConstructorParameter> parameters)
-            : base(span, symbol)
+        protected InvocableDeclaration(
+            CodeFile file,
+            TextSpan span,
+            Symbol symbol,
+            FixedList<IConstructorParameter> parameters)
+            : base(file, span, symbol)
         {
             Parameters = parameters;
         }

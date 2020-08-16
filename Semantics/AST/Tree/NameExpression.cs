@@ -7,12 +7,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
 {
     internal class NameExpression : Expression, INameExpression
     {
-        public BindingSymbol ReferencedSymbol { get; }
+        public NamedBindingSymbol ReferencedSymbol { get; }
 
         public NameExpression(
             TextSpan span,
             DataType dataType,
-            BindingSymbol referencedSymbol)
+            NamedBindingSymbol referencedSymbol)
             : base(span, dataType)
         {
             ReferencedSymbol = referencedSymbol;

@@ -46,18 +46,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
     [Closed(
         typeof(ILocalBinding),
-        typeof(IFieldDeclaration))]
+        typeof(IFieldDeclaration),
+        typeof(IBindingParameter))]
     public partial interface IBinding : IAbstractSyntax
     {
         BindingSymbol Symbol { get; }
     }
 
     [Closed(
-        typeof(IBindingParameter),
+        typeof(INamedParameter),
         typeof(IVariableDeclarationStatement),
         typeof(IForeachExpression))]
     public partial interface ILocalBinding : IBinding
     {
+        new NamedBindingSymbol Symbol { get; }
     }
 
     [Closed(
@@ -66,6 +68,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(IMemberDeclaration))]
     public partial interface IDeclaration : IAbstractSyntax
     {
+        CodeFile File { get; }
         Symbol Symbol { get; }
     }
 
@@ -84,6 +87,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     }
 
     [Closed(
+        typeof(IFunctionDeclaration),
         typeof(IConcreteMethodDeclaration),
         typeof(IConstructorDeclaration),
         typeof(IAssociatedFunctionDeclaration))]
@@ -105,11 +109,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         FixedList<IMemberDeclaration> Members { get; }
     }
 
-    public partial interface IFunctionDeclaration : INonMemberDeclaration
+    public partial interface IFunctionDeclaration : INonMemberDeclaration, IConcreteInvocableDeclaration
     {
         new FunctionSymbol Symbol { get; }
-        FixedList<INamedParameter> Parameters { get; }
-        IBody Body { get; }
+        new FixedList<INamedParameter> Parameters { get; }
     }
 
     [Closed(
@@ -178,11 +181,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     [Closed(
         typeof(INamedParameter),
         typeof(ISelfParameter))]
-    public partial interface IBindingParameter : IParameter, ILocalBinding
+    public partial interface IBindingParameter : IParameter, IBinding
     {
     }
 
-    public partial interface INamedParameter : IParameter, IConstructorParameter, IBindingParameter
+    public partial interface INamedParameter : IParameter, IConstructorParameter, IBindingParameter, ILocalBinding
     {
         new VariableSymbol Symbol { get; }
         IExpression? DefaultValue { get; }
@@ -423,7 +426,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
     public partial interface INameExpression : IAssignableExpression
     {
-        BindingSymbol ReferencedSymbol { get; }
+        NamedBindingSymbol ReferencedSymbol { get; }
     }
 
     public partial interface ISelfExpression : IExpression

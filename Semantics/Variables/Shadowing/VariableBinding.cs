@@ -1,6 +1,6 @@
 using System.Collections.Generic;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Shadowing
@@ -13,17 +13,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Variables.Shadowing
         public IReadOnlyList<VariableBinding> WasShadowedBy => wasShadowedBy;
         private readonly List<VariableBinding> wasShadowedBy = new List<VariableBinding>();
 
-        public VariableBinding(INamedParameterSyntax parameter)
+        public VariableBinding(INamedParameter parameter)
         {
-            MutableBinding = parameter.IsMutableBinding;
-            Name = parameter.Name;
+            MutableBinding = parameter.Symbol.IsMutableBinding;
+            Name = parameter.Symbol.Name;
             NameSpan = parameter.Span;
         }
 
-        public VariableBinding(IVariableDeclarationStatementSyntax variableDeclaration)
+        public VariableBinding(IVariableDeclarationStatement variableDeclaration)
         {
-            MutableBinding = variableDeclaration.IsMutableBinding;
-            Name = variableDeclaration.Name;
+            MutableBinding = variableDeclaration.Symbol.IsMutableBinding;
+            Name = variableDeclaration.Symbol.Name;
             NameSpan = variableDeclaration.NameSpan;
         }
 

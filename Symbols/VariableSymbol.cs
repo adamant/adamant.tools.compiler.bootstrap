@@ -7,10 +7,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
     /// <summary>
     /// A symbol for a variable or parameter. Both of which are bindings using `let` or `var`
     /// </summary>
-    public sealed class VariableSymbol : BindingSymbol
+    public sealed class VariableSymbol : NamedBindingSymbol
     {
         public new InvocableSymbol ContainingSymbol { get; }
-        public new Name Name { get; }
         public int? DeclarationNumber { get; }
 
         public VariableSymbol(
@@ -22,7 +21,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
             : base(containingSymbol, name, isMutableBinding, dataType)
         {
             ContainingSymbol = containingSymbol;
-            Name = name;
             DeclarationNumber = declarationNumber;
         }
 

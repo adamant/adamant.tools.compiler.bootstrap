@@ -35,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         }
         // A null name means this syntax was generated as an assumed missing name and the name is unknown
         public Name? Name { get; }
-        public Promise<BindingSymbol?> ReferencedSymbol { get; } = new Promise<BindingSymbol?>();
+        public Promise<NamedBindingSymbol?> ReferencedSymbol { get; } = new Promise<NamedBindingSymbol?>();
         public bool VariableIsLiveAfter { get; set; } = true;
 
         public NameExpressionSyntax(TextSpan span, Name? name)
@@ -44,15 +44,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name = name;
         }
 
-        public IEnumerable<IPromise<BindingSymbol>> LookupInContainingScope()
+        public IEnumerable<IPromise<NamedBindingSymbol>> LookupInContainingScope()
         {
             if (containingLexicalScope == null)
                 throw new InvalidOperationException($"Can't lookup type name without {nameof(ContainingLexicalScope)}");
 
             // If name is unknown, no symbols
-            if (Name is null) return Enumerable.Empty<IPromise<BindingSymbol>>();
+            if (Name is null) return Enumerable.Empty<IPromise<NamedBindingSymbol>>();
 
-            return containingLexicalScope.Lookup(Name).Select(p => p.As<BindingSymbol>()).NotNull();
+            return containingLexicalScope.Lookup(Name).Select(p => p.As<NamedBindingSymbol>()).NotNull();
         }
 
         protected override OperatorPrecedence ExpressionPrecedence => OperatorPrecedence.Primary;

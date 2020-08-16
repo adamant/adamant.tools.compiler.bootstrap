@@ -12,11 +12,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
         public IBody Body { get; }
 
         public AssociatedFunctionDeclaration(
+            CodeFile file,
             TextSpan span,
             FunctionSymbol symbol,
             FixedList<INamedParameter> parameters,
             IBody body)
-            : base(span, symbol, parameters.ToFixedList<IConstructorParameter>())
+            : base(file, span, symbol, parameters.ToFixedList<IConstructorParameter>())
         {
             Symbol = symbol;
             Parameters = parameters;

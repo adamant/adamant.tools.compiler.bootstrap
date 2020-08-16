@@ -39,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
         {
             var symbol = syn.Symbol.Result;
             var members = syn.Members.Select(BuildMember).ToFixedList();
-            return new ClassDeclaration(syn.Span, symbol, members);
+            return new ClassDeclaration(syn.File, syn.Span, symbol, members);
         }
 
         private static IMemberDeclaration BuildMember(IMemberDeclarationSyntax member)
@@ -60,7 +60,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
             var symbol = syn.Symbol.Result;
             var parameters = syn.Parameters.Select(BuildParameter).ToFixedList();
             IBody body = BuildBody(syn.Body);
-            return new AssociatedFunctionDeclaration(syn.Span, symbol, parameters, body);
+            return new AssociatedFunctionDeclaration(syn.File, syn.Span, symbol, parameters, body);
         }
 
         private static IAbstractMethodDeclaration BuildAbstractMethod(IAbstractMethodDeclarationSyntax syn)
@@ -68,7 +68,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
             var symbol = syn.Symbol.Result;
             var selfParameter = BuildParameter(syn.SelfParameter);
             var parameters = syn.Parameters.Select(BuildParameter).ToFixedList();
-            return new AbstractMethodDeclaration(syn.Span, symbol, selfParameter, parameters);
+            return new AbstractMethodDeclaration(syn.File, syn.Span, symbol, selfParameter, parameters);
         }
 
         private static IConcreteMethodDeclaration BuildConcreteMethod(IConcreteMethodDeclarationSyntax syn)
@@ -77,7 +77,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
             var selfParameter = BuildParameter(syn.SelfParameter);
             var parameters = syn.Parameters.Select(BuildParameter).ToFixedList();
             IBody body = BuildBody(syn.Body);
-            return new ConcreteMethodDeclaration(syn.Span, symbol, selfParameter, parameters, body);
+            return new ConcreteMethodDeclaration(syn.File, syn.Span, symbol, selfParameter, parameters, body);
         }
 
         private static IConstructorDeclaration BuildConstructor(IConstructorDeclarationSyntax syn)
@@ -86,13 +86,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
             var selfParameter = BuildParameter(syn.ImplicitSelfParameter);
             var parameters = syn.Parameters.Select(BuildParameter).ToFixedList();
             IBody body = BuildBody(syn.Body);
-            return new ConstructorDeclaration(syn.Span, symbol, selfParameter, parameters, body);
+            return new ConstructorDeclaration(syn.File, syn.Span, symbol, selfParameter, parameters, body);
         }
 
         private static IFieldDeclaration BuildField(IFieldDeclarationSyntax syn)
         {
             var symbol = syn.Symbol.Result;
-            return new FieldDeclaration(syn.Span, symbol);
+            return new FieldDeclaration(syn.File, syn.Span, symbol);
         }
 
         private static IFunctionDeclaration BuildFunction(IFunctionDeclarationSyntax syn)
@@ -100,7 +100,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
             var symbol = syn.Symbol.Result;
             var parameters = syn.Parameters.Select(BuildParameter).ToFixedList();
             IBody body = BuildBody(syn.Body);
-            return new FunctionDeclaration(syn.Span, symbol, parameters, body);
+            return new FunctionDeclaration(syn.File, syn.Span, symbol, parameters, body);
         }
 
         private static IConstructorParameter BuildParameter(IConstructorParameterSyntax parameter)

@@ -11,10 +11,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
         public FixedList<IMemberDeclaration> Members { get; }
 
         public ClassDeclaration(
+            CodeFile file,
             TextSpan span,
             ObjectTypeSymbol symbol,
             FixedList<IMemberDeclaration> members)
-            : base(span, symbol)
+            : base(file, span, symbol)
         {
             Symbol = symbol;
             Members = members;

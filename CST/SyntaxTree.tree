@@ -26,7 +26,7 @@ BlockOrResult: ElseClause;
 
 // ---------- Bindings
 Binding = IsMutableBinding:'bool' Symbol:'IPromise<BindingSymbol>';
-LocalBinding: Binding;
+LocalBinding: Binding = Symbol:'IPromise<NamedBindingSymbol>';
 
 // ---------- Declarations
 Declaration: 'ISyntax', 'IHasContainingLexicalScope' = File:'CodeFile' Name:'Name'? NameSpan:'TextSpan' Symbol:'IPromise<Symbol>';
@@ -59,8 +59,8 @@ Parameter = Name:'Name'? DataType:'IPromise<DataType>' Unused:'bool';
 /// A parameter that can be declared in a constructor
 ConstructorParameter: Parameter;
 /// A parameter that creates a binding, i.e. a named or self parameter
-BindingParameter: Parameter, LocalBinding;
-NamedParameter: Parameter, ConstructorParameter, BindingParameter = Name:'Name' DeclarationNumber:'Promise<int?>' Type Symbol:'Promise<VariableSymbol>' DefaultValue:Expression?;
+BindingParameter: Parameter, Binding;
+NamedParameter: Parameter, ConstructorParameter, BindingParameter, LocalBinding = Name:'Name' DeclarationNumber:'Promise<int?>' Type Symbol:'Promise<VariableSymbol>' DefaultValue:Expression?;
 SelfParameter: Parameter, BindingParameter = MutableSelf:'bool' Symbol:'Promise<SelfParameterSymbol>';
 FieldParameter: Parameter, ConstructorParameter = ReferencedSymbol:'Promise<FieldSymbol?>' DefaultValue:Expression?;
 
@@ -130,7 +130,7 @@ FunctionInvocationExpression: InvocationExpression, 'IHasContainingLexicalScope'
 MethodInvocationExpression: InvocationExpression, 'IHasContainingLexicalScope' = &Context:Expression MethodNameSyntax:InvocableName Arguments:Argument* ReferencedSymbol:'Promise<MethodSymbol?>';
 
 // ---------- Variable Expressions
-NameExpression: AssignableExpression, 'IHasContainingLexicalScope' = Name:'Name'? ReferencedSymbol:'Promise<BindingSymbol?>';
+NameExpression: AssignableExpression, 'IHasContainingLexicalScope' = Name:'Name'? ReferencedSymbol:'Promise<NamedBindingSymbol?>';
 SelfExpression: Expression = IsImplicit:'bool' ReferencedSymbol:'Promise<SelfParameterSymbol?>';
 // TODO in the CST, we don't know that this is a field access, it is just a qualified access (not even member because namespaces don't have members)
 FieldAccessExpression: AssignableExpression = &Context:Expression AccessOperator:'AccessOperator' Field:NameExpression ReferencedSymbol:'IPromise<FieldSymbol?>';

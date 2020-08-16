@@ -4,10 +4,9 @@ using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Symbols
 {
-    public sealed class FieldSymbol : BindingSymbol
+    public sealed class FieldSymbol : NamedBindingSymbol
     {
         public new TypeSymbol ContainingSymbol { get; }
-        public new Name Name { get; }
 
         public FieldSymbol(
             TypeSymbol containingSymbol,
@@ -17,7 +16,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
             : base(containingSymbol, name, isMutableBinding, dataType)
         {
             ContainingSymbol = containingSymbol;
-            Name = name;
         }
 
         public override bool Equals(Symbol? other)

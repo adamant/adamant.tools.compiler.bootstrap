@@ -18,11 +18,11 @@ BlockOrResult: ElseClause;
 
 // ---------- Bindings
 Binding = Symbol:'BindingSymbol';
-LocalBinding: Binding;
+LocalBinding: Binding = Symbol:'NamedBindingSymbol';
 
 // ---------- Declarations
 // Note: in the AST all declarations are entities because there are no namespace declarations
-Declaration = Symbol:'Symbol';
+Declaration = File:'CodeFile' Symbol:'Symbol';
 /// A declaration that could contain executable code (i.e. invocable declaration or field declaration)
 ExecutableDeclaration: Declaration;
 InvocableDeclaration: ExecutableDeclaration = Parameters:ConstructorParameter*;
@@ -31,7 +31,7 @@ ConcreteInvocableDeclaration: InvocableDeclaration = Body;
 // ---------- Non-Member Declarations
 NonMemberDeclaration: Declaration;
 ClassDeclaration: NonMemberDeclaration = Symbol:'ObjectTypeSymbol' Members:MemberDeclaration*;
-FunctionDeclaration: NonMemberDeclaration = Symbol:'FunctionSymbol' Parameters:NamedParameter* Body;
+FunctionDeclaration: NonMemberDeclaration, ConcreteInvocableDeclaration = Symbol:'FunctionSymbol' Parameters:NamedParameter* Body;
 
 // ---------- Member Declarations
 MemberDeclaration: Declaration;
@@ -47,8 +47,8 @@ Parameter = Unused:'bool';
 /// A parameter that can be declared in a constructor
 ConstructorParameter: Parameter;
 /// A parameter that creates a binding, i.e. a named or self parameter
-BindingParameter: Parameter, LocalBinding;
-NamedParameter: Parameter, ConstructorParameter, BindingParameter = Symbol:'VariableSymbol' DefaultValue:Expression?;
+BindingParameter: Parameter, Binding;
+NamedParameter: Parameter, ConstructorParameter, BindingParameter, LocalBinding = Symbol:'VariableSymbol' DefaultValue:Expression?;
 SelfParameter: Parameter, BindingParameter = Symbol:'SelfParameterSymbol';
 FieldParameter: Parameter, ConstructorParameter = ReferencedSymbol:'FieldSymbol' DefaultValue:Expression?;
 
@@ -103,7 +103,7 @@ FunctionInvocationExpression: InvocationExpression = ReferencedSymbol:'FunctionS
 MethodInvocationExpression: InvocationExpression = Context:Expression ReferencedSymbol:'MethodSymbol' Arguments:Expression*;
 
 // ---------- Variable Expressions
-NameExpression: AssignableExpression = ReferencedSymbol:'BindingSymbol';
+NameExpression: AssignableExpression = ReferencedSymbol:'NamedBindingSymbol';
 SelfExpression: Expression = ReferencedSymbol:'SelfParameterSymbol' IsImplicit:'bool';
 FieldAccessExpression: AssignableExpression = Context:Expression AccessOperator:'AccessOperator' ReferencedSymbol:'FieldSymbol';
 BorrowExpression: Expression = ReferencedSymbol:'BindingSymbol' Referent:Expression;
