@@ -8,11 +8,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
     {
         public CodeFile File { get; }
         public Symbol Symbol { get; }
+        public TextSpan NameSpan { get; }
 
-        protected Declaration(CodeFile file, TextSpan span, Symbol symbol)
+        protected Declaration(CodeFile file, TextSpan span, Symbol symbol, TextSpan nameSpan)
             : base(span)
         {
             Symbol = symbol;
+            NameSpan = nameSpan;
             File = file;
         }
     }

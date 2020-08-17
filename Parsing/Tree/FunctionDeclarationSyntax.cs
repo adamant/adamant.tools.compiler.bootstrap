@@ -28,7 +28,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         }
         public new Name Name { get; }
 
-        public bool IsExternalFunction { [DebuggerStepThrough] get; [DebuggerStepThrough] set; }
         public ITypeSyntax? ReturnType { [DebuggerStepThrough] get; }
         public new FixedList<INamedParameterSyntax> Parameters { [DebuggerStepThrough] get; }
         public IBodySyntax Body { [DebuggerStepThrough] get; }

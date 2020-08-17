@@ -14,8 +14,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
             CodeFile file,
             TextSpan span,
             IClassDeclaration declaringClass,
-            FieldSymbol symbol)
-            : base(file, span, symbol)
+            FieldSymbol symbol,
+            TextSpan nameSpan)
+            : base(file, span, symbol, nameSpan)
         {
             Symbol = symbol;
             DeclaringClass = declaringClass;

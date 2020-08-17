@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
     /// </summary>
     public class TypeKnownValidator : SyntaxWalker
     {
-        public void Walk(IEnumerable<IEntityDeclarationSyntax> entityDeclarations)
+        public void Validate(IEnumerable<IEntityDeclarationSyntax> entityDeclarations)
         {
             foreach (var declaration in entityDeclarations)
                 WalkNonNull(declaration);

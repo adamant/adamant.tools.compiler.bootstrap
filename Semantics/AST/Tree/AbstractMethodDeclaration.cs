@@ -19,9 +19,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
             TextSpan span,
             IClassDeclaration declaringClass,
             MethodSymbol symbol,
+            TextSpan nameSpan,
             ISelfParameter selfParameter,
             FixedList<INamedParameter> parameters)
-            : base(file, span, symbol, parameters.ToFixedList<IConstructorParameter>())
+            : base(file, span, symbol, nameSpan, parameters.ToFixedList<IConstructorParameter>())
         {
             Symbol = symbol;
             SelfParameter = selfParameter;

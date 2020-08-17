@@ -16,7 +16,7 @@
 
 'ISyntax' = Span:'TextSpan';
 // Note: by declaring the AllEntityDeclarations property type with quotes, it avoids the system assuming it must represent a direct child syntax node
-CompilationUnit = File:'CodeFile' ImplicitNamespaceName:'NamespaceName' UsingDirectives:UsingDirective* Declarations:NonMemberDeclaration* AllEntityDeclarations:'FixedList<IEntityDeclarationSyntax>' Diagnostics:'Diagnostic'*;
+CompilationUnit = File:'CodeFile' ImplicitNamespaceName:'NamespaceName' UsingDirectives:UsingDirective* Declarations:NonMemberDeclaration* Diagnostics:'Diagnostic'*;
 UsingDirective = Name:'NamespaceName';
 
 // ---------- Special Parts
@@ -42,7 +42,7 @@ NamespaceDeclaration: NonMemberDeclaration = IsGlobalQualified:'bool' DeclaredNa
 // ---------- Non-Member Entity Declarations
 NonMemberEntityDeclaration: EntityDeclaration, NonMemberDeclaration = Name:'Name';
 ClassDeclaration: NonMemberEntityDeclaration = MutableModifier:'IMutableKeywordToken'? Name:'Name' Symbol:'AcyclicPromise<ObjectTypeSymbol>' Members:MemberDeclaration* DefaultConstructorSymbol:'ConstructorSymbol'?;
-FunctionDeclaration: NonMemberEntityDeclaration, ConcreteInvocableDeclaration = IsExternalFunction:'bool' Name:'Name' Parameters:NamedParameter* ReturnType:Type? ReachabilityAnnotations:ReachabilityAnnotation* Body Symbol:'AcyclicPromise<FunctionSymbol>';
+FunctionDeclaration: NonMemberEntityDeclaration, ConcreteInvocableDeclaration = Name:'Name' Parameters:NamedParameter* ReturnType:Type? ReachabilityAnnotations:ReachabilityAnnotation* Body Symbol:'AcyclicPromise<FunctionSymbol>';
 
 // ---------- Member Declarations
 // Note: by declaring the DeclaringClass property type with quotes, it avoids the system assuming it must represent a child syntax node

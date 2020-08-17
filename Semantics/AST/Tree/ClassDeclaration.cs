@@ -10,15 +10,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
     {
         public new ObjectTypeSymbol Symbol { get; }
         public FixedList<IMemberDeclaration> Members { get; }
+        public ConstructorSymbol? DefaultConstructorSymbol { get; }
 
         public ClassDeclaration(
             CodeFile file,
             TextSpan span,
             ObjectTypeSymbol symbol,
+            TextSpan nameSpan,
+            ConstructorSymbol? defaultConstructorSymbol,
             Func<IClassDeclaration, FixedList<IMemberDeclaration>> buildMembers)
-            : base(file, span, symbol)
+            : base(file, span, symbol, nameSpan)
         {
             Symbol = symbol;
+            DefaultConstructorSymbol = defaultConstructorSymbol;
             Members = buildMembers(this);
         }
 

@@ -17,10 +17,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
             TextSpan span,
             IClassDeclaration declaringClass,
             ConstructorSymbol symbol,
+            TextSpan nameSpan,
             ISelfParameter implicitSelfParameter,
             FixedList<IConstructorParameter> parameters,
             IBody body)
-            : base(file, span, symbol, parameters)
+            : base(file, span, symbol, nameSpan, parameters)
         {
             Symbol = symbol;
             ImplicitSelfParameter = implicitSelfParameter;

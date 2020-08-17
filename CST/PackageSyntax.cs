@@ -5,8 +5,10 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Primitives;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
@@ -18,36 +20,61 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public class PackageSyntax
     {
         public PackageSymbol Symbol { get; }
-        public SymbolTreeBuilder SymbolTreeBuilder { get; }
+        public SymbolTreeBuilder SymbolTree { get; }
+        public SymbolForest SymbolTrees { get; }
 
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-        public FixedList<ICompilationUnitSyntax> CompilationUnits { get; }
-
+        public FixedSet<ICompilationUnitSyntax> CompilationUnits { get; }
+        public FixedSet<IEntityDeclarationSyntax> AllEntityDeclarations { get; }
         public FixedDictionary<Name, PackageIL> References { get; }
-
-        public IEnumerable<Diagnostic> Diagnostics =>
-            CompilationUnits.SelectMany(cu => cu.Diagnostics);
+        public IEnumerable<PackageIL> ReferencedPackages => References.Values;
+        public Diagnostics Diagnostics { get; }
 
         public PackageSyntax(
             Name name,
-            FixedList<ICompilationUnitSyntax> compilationUnits,
+            FixedSet<ICompilationUnitSyntax> compilationUnits,
             FixedDictionary<Name, PackageIL> references)
         {
             Symbol = new PackageSymbol(name);
-            SymbolTreeBuilder = new SymbolTreeBuilder(Symbol);
+            SymbolTree = new SymbolTreeBuilder(Symbol);
             CompilationUnits = compilationUnits;
+            AllEntityDeclarations = GetEntityDeclarations(CompilationUnits).ToFixedSet();
             References = references;
+            SymbolTrees = new SymbolForest(Primitive.SymbolTree, SymbolTree, ReferencedPackages.Select(p => p.SymbolTree));
+            Diagnostics = new Diagnostics(CompilationUnits.SelectMany(cu => cu.Diagnostics));
         }
 
-        public IEnumerable<IDeclarationSyntax> GetDeclarations()
+        /// <remarks>
+        /// It wouldn't make sense to get all declarations including non-member because
+        /// that includes namespace declarations. However, some namespaces come from
+        /// the implicit namespace of a compilation unit or are implicitly declared,
+        /// so it wouldn't give a full list of the namespaces.
+        /// </remarks>
+        private static IEnumerable<IEntityDeclarationSyntax> GetEntityDeclarations(
+            FixedSet<ICompilationUnitSyntax> compilationUnits)
         {
             var declarations = new Queue<IDeclarationSyntax>();
-            declarations.EnqueueRange(CompilationUnits.SelectMany(cu => cu.Declarations));
+            declarations.EnqueueRange(compilationUnits.SelectMany(cu => cu.Declarations));
             while (declarations.TryDequeue(out var declaration))
             {
-                yield return declaration;
-                if (declaration is INamespaceDeclarationSyntax ns)
-                    declarations.EnqueueRange(ns.Declarations);
+                switch (declaration)
+                {
+                    default:
+                        throw ExhaustiveMatch.Failed(declaration);
+                    case IMemberDeclarationSyntax syn:
+                        yield return syn;
+                        break;
+                    case IFunctionDeclarationSyntax syn:
+                        yield return syn;
+                        break;
+                    case INamespaceDeclarationSyntax syn:
+                        declarations.EnqueueRange(syn.Declarations);
+                        break;
+                    case IClassDeclarationSyntax syn:
+                        yield return syn;
+                        declarations.EnqueueRange(syn.Members);
+                        break;
+                }
             }
         }
 

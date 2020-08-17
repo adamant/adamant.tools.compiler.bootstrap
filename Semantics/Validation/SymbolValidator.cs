@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
             this.symbolTree = symbolTree;
         }
 
-        public void Walk(IEnumerable<IEntityDeclarationSyntax> entityDeclaration)
+        public void Validate(IEnumerable<IEntityDeclarationSyntax> entityDeclaration)
         {
             foreach (var declaration in entityDeclaration)
                 WalkNonNull(declaration);
@@ -34,6 +34,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                     CheckSymbol(syn, syn.Symbol);
                     // Don't recur into body, we will see those as separate members
                     return;
+                case IFieldDeclarationSyntax syn:
+                    CheckSymbol(syn, syn.Symbol);
+                    break;
                 case IEntityDeclarationSyntax syn:
                     CheckSymbol(syn, syn.Symbol);
                     break;
@@ -47,6 +50,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                     CheckSymbol(syn, syn.Symbol);
                     break;
                 case IVariableDeclarationStatementSyntax syn:
+                    CheckSymbol(syn, syn.Symbol);
+                    break;
+                case IDeclarationSyntax syn:
                     CheckSymbol(syn, syn.Symbol);
                     break;
                 case INameExpressionSyntax syn:

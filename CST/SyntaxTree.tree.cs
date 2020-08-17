@@ -37,7 +37,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         NamespaceName ImplicitNamespaceName { get; }
         FixedList<IUsingDirectiveSyntax> UsingDirectives { get; }
         FixedList<INonMemberDeclarationSyntax> Declarations { get; }
-        FixedList<IEntityDeclarationSyntax> AllEntityDeclarations { get; }
         FixedList<Diagnostic> Diagnostics { get; }
     }
 
@@ -164,7 +163,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface IFunctionDeclarationSyntax : INonMemberEntityDeclarationSyntax, IConcreteInvocableDeclarationSyntax
     {
-        bool IsExternalFunction { get; }
         new Name Name { get; }
         new FixedList<INamedParameterSyntax> Parameters { get; }
         ITypeSyntax? ReturnType { get; }

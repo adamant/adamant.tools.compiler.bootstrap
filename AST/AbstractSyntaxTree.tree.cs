@@ -72,6 +72,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         CodeFile File { get; }
         Symbol Symbol { get; }
+        TextSpan NameSpan { get; }
     }
 
     [Closed(
@@ -110,6 +111,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         new ObjectTypeSymbol Symbol { get; }
         FixedList<IMemberDeclaration> Members { get; }
+        ConstructorSymbol? DefaultConstructorSymbol { get; }
     }
 
     public partial interface IFunctionDeclaration : INonMemberDeclaration, IConcreteInvocableDeclaration
@@ -144,6 +146,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
     public partial interface IConcreteMethodDeclaration : IMethodDeclaration, IConcreteInvocableDeclaration
     {
+        new MethodSymbol Symbol { get; }
         new FixedList<INamedParameter> Parameters { get; }
     }
 

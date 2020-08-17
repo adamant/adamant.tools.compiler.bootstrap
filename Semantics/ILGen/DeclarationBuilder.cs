@@ -1,7 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.CST;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
@@ -15,82 +14,82 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
     public class DeclarationBuilder
     {
         private readonly ILFactory ilFactory;
-        private readonly Dictionary<Symbol, DeclarationIL> declarations = new Dictionary<Symbol, DeclarationIL>();
+        private readonly Dictionary<Symbol, DeclarationIL> declarationsIL = new Dictionary<Symbol, DeclarationIL>();
 
         public DeclarationBuilder(ILFactory ilFactory)
         {
             this.ilFactory = ilFactory;
         }
 
-        public IEnumerable<DeclarationIL> AllDeclarations => declarations.Values;
+        public IEnumerable<DeclarationIL> AllDeclarations => declarationsIL.Values;
 
-        public void Build(IEnumerable<IEntityDeclarationSyntax> entityDeclarations, ISymbolTree symbolTree)
+        public void Build(IEnumerable<IDeclaration> declarations, ISymbolTree symbolTree)
         {
-            foreach (var memberDeclaration in entityDeclarations)
-                Build(memberDeclaration, symbolTree);
+            foreach (var declaration in declarations)
+                Build(declaration, symbolTree);
         }
 
         private FixedList<DeclarationIL> BuildList(
-            IEnumerable<IMemberDeclarationSyntax> memberDeclarations,
+            IEnumerable<IMemberDeclaration> memberDeclarations,
             ISymbolTree symbolTree)
         {
             return memberDeclarations.Select(e => Build(e, symbolTree)).ToFixedList();
         }
 
-        private DeclarationIL Build(IEntityDeclarationSyntax entityDeclaration, ISymbolTree symbolTree)
+        private DeclarationIL Build(IDeclaration declaration, ISymbolTree symbolTree)
         {
-            if (declarations.TryGetValue(entityDeclaration.Symbol.Result, out var declaration))
-                return declaration;
+            if (declarationsIL.TryGetValue(declaration.Symbol, out var declarationIL))
+                return declarationIL;
 
-            switch (entityDeclaration)
+            switch (declaration)
             {
                 default:
-                    throw ExhaustiveMatch.Failed(entityDeclaration);
-                case IFunctionDeclarationSyntax function:
+                    throw ExhaustiveMatch.Failed(declaration);
+                case IFunctionDeclaration function:
                 {
                     var il = ilFactory.CreateGraph(function);
-                    declaration = new FunctionIL(function.IsExternalFunction, false, function.Symbol.Result, BuildParameters(function.Parameters), il);
+                    declarationIL = new FunctionIL(false, false, function.Symbol, BuildParameters(function.Parameters), il);
                     break;
                 }
-                case IAssociatedFunctionDeclarationSyntax associatedFunction:
+                case IAssociatedFunctionDeclaration associatedFunction:
                 {
                     var il = ilFactory.CreateGraph(associatedFunction);
-                    declaration = new FunctionIL(false, true, associatedFunction.Symbol.Result, BuildParameters(associatedFunction.Parameters), il);
+                    declarationIL = new FunctionIL(false, true, associatedFunction.Symbol, BuildParameters(associatedFunction.Parameters), il);
                     break;
                 }
-                case IConcreteMethodDeclarationSyntax method:
+                case IConcreteMethodDeclaration method:
                 {
                     var il = ilFactory.CreateGraph(method);
-                    declaration = new MethodDeclarationIL(method.Symbol.Result, BuildParameter(method.SelfParameter), BuildParameters(method.Parameters), il);
+                    declarationIL = new MethodDeclarationIL(method.Symbol, BuildParameter(method.SelfParameter), BuildParameters(method.Parameters), il);
                     break;
                 }
-                case IAbstractMethodDeclarationSyntax method:
+                case IAbstractMethodDeclaration method:
                 {
-                    declaration = new MethodDeclarationIL(method.Symbol.Result, BuildParameter(method.SelfParameter), BuildParameters(method.Parameters), null);
+                    declarationIL = new MethodDeclarationIL(method.Symbol, BuildParameter(method.SelfParameter), BuildParameters(method.Parameters), null);
                     break;
                 }
-                case IConstructorDeclarationSyntax constructor:
+                case IConstructorDeclaration constructor:
                 {
                     var il = ilFactory.CreateGraph(constructor);
                     var parameters = BuildConstructorParameters(constructor);
                     var fieldInitializations = BuildFieldInitializations(constructor);
-                    declaration = new ConstructorIL(constructor.Symbol.Result, parameters, fieldInitializations, il);
+                    declarationIL = new ConstructorIL(constructor.Symbol, parameters, fieldInitializations, il);
                     break;
                 }
-                case IFieldDeclarationSyntax fieldDeclaration:
-                    declaration = new FieldIL(fieldDeclaration.Symbol.Result);
+                case IFieldDeclaration fieldDeclaration:
+                    declarationIL = new FieldIL(fieldDeclaration.Symbol);
                     break;
-                case IClassDeclarationSyntax classDeclaration:
-                    declaration = new ClassIL(classDeclaration.Symbol.Result,
+                case IClassDeclaration classDeclaration:
+                    declarationIL = new ClassIL(classDeclaration.Symbol,
                         BuildClassMembers(classDeclaration, symbolTree));
                     break;
             }
-            declarations.Add(entityDeclaration.Symbol.Result, declaration);
-            return declaration;
+            declarationsIL.Add(declaration.Symbol, declarationIL);
+            return declarationIL;
         }
 
         private FixedList<DeclarationIL> BuildClassMembers(
-            IClassDeclarationSyntax classDeclaration,
+            IClassDeclaration classDeclaration,
             ISymbolTree symbolTree)
         {
             var members = BuildList(classDeclaration.Members, symbolTree);
@@ -101,13 +100,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         }
 
         private DeclarationIL? BuildDefaultConstructor(
-            IClassDeclarationSyntax classDeclaration,
+            IClassDeclaration classDeclaration,
             ISymbolTree symbolTree)
         {
             var constructorSymbol = classDeclaration.DefaultConstructorSymbol;
             if (constructorSymbol is null) return null;
 
-            if (declarations.TryGetValue(constructorSymbol, out var declaration))
+            if (declarationsIL.TryGetValue(constructorSymbol, out var declaration))
                 return declaration;
 
             var selfParameterSymbol = symbolTree.Children(constructorSymbol).OfType<SelfParameterSymbol>().Single();
@@ -129,46 +128,44 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                                             parameters, FixedList<FieldInitializationIL>.Empty, graph.Build());
 
             //defaultConstructor.ControlFlowOld.InsertedDeletes = new InsertedDeletes();
-            declarations.Add(constructorSymbol, defaultConstructor);
+            declarationsIL.Add(constructorSymbol, defaultConstructor);
             return defaultConstructor;
         }
 
-        private static FixedList<ParameterIL> BuildParameters(IEnumerable<IParameterSyntax> parameters)
+        private static FixedList<ParameterIL> BuildParameters(IEnumerable<IParameter> parameters)
         {
             return parameters.Select(BuildParameter).ToFixedList();
         }
 
-        private static FixedList<ParameterIL> BuildConstructorParameters(IConstructorDeclarationSyntax constructorDeclaration)
+        private static FixedList<ParameterIL> BuildConstructorParameters(IConstructorDeclaration constructorDeclaration)
         {
-            var selfParameterSymbol = constructorDeclaration.ImplicitSelfParameter.Symbol.Result;
+            var selfParameterSymbol = constructorDeclaration.ImplicitSelfParameter.Symbol;
             var selfParameter = new SelfParameterIL(selfParameterSymbol);
             return selfParameter.Yield().Concat(constructorDeclaration.Parameters.Select(BuildParameter)).ToFixedList();
         }
 
-        private static ParameterIL BuildParameter(IParameterSyntax parameter)
+        private static ParameterIL BuildParameter(IParameter parameter)
         {
             return parameter switch
             {
-                INamedParameterSyntax namedParameter => new NamedParameterIL(namedParameter.Symbol.Result),
-                ISelfParameterSyntax selfParameter => new SelfParameterIL(selfParameter.Symbol.Result),
-                IFieldParameterSyntax fieldParameter =>
-                     new FieldParameterIL(fieldParameter.ReferencedSymbol.Result ?? throw new InvalidOperationException()),
+                INamedParameter namedParameter => new NamedParameterIL(namedParameter.Symbol),
+                ISelfParameter selfParameter => new SelfParameterIL(selfParameter.Symbol),
+                IFieldParameter fieldParameter => new FieldParameterIL(fieldParameter.ReferencedSymbol),
                 _ => throw ExhaustiveMatch.Failed(parameter)
             };
         }
 
         private static FixedList<FieldInitializationIL> BuildFieldInitializations(
-            IConstructorDeclarationSyntax constructorDeclaration)
+            IConstructorDeclaration constructorDeclaration)
         {
-            return constructorDeclaration.Parameters.OfType<IFieldParameterSyntax>()
+            return constructorDeclaration.Parameters.OfType<IFieldParameter>()
                                          .Select(BuildFieldInitialization)
                                          .ToFixedList();
         }
 
-        private static FieldInitializationIL BuildFieldInitialization(IFieldParameterSyntax parameter)
+        private static FieldInitializationIL BuildFieldInitialization(IFieldParameter parameter)
         {
-            var field = parameter.ReferencedSymbol.Result ?? throw new InvalidOperationException();
-            return new FieldInitializationIL(field);
+            return new FieldInitializationIL(parameter.ReferencedSymbol);
         }
     }
 }

@@ -16,14 +16,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         /// Referenced packages
         /// </summary>
         /// <remarks>No longer need aliases. All references are now explicit.</remarks>
-        public FixedList<PackageIL> References { get; }
-        public FixedList<DeclarationIL> Declarations { get; }
+        public FixedSet<PackageIL> References { get; }
+        public FixedSet<DeclarationIL> Declarations { get; }
         public FunctionIL EntryPoint { get; internal set; }
 
         public PackageIL(
             FixedSymbolTree symbolTree,
             FixedList<Diagnostic> diagnostics,
-            FixedList<PackageIL> references,
+            FixedSet<PackageIL> references,
             IEnumerable<DeclarationIL> declarations,
             FunctionIL entryPoint)
         {
@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
             Diagnostics = diagnostics;
             References = references;
             EntryPoint = entryPoint;
-            Declarations = declarations.ToFixedList();
+            Declarations = declarations.ToFixedSet();
         }
 
         public IEnumerable<DeclarationIL> GetNonMemberDeclarations()

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Promises;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -36,16 +35,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                                             .Where(s => s.ContainingSymbol is null)
                                             .Select(s => new NonMemberSymbol(s));
 
-            var packageNamespaces = package.SymbolTreeBuilder.Symbols
+            var packageNamespaces = package.SymbolTree.Symbols
                                            .OfType<NamespaceSymbol>()
                                            .Select(s => new NonMemberSymbol(s));
 
-            var packageSymbols = package.GetDeclarations()
+            var packageSymbols = package.AllEntityDeclarations
                                         .OfType<INonMemberEntityDeclarationSyntax>()
                                         .Select(d => new NonMemberSymbol(d));
 
             // TODO it might be better to go to the declarations and get their symbols (once that is implemented)
-            var referencedSymbols = package.References.Values
+            var referencedSymbols = package.ReferencedPackages
                                            .SelectMany(p => p.SymbolTree.Symbols)
                                            .Concat(Intrinsic.SymbolTree.Symbols)
                                            .Where(s => s.ContainingSymbol is NamespaceOrPackageSymbol)

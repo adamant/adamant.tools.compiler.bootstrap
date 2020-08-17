@@ -18,13 +18,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
         private readonly Diagnostics diagnostics;
         private readonly SymbolTreeBuilder symbolTree;
 
-        public EntitySymbolBuilder(Diagnostics diagnostics, SymbolTreeBuilder symbolTree)
+        private EntitySymbolBuilder(Diagnostics diagnostics, SymbolTreeBuilder symbolTree)
         {
             this.diagnostics = diagnostics;
             this.symbolTree = symbolTree;
         }
 
-        public void Build(FixedList<IEntityDeclarationSyntax> entities)
+        public static void BuildFor(PackageSyntax package)
+        {
+            var builder = new EntitySymbolBuilder(package.Diagnostics, package.SymbolTree);
+            builder.Build(package.AllEntityDeclarations);
+        }
+
+        private void Build(FixedSet<IEntityDeclarationSyntax> entities)
         {
             // Process all classes first because they may be referenced by functions etc.
             foreach (var @class in entities.OfType<IClassDeclarationSyntax>())

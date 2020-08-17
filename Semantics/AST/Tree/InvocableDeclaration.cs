@@ -14,8 +14,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
             CodeFile file,
             TextSpan span,
             InvocableSymbol symbol,
+            TextSpan nameSpan,
             FixedList<IConstructorParameter> parameters)
-            : base(file, span, symbol)
+            : base(file, span, symbol, nameSpan)
         {
             Symbol = symbol;
             Parameters = parameters;

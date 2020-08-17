@@ -30,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         private readonly ObjectTypeSymbol? stringSymbol;
         private readonly Diagnostics diagnostics;
 
-        public BasicAnalyzer(
+        private BasicAnalyzer(
             SymbolTreeBuilder symbolTreeBuilder,
             SymbolForest symbolTrees,
             ObjectTypeSymbol? stringSymbol,
@@ -42,7 +42,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             this.diagnostics = diagnostics;
         }
 
-        public void Check(FixedList<IEntityDeclarationSyntax> entities)
+        public static void Check(PackageSyntax package, ObjectTypeSymbol? stringSymbol)
+        {
+            var analyzer = new BasicAnalyzer(package.SymbolTree, package.SymbolTrees, stringSymbol, package.Diagnostics);
+            analyzer.Check(package.AllEntityDeclarations);
+        }
+
+        private void Check(FixedSet<IEntityDeclarationSyntax> entities)
         {
             foreach (var entity in entities)
                 ResolveBodyTypes(entity);

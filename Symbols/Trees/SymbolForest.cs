@@ -23,6 +23,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols.Trees
             this.packageTrees = packageTrees.Append<ISymbolTree>(symbolTreeBuilder).ToFixedDictionary(t => t.Package!);
         }
 
+        public SymbolForest(PrimitiveSymbolTree primitiveSymbolTree, IEnumerable<FixedSymbolTree> packageTrees)
+        {
+            PrimitiveSymbolTree = primitiveSymbolTree;
+            this.packageTrees = packageTrees.ToFixedDictionary(t => t.Package!, t => (ISymbolTree)t);
+        }
+
         public IEnumerable<Symbol> Children(Symbol symbol)
         {
             if (symbol.Package is null)

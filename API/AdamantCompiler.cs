@@ -74,7 +74,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             var references = referencePairs.ToFixedDictionary(r => r.alias, r => r.package);
 
             // TODO add the references to the package syntax
-            var packageSyntax = new PackageSyntax(name, compilationUnits.ToFixedList(), references);
+            var packageSyntax = new PackageSyntax(name, compilationUnits.ToFixedSet(), references);
 
             var analyzer = new SemanticAnalyzer()
             {
@@ -107,7 +107,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                     var tokens = lexer.Lex(context).WhereNotTrivia();
                     return parser.Parse(tokens);
                 })
-                .ToFixedList();
+                .ToFixedSet();
             var packageSyntax = new PackageSyntax(name, compilationUnits, references);
 
             var analyzer = new SemanticAnalyzer()

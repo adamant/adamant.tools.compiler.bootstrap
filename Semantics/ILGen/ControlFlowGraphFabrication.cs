@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core.Operators;
-using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions;
@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
     /// </remarks>
     public class ControlFlowGraphFabrication
     {
-        private readonly IConcreteInvocableDeclarationSyntax invocable;
+        private readonly IConcreteInvocableDeclaration invocable;
         private readonly SelfParameterSymbol? selfParameter;
         private readonly DataType returnType;
         private readonly ControlFlowGraphBuilder graph;
@@ -55,7 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         private readonly Stack<Scope> scopes = new Stack<Scope>();
         private Scope CurrentScope => scopes.Peek();
 
-        public ControlFlowGraphFabrication(IConcreteInvocableDeclarationSyntax invocable)
+        public ControlFlowGraphFabrication(IConcreteInvocableDeclaration invocable)
         {
             this.invocable = invocable;
             graph = new ControlFlowGraphBuilder(invocable.File);
@@ -67,19 +67,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
             {
                 default:
                     throw ExhaustiveMatch.Failed(invocable);
-                case IConcreteMethodDeclarationSyntax method:
+                case IConcreteMethodDeclaration method:
                     // TODO what about the self parameter of methods?
-                    returnType = method.Symbol.Result.ReturnDataType.Known();
+                    returnType = method.Symbol.ReturnDataType.Known();
                     break;
-                case IConstructorDeclarationSyntax constructor:
-                    selfParameter = constructor.ImplicitSelfParameter.Symbol.Result;
+                case IConstructorDeclaration constructor:
+                    selfParameter = constructor.ImplicitSelfParameter.Symbol;
                     returnType = DataType.Void; // the body should `return;`
                     break;
-                case IAssociatedFunctionDeclarationSyntax associatedFunction:
-                    returnType = associatedFunction.Symbol.Result.ReturnDataType.Known();
+                case IAssociatedFunctionDeclaration associatedFunction:
+                    returnType = associatedFunction.Symbol.ReturnDataType.Known();
                     break;
-                case IFunctionDeclarationSyntax function:
-                    returnType = function.Symbol.Result.ReturnDataType.Known();
+                case IFunctionDeclaration function:
+                    returnType = function.Symbol.ReturnDataType.Known();
                     break;
             }
 
@@ -92,8 +92,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
             // Temp Variable for return
             if (selfParameter != null) graph.AddSelfParameter(selfParameter);
 
-            foreach (var parameter in invocable.Parameters.Where(p => !p.Unused).OfType<INamedParameterSyntax>())
-                graph.AddParameter(parameter.IsMutableBinding, parameter.DataType.Result, CurrentScope, parameter.Symbol.Result);
+            foreach (var parameter in invocable.Parameters.Where(p => !p.Unused).OfType<INamedParameter>())
+                graph.AddParameter(parameter.Symbol.IsMutableBinding, parameter.Symbol.DataType, CurrentScope, parameter.Symbol);
 
             currentBlock = graph.NewBlock();
             foreach (var statement in invocable.Body.Statements)
@@ -111,17 +111,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         }
 
 
-        private void Convert(IStatementSyntax statement)
+        private void Convert(IStatement statement)
         {
             switch (statement)
             {
                 default:
                     throw ExhaustiveMatch.Failed(statement);
-                case IVariableDeclarationStatementSyntax variableDeclaration:
+                case IVariableDeclarationStatement variableDeclaration:
                 {
-                    var variable = graph.AddVariable(variableDeclaration.IsMutableBinding,
-                        variableDeclaration.Symbol.Result.DataType,
-                        CurrentScope, variableDeclaration.Symbol.Result);
+                    var variable = graph.AddVariable(variableDeclaration.Symbol.IsMutableBinding,
+                        variableDeclaration.Symbol.DataType,
+                        CurrentScope, variableDeclaration.Symbol);
                     if (variableDeclaration.Initializer != null)
                     {
                         ConvertIntoPlace(variableDeclaration.Initializer,
@@ -129,7 +129,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     }
                 }
                 break;
-                case IExpressionStatementSyntax expressionStatement:
+                case IExpressionStatement expressionStatement:
                 {
                     var expression = expressionStatement.Expression;
                     if (!expression.DataType.Assigned().IsKnown)
@@ -138,7 +138,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     Convert(expression);
                 }
                 break;
-                case IResultStatementSyntax resultStatement:
+                case IResultStatement resultStatement:
                 {
                     var expression = resultStatement.Expression;
                     if (!expression.DataType.Assigned().IsKnown)
@@ -153,32 +153,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         /// <summary>
         /// Convert without expecting any result value
         /// </summary>
-        private void Convert(IBlockOrResultSyntax blockOrResult)
+        private void Convert(IBlockOrResult blockOrResult)
         {
             switch (blockOrResult)
             {
                 default:
                     throw ExhaustiveMatch.Failed(blockOrResult);
-                case IBlockExpressionSyntax exp:
-                    Convert((IExpressionSyntax)exp);
+                case IBlockExpression exp:
+                    Convert((IExpression)exp);
                     break;
-                case IResultStatementSyntax statement:
-                    Convert((IStatementSyntax)statement);
+                case IResultStatement statement:
+                    Convert((IStatement)statement);
                     break;
             }
         }
 
-        private void Convert(IElseClauseSyntax elseClause)
+        private void Convert(IElseClause elseClause)
         {
             switch (elseClause)
             {
                 default:
                     throw ExhaustiveMatch.Failed(elseClause);
-                case IBlockOrResultSyntax blockOrResult:
+                case IBlockOrResult blockOrResult:
                     Convert(blockOrResult);
                     break;
-                case IIfExpressionSyntax exp:
-                    Convert((IExpressionSyntax)exp);
+                case IIfExpression exp:
+                    Convert((IExpression)exp);
                     break;
             }
         }
@@ -186,34 +186,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         /// <summary>
         /// Convert an expression without expecting any result value
         /// </summary>
-        private void Convert(IExpressionSyntax expression)
+        private void Convert(IExpression expression)
         {
             switch (expression)
             {
                 default:
                     throw ExhaustiveMatch.Failed(expression);
-                case INewObjectExpressionSyntax _:
-                case IFieldAccessExpressionSyntax _:
+                case INewObjectExpression _:
+                case IFieldAccessExpression _:
                     throw new NotImplementedException($"Convert({expression.GetType().Name}) Not Implemented.");
-                case IBorrowExpressionSyntax exp:
+                case IBorrowExpression exp:
                     Convert(exp.Referent);
                     break;
-                case IShareExpressionSyntax exp:
+                case IShareExpression exp:
                     Convert(exp.Referent);
                     break;
-                case IMoveExpressionSyntax exp:
+                case IMoveExpression exp:
                     Convert(exp.Referent);
                     break;
-                case IImplicitNumericConversionExpressionSyntax exp:
+                case IImplicitNumericConversionExpression exp:
                     Convert(exp.Expression);
                     break;
-                case IImplicitOptionalConversionExpressionSyntax exp:
+                case IImplicitOptionalConversionExpression exp:
                     Convert(exp.Expression);
                     break;
-                case IImplicitImmutabilityConversionExpressionSyntax exp:
+                case IImplicitImmutabilityConversionExpression exp:
                     Convert(exp.Expression);
                     break;
-                case ILoopExpressionSyntax exp:
+                case ILoopExpression exp:
                 {
                     var loopEntry = graph.NewEntryBlock(currentBlock!, exp.Block.Span.AtStart(), CurrentScope);
                     currentBlock = loopEntry;
@@ -224,7 +224,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     currentBlock = loopExit;
                 }
                 break;
-                case IWhileExpressionSyntax whileExpression:
+                case IWhileExpression whileExpression:
                 {
                     // There is a block for the condition, it then goes either to
                     // the body or the after block.
@@ -245,7 +245,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     currentBlock = loopExit;
                 }
                 break;
-                case IForeachExpressionSyntax exp:
+                case IForeachExpression exp:
                 {
                     // For now, we support only range syntax `foreach x: T in z..y`. Range operators
                     // aren't yet supported by the rest of the language, so they must be directly
@@ -258,7 +258,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     //     x += 1;
                     //     if x > temp => break;
                     // }
-                    if (!(exp.InExpression is IBinaryOperatorExpressionSyntax inExpression)
+                    if (!(exp.InExpression is IBinaryOperatorExpression inExpression)
                         || (inExpression.Operator != BinaryOperator.DotDot
                             && inExpression.Operator != BinaryOperator.LessThanDotDot
                             && inExpression.Operator != BinaryOperator.DotDotLessThan
@@ -269,9 +269,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     var startExpression = inExpression.LeftOperand;
                     var endExpression = inExpression.RightOperand;
 
-                    var variableType = (IntegerType)exp.Symbol.Result.DataType;
-                    var loopVariable = graph.AddVariable(exp.IsMutableBinding,
-                                            variableType, CurrentScope, exp.Symbol.Result);
+                    var variableType = (IntegerType)exp.Symbol.DataType;
+                    var loopVariable = graph.AddVariable(exp.Symbol.IsMutableBinding,
+                                            variableType, CurrentScope, exp.Symbol);
                     var loopVariablePlace = loopVariable.Place(exp.Span);
                     var loopVariableReference = loopVariable.Reference(exp.Span);
 
@@ -322,7 +322,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     currentBlock = loopExit;
                 }
                 break;
-                case IBreakExpressionSyntax exp:
+                case IBreakExpression exp:
                 {
                     // TODO Do we need `ExitScope(exp.Span.AtEnd());` ?
                     // capture the current block for use in the lambda
@@ -331,7 +331,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     currentBlock = null;
                 }
                 break;
-                case INextExpressionSyntax exp:
+                case INextExpression exp:
                 {
                     // TODO Do we need `ExitScope(nextExpression.Span.AtEnd());` ?
                     currentBlock!.End(new GotoInstruction(continueToBlock?.Number ?? throw new InvalidOperationException(),
@@ -339,7 +339,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     currentBlock = null;
                 }
                 break;
-                case IIfExpressionSyntax exp:
+                case IIfExpression exp:
                 {
                     var containingBlock = currentBlock!;
                     var condition = ConvertToOperand(exp.Condition);
@@ -372,15 +372,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     currentBlock = exit;
                 }
                 break;
-                case IMethodInvocationExpressionSyntax exp:
+                case IMethodInvocationExpression exp:
                 {
-                    var method = exp.ReferencedSymbol.Result ?? throw new InvalidOperationException();
+                    var method = exp.ReferencedSymbol;
                     var target = ConvertToOperand(exp.Context);
-                    var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
+                    var args = exp.Arguments.Select(ConvertToOperand).ToFixedList();
                     currentBlock!.Add(new CallVirtualInstruction(target, method, args, exp.Span, CurrentScope));
                 }
                 break;
-                case IAssignmentExpressionSyntax exp:
+                case IAssignmentExpression exp:
                 {
                     var leftOperand = exp.LeftOperand;
                     var assignInto = ConvertToPlace(leftOperand);
@@ -403,21 +403,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     }
                 }
                 break;
-                case IUnsafeExpressionSyntax exp:
+                case IUnsafeExpression exp:
                     Convert(exp.Expression);
                     break;
-                case IBlockExpressionSyntax exp:
+                case IBlockExpression exp:
                     foreach (var statement in exp.Statements)
                         Convert(statement);
                     break;
-                case IFunctionInvocationExpressionSyntax exp:
+                case IFunctionInvocationExpression exp:
                 {
-                    var functionName = exp.ReferencedSymbol.Result ?? throw new InvalidOperationException();
-                    var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
+                    var functionName = exp.ReferencedSymbol;
+                    var args = exp.Arguments.Select(ConvertToOperand).ToFixedList();
                     currentBlock!.Add(CallInstruction.ForFunction(functionName, args, exp.Span, CurrentScope));
                 }
                 break;
-                case IReturnExpressionSyntax exp:
+                case IReturnExpression exp:
                 {
                     if (exp.Value is null)
                         currentBlock!.End(new ReturnVoidInstruction(exp.Span, CurrentScope));
@@ -431,15 +431,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     currentBlock = null;
                 }
                 break;
-                case INameExpressionSyntax _:
-                case IBinaryOperatorExpressionSyntax _:
-                case IUnaryOperatorExpressionSyntax _:
-                case IBoolLiteralExpressionSyntax _:
-                case IStringLiteralExpressionSyntax _:
-                case ISelfExpressionSyntax _:
-                case INoneLiteralExpressionSyntax _:
-                case IIntegerLiteralExpressionSyntax _:
-                case IImplicitNoneConversionExpressionSyntax _:
+                case INameExpression _:
+                case IBinaryOperatorExpression _:
+                case IUnaryOperatorExpression _:
+                case IBoolLiteralExpression _:
+                case IStringLiteralExpression _:
+                case ISelfExpression _:
+                case INoneLiteralExpression _:
+                case IIntegerLiteralExpression _:
+                case IImplicitNoneConversionExpression _:
                     // These operation have no side effects, so if the result isn't needed, there is nothing to do
                     break;
 
@@ -449,11 +449,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         /// <summary>
         /// Convert the body of a loop. Ensures break statements are handled correctly.
         /// </summary>
-        private BlockBuilder? ConvertLoopBody(IBlockExpressionSyntax body, bool exitRequired = true)
+        private BlockBuilder? ConvertLoopBody(IBlockExpression body, bool exitRequired = true)
         {
             var oldAddBreaks = addBreaks;
             addBreaks = new List<Action<BlockBuilder>>();
-            Convert((IExpressionSyntax)body);
+            Convert((IExpression)body);
             BlockBuilder? loopExit = null;
             // If this kind of loop requires an exit or if there is a break, create an exit block
             if (exitRequired || addBreaks.Any())
@@ -468,53 +468,53 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         /// <summary>
         /// Convert an expression that yields a value and assign that value into <paramref name="resultPlace"/>.
         /// </summary>
-        private void ConvertIntoPlace(IExpressionSyntax expression, Place resultPlace)
+        private void ConvertIntoPlace(IExpression expression, Place resultPlace)
         {
             switch (expression)
             {
                 default:
                     throw ExhaustiveMatch.Failed(expression);
-                case ILoopExpressionSyntax _:
-                case IWhileExpressionSyntax _:
-                case IForeachExpressionSyntax _:
-                case IReturnExpressionSyntax _:
-                case IBreakExpressionSyntax _:
-                case INextExpressionSyntax _:
-                case ISelfExpressionSyntax _:
-                case IIfExpressionSyntax _:
-                case IUnsafeExpressionSyntax _:
-                case IBlockExpressionSyntax _:
-                case INoneLiteralExpressionSyntax _:
+                case ILoopExpression _:
+                case IWhileExpression _:
+                case IForeachExpression _:
+                case IReturnExpression _:
+                case IBreakExpression _:
+                case INextExpression _:
+                case ISelfExpression _:
+                case IIfExpression _:
+                case IUnsafeExpression _:
+                case IBlockExpression _:
+                case INoneLiteralExpression _:
                     throw new NotImplementedException($"ConvertIntoPlace({expression.GetType().Name}, Place) Not Implemented.");
-                case IImplicitOptionalConversionExpressionSyntax exp:
+                case IImplicitOptionalConversionExpression exp:
                 {
                     var operand = ConvertToOperand(exp.Expression);
                     currentBlock!.Add(new SomeInstruction(resultPlace, exp.ConvertToType, operand, exp.Span, CurrentScope));
                 }
                 break;
-                case IAssignmentExpressionSyntax exp:
+                case IAssignmentExpression exp:
                     throw new NotImplementedException("Assignments don't have a result");
-                case INameExpressionSyntax exp:
+                case INameExpression exp:
                 {
                     // This occurs when the source code contains a simple assignment like `x = y`
-                    var symbol = exp.ReferencedSymbol.Result ?? throw new InvalidOperationException();
+                    var symbol = exp.ReferencedSymbol;
                     var variable = graph.VariableFor(symbol).Reference(exp.Span);
                     currentBlock!.Add(new AssignmentInstruction(resultPlace, variable, exp.Span, CurrentScope));
                 }
                 break;
-                case IBorrowExpressionSyntax exp:
+                case IBorrowExpression exp:
                     ConvertIntoPlace(exp.Referent, resultPlace);
                     break;
-                case IShareExpressionSyntax exp:
+                case IShareExpression exp:
                     ConvertIntoPlace(exp.Referent, resultPlace);
                     break;
-                case IMoveExpressionSyntax exp:
+                case IMoveExpression exp:
                     ConvertIntoPlace(exp.Referent, resultPlace);
                     break;
-                case IImplicitImmutabilityConversionExpressionSyntax exp:
+                case IImplicitImmutabilityConversionExpression exp:
                     ConvertIntoPlace(exp.Expression, resultPlace);
                     break;
-                case IBinaryOperatorExpressionSyntax exp:
+                case IBinaryOperatorExpression exp:
                 {
                     var resultType = exp.DataType.Assigned().Known();
                     var operandType = exp.LeftOperand.DataType.Assigned().Known();
@@ -586,7 +586,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     }
                 }
                 break;
-                case IUnaryOperatorExpressionSyntax exp:
+                case IUnaryOperatorExpression exp:
                 {
                     var type = exp.DataType.Assigned().Known();
                     var operand = ConvertToOperand(exp.Operand);
@@ -603,46 +603,46 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     }
                 }
                 break;
-                case IFieldAccessExpressionSyntax exp:
+                case IFieldAccessExpression exp:
                 {
                     var context = ConvertToOperand(exp.Context);
-                    var field = exp.ReferencedSymbol.Result ?? throw new InvalidOperationException();
+                    var field = exp.ReferencedSymbol;
                     currentBlock!.Add(new FieldAccessInstruction(resultPlace, context, field, exp.Span, CurrentScope));
                 }
                 break;
-                case IFunctionInvocationExpressionSyntax exp:
+                case IFunctionInvocationExpression exp:
                 {
-                    var functionName = exp.ReferencedSymbol.Result ?? throw new InvalidOperationException();
-                    var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
+                    var functionName = exp.ReferencedSymbol;
+                    var args = exp.Arguments.Select(e => ConvertToOperand(e)).ToFixedList();
                     currentBlock!.Add(CallInstruction.ForFunction(resultPlace, functionName, args, exp.Span, CurrentScope));
                 }
                 break;
-                case IMethodInvocationExpressionSyntax exp:
+                case IMethodInvocationExpression exp:
                 {
-                    var methodName = exp.ReferencedSymbol.Result ?? throw new InvalidOperationException();
+                    var methodName = exp.ReferencedSymbol;
                     var target = ConvertToOperand(exp.Context);
-                    var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
+                    var args = exp.Arguments.Select(ConvertToOperand).ToFixedList();
                     if (exp.Context.DataType is ReferenceType)
                         currentBlock!.Add(new CallVirtualInstruction(resultPlace, target, methodName, args, exp.Span, CurrentScope));
                     else
                         currentBlock!.Add(CallInstruction.ForMethod(resultPlace, target, methodName, args, exp.Span, CurrentScope));
                 }
                 break;
-                case INewObjectExpressionSyntax exp:
+                case INewObjectExpression exp:
                 {
-                    var constructor = exp.ReferencedSymbol.Result ?? throw new InvalidOperationException();
-                    var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
-                    var constructedType = (ObjectType)exp.Type.NamedType.Assigned().Known();
+                    var constructor = exp.ReferencedSymbol;
+                    var args = exp.Arguments.Select(ConvertToOperand).ToFixedList();
+                    var constructedType = (ObjectType)exp.DataType.Known();
                     currentBlock!.Add(new NewObjectInstruction(resultPlace, constructor, constructedType, args, exp.Span, CurrentScope));
                 }
                 break;
-                case IStringLiteralExpressionSyntax exp:
+                case IStringLiteralExpression exp:
                     currentBlock!.Add(new LoadStringInstruction(resultPlace, exp.Value, exp.Span, CurrentScope));
                     break;
-                case IBoolLiteralExpressionSyntax exp:
+                case IBoolLiteralExpression exp:
                     currentBlock!.Add(new LoadBoolInstruction(resultPlace, exp.Value, exp.Span, CurrentScope));
                     break;
-                case IImplicitNumericConversionExpressionSyntax exp:
+                case IImplicitNumericConversionExpression exp:
                 {
                     if (exp.Expression.DataType.Assigned().Known() is IntegerConstantType constantType)
                         currentBlock!.Add(new LoadIntegerInstruction(resultPlace, constantType.Value,
@@ -654,10 +654,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                             exp.Span, CurrentScope));
                 }
                 break;
-                case IIntegerLiteralExpressionSyntax exp:
+                case IIntegerLiteralExpression exp:
                     throw new InvalidOperationException(
                         "Integer literals should have an implicit conversion around them");
-                case IImplicitNoneConversionExpressionSyntax exp:
+                case IImplicitNoneConversionExpression exp:
                     currentBlock!.Add(new LoadNoneInstruction(resultPlace, exp.ConvertToType, exp.Span, CurrentScope));
                     break;
             }
@@ -666,46 +666,46 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         /// <summary>
         /// Convert an expression that yields a value into an operand for another instruction
         /// </summary>
-        private Operand ConvertToOperand(IExpressionSyntax expression)
+        private Operand ConvertToOperand(IExpression expression)
         {
             switch (expression)
             {
                 default:
                     throw ExhaustiveMatch.Failed(expression);
-                case ISelfExpressionSyntax exp:
+                case ISelfExpression exp:
                     return graph.SelfVariable.Reference(exp.Span);
-                case INameExpressionSyntax exp:
+                case INameExpression exp:
                 {
-                    var symbol = exp.ReferencedSymbol.Result ?? throw new InvalidOperationException();
+                    var symbol = exp.ReferencedSymbol;
                     return graph.VariableFor(symbol).Reference(exp.Span);
                 }
-                case IAssignmentExpressionSyntax _:
-                case IBinaryOperatorExpressionSyntax _:
-                case IUnaryOperatorExpressionSyntax _:
-                case IFieldAccessExpressionSyntax _:
-                case IMethodInvocationExpressionSyntax _:
-                case INewObjectExpressionSyntax _:
-                case IImplicitNumericConversionExpressionSyntax _:
-                case IIntegerLiteralExpressionSyntax _:
-                case IStringLiteralExpressionSyntax _:
-                case IBoolLiteralExpressionSyntax _:
-                case INoneLiteralExpressionSyntax _:
-                case IImplicitImmutabilityConversionExpressionSyntax _:
-                case IImplicitOptionalConversionExpressionSyntax _:
-                case IUnsafeExpressionSyntax _:
-                case IBlockExpressionSyntax _:
-                case IImplicitNoneConversionExpressionSyntax _:
-                case IBreakExpressionSyntax _:
-                case INextExpressionSyntax _:
-                case IReturnExpressionSyntax _:
-                case IMoveExpressionSyntax _:
-                case IBorrowExpressionSyntax _:
-                case IShareExpressionSyntax _:
-                case IIfExpressionSyntax _:
-                case IFunctionInvocationExpressionSyntax _:
-                case IForeachExpressionSyntax _:
-                case ILoopExpressionSyntax _:
-                case IWhileExpressionSyntax _:
+                case IAssignmentExpression _:
+                case IBinaryOperatorExpression _:
+                case IUnaryOperatorExpression _:
+                case IFieldAccessExpression _:
+                case IMethodInvocationExpression _:
+                case INewObjectExpression _:
+                case IImplicitNumericConversionExpression _:
+                case IIntegerLiteralExpression _:
+                case IStringLiteralExpression _:
+                case IBoolLiteralExpression _:
+                case INoneLiteralExpression _:
+                case IImplicitImmutabilityConversionExpression _:
+                case IImplicitOptionalConversionExpression _:
+                case IUnsafeExpression _:
+                case IBlockExpression _:
+                case IImplicitNoneConversionExpression _:
+                case IBreakExpression _:
+                case INextExpression _:
+                case IReturnExpression _:
+                case IMoveExpression _:
+                case IBorrowExpression _:
+                case IShareExpression _:
+                case IIfExpression _:
+                case IFunctionInvocationExpression _:
+                case IForeachExpression _:
+                case ILoopExpression _:
+                case IWhileExpression _:
                 {
                     var tempVar = graph.Let(expression.DataType.Assigned().Known(), CurrentScope);
                     ConvertIntoPlace(expression, tempVar.Place(expression.Span));
@@ -717,24 +717,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         /// <summary>
         /// Convert an expression to a place. Used for LValues
         /// </summary>
-        private Place ConvertToPlace(IExpressionSyntax expression)
+        private Place ConvertToPlace(IExpression expression)
         {
             switch (expression)
             {
                 default:
                     //throw ExhaustiveMatch.Failed(expression);
                     throw new NotImplementedException($"ConvertToPlaceWithoutSideEffects({expression.GetType().Name}) Not Implemented.");
-                case IFieldAccessExpressionSyntax exp:
+                case IFieldAccessExpression exp:
                 {
                     var context = ConvertToOperand(exp.Context);
-                    var field = exp.ReferencedSymbol.Result ?? throw new InvalidOperationException();
+                    var field = exp.ReferencedSymbol;
                     return new FieldPlace(context, field, exp.Span);
                 }
-                case ISelfExpressionSyntax exp:
+                case ISelfExpression exp:
                     return new VariablePlace(Variable.Self, exp.Span);
-                case INameExpressionSyntax exp:
+                case INameExpression exp:
                 {
-                    var symbol = exp.ReferencedSymbol.Result ?? throw new InvalidOperationException();
+                    var symbol = exp.ReferencedSymbol;
                     return graph.VariableFor(symbol).Place(exp.Span);
                 }
             }

@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Namespaces
 
         public static void BuildNamespaceSymbols(PackageSyntax package)
         {
-            var builder = new NamespaceSymbolBuilder(package.SymbolTreeBuilder);
+            var builder = new NamespaceSymbolBuilder(package.SymbolTree);
             foreach (var compilationUnit in package.CompilationUnits)
                 builder.Walk(compilationUnit, package.Symbol);
         }
