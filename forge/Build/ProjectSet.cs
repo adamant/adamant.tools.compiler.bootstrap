@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -299,7 +298,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
                     return;
 
                 default:
-                    throw new InvalidEnumArgumentException("state[project]", (int)state[project], typeof(SortState));
+                    throw ExhaustiveMatch.Failed(state[project]);
             }
         }
 
