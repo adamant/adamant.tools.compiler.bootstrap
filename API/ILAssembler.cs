@@ -17,9 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         public string Disassemble(PackageIL package)
         {
             var builder = new AssemblyBuilder();
-            var typeMembers = package.Declarations.OfType<ClassIL>()
-                .SelectMany(t => t.Members).ToList();
-            foreach (var declaration in package.Declarations.Except(typeMembers))
+            foreach (var declaration in package.GetNonMemberDeclarations())
             {
                 Disassemble(declaration, builder);
                 builder.BlankLine();

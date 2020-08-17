@@ -65,10 +65,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // TODO can the BuildIL() step introduce errors?
             packageAbstractSyntax.Diagnostics.ThrowIfFatalErrors();
 
-            var entryPoint = DetermineEntryPoint(declarationsIL, packageAbstractSyntax.Diagnostics);
+            var entryPointIL = DetermineEntryPoint(declarationsIL, packageAbstractSyntax.Diagnostics);
 
             var references = packageSyntax.ReferencedPackages.ToFixedSet();
-            return new PackageIL(packageSyntax.SymbolTree.Build(), packageAbstractSyntax.Diagnostics.Build(), references, declarationsIL, entryPoint);
+            return new PackageIL(packageAbstractSyntax.SymbolTree, packageAbstractSyntax.Diagnostics.Build(), references, declarationsIL, entryPointIL);
         }
 
         private static Package CheckSemantics(PackageSyntax packageSyntax)
