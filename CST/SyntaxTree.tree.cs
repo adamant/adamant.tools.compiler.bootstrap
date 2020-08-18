@@ -280,12 +280,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface IReachableFromAnnotationSyntax : IReachabilityAnnotationSyntax
     {
-        FixedList<INameExpressionSyntax> ReachableFrom { get; }
+        FixedList<INameOrSelfExpressionSyntax> ReachableFrom { get; }
     }
 
     public partial interface ICanReachAnnotationSyntax : IReachabilityAnnotationSyntax
     {
-        FixedList<INameExpressionSyntax> CanReach { get; }
+        FixedList<INameOrSelfExpressionSyntax> CanReach { get; }
     }
 
     public partial interface IInvocableNameSyntax : ISyntax
@@ -381,7 +381,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(IReturnExpressionSyntax),
         typeof(IImplicitConversionExpressionSyntax),
         typeof(IInvocationExpressionSyntax),
-        typeof(ISelfExpressionSyntax),
+        typeof(INameOrSelfExpressionSyntax),
         typeof(IBorrowExpressionSyntax),
         typeof(IMoveExpressionSyntax),
         typeof(IShareExpressionSyntax))]
@@ -559,16 +559,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         new Promise<MethodSymbol?> ReferencedSymbol { get; }
     }
 
-    public partial interface INameExpressionSyntax : IAssignableExpressionSyntax, IHasContainingLexicalScope
+    [Closed(
+        typeof(INameExpressionSyntax),
+        typeof(ISelfExpressionSyntax))]
+    public partial interface INameOrSelfExpressionSyntax : IExpressionSyntax
     {
-        Name? Name { get; }
-        Promise<NamedBindingSymbol?> ReferencedSymbol { get; }
+        IPromise<BindingSymbol?> ReferencedSymbol { get; }
     }
 
-    public partial interface ISelfExpressionSyntax : IExpressionSyntax
+    public partial interface INameExpressionSyntax : IAssignableExpressionSyntax, INameOrSelfExpressionSyntax, IHasContainingLexicalScope
+    {
+        Name? Name { get; }
+        new Promise<NamedBindingSymbol?> ReferencedSymbol { get; }
+    }
+
+    public partial interface ISelfExpressionSyntax : INameOrSelfExpressionSyntax
     {
         bool IsImplicit { get; }
-        Promise<SelfParameterSymbol?> ReferencedSymbol { get; }
+        new Promise<SelfParameterSymbol?> ReferencedSymbol { get; }
     }
 
     public partial interface IFieldAccessExpressionSyntax : IAssignableExpressionSyntax

@@ -6,9 +6,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class CanReachAnnotationSyntax : Syntax, ICanReachAnnotationSyntax
     {
-        public FixedList<INameExpressionSyntax> CanReach { get; }
+        public FixedList<INameOrSelfExpressionSyntax> CanReach { get; }
 
-        public CanReachAnnotationSyntax(TextSpan span, FixedList<INameExpressionSyntax> canReach)
+        public CanReachAnnotationSyntax(TextSpan span, FixedList<INameOrSelfExpressionSyntax> canReach)
             : base(span)
         {
             CanReach = canReach;

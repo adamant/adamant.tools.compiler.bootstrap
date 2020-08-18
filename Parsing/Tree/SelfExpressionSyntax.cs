@@ -10,6 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     {
         public bool IsImplicit { get; }
         public Promise<SelfParameterSymbol?> ReferencedSymbol { get; } = new Promise<SelfParameterSymbol?>();
+        IPromise<BindingSymbol?> INameOrSelfExpressionSyntax.ReferencedSymbol => ReferencedSymbol;
 
         public SelfExpressionSyntax(TextSpan span, bool isImplicit)
             : base(span)

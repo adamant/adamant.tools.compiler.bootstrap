@@ -20,14 +20,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IRightWaveArrowToken _:
                 {
                     var rightArrow = Tokens.Required<IRightWaveArrowToken>();
-                    var names = ParseManySeparated<INameExpressionSyntax, ICommaToken>(ParseNameExpression);
+                    var names = ParseManySeparated<INameOrSelfExpressionSyntax, ICommaToken>(ParseNameOrSelfExpression);
                     var span = TextSpan.Covering(rightArrow, names[^1].Span);
                     return new CanReachAnnotationSyntax(span, names);
                 }
                 case ILeftWaveArrowToken _:
                 {
                     var leftArrow = Tokens.Required<ILeftWaveArrowToken>();
-                    var names = ParseManySeparated<INameExpressionSyntax, ICommaToken>(ParseNameExpression);
+                    var names = ParseManySeparated<INameOrSelfExpressionSyntax, ICommaToken>(ParseNameOrSelfExpression);
                     var span = TextSpan.Covering(leftArrow, names[^1].Span);
                     return new ReachableFromAnnotationSyntax(span, names);
                 }
@@ -36,10 +36,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             }
         }
 
-        private INameExpressionSyntax ParseNameExpression()
+        private INameOrSelfExpressionSyntax ParseNameOrSelfExpression()
         {
-            var name = ParseName();
-            return new NameExpressionSyntax(name.Span, name.Name);
+            return Tokens.Current switch
+            {
+                ISelfKeywordToken _ => ParseSelfExpression(),
+                IIdentifierToken _ => ParseName().ToExpression(),
+                _ => ParseMissingIdentifier()
+            };
         }
     }
 }

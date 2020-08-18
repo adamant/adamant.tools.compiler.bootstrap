@@ -6,9 +6,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class ReachableFromAnnotationSyntax : Syntax, IReachableFromAnnotationSyntax
     {
-        public FixedList<INameExpressionSyntax> ReachableFrom { get; }
+        public FixedList<INameOrSelfExpressionSyntax> ReachableFrom { get; }
 
-        public ReachableFromAnnotationSyntax(TextSpan span, FixedList<INameExpressionSyntax> reachableFrom)
+        public ReachableFromAnnotationSyntax(TextSpan span, FixedList<INameOrSelfExpressionSyntax> reachableFrom)
             : base(span)
         {
             ReachableFrom = reachableFrom;

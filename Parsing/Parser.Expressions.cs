@@ -3,7 +3,6 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Operators;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Parsing.Tree;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using ExhaustiveMatching;
@@ -242,8 +241,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 default:
                     throw ExhaustiveMatch.Failed(Tokens.Current);
                 case ISelfKeywordToken _:
-                    var selfKeyword = Tokens.Expect<ISelfKeywordToken>();
-                    return new SelfExpressionSyntax(selfKeyword, false);
+                    return ParseSelfExpression();
                 case INewKeywordToken _:
                 {
                     var newKeyword = Tokens.Expect<INewKeywordToken>();
@@ -357,11 +355,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IQuestionDotToken _:
                 case ISemicolonToken _:
                 case ICloseParenToken _:
-                {
                     // If it is one of these, we assume there is a missing identifier
-                    var identifierSpan = Tokens.Expect<IIdentifierToken>();
-                    return new NameExpressionSyntax(identifierSpan, null);
-                }
+                    return ParseMissingIdentifier();
                 case IOpenBraceToken _:
                 case ICloseBraceToken _:
                 case IColonToken _:
@@ -380,6 +375,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IRightDoubleArrowToken _:
                     throw new NotImplementedException($"`{Tokens.Current.Text(File.Code)}` in expression position");
             }
+        }
+
+        private ISelfExpressionSyntax ParseSelfExpression()
+        {
+            var selfKeyword = Tokens.Expect<ISelfKeywordToken>();
+            return new SelfExpressionSyntax(selfKeyword, false);
+        }
+
+        private INameExpressionSyntax ParseMissingIdentifier()
+        {
+            var identifierSpan = Tokens.Expect<IIdentifierToken>();
+            return new NameExpressionSyntax(identifierSpan, null);
         }
 
         private IUnsafeExpressionSyntax ParseUnsafeExpression()

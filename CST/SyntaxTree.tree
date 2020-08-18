@@ -66,8 +66,8 @@ FieldParameter: Parameter, ConstructorParameter = ReferencedSymbol:'Promise<Fiel
 
 // ---------- Annotations
 ReachabilityAnnotation;
-ReachableFromAnnotation: ReachabilityAnnotation = ReachableFrom:NameExpression*;
-CanReachAnnotation: ReachabilityAnnotation = CanReach:NameExpression*;
+ReachableFromAnnotation: ReachabilityAnnotation = ReachableFrom:NameOrSelfExpression*;
+CanReachAnnotation: ReachabilityAnnotation = CanReach:NameOrSelfExpression*;
 
 // ---------- Function Parts
 InvocableName = Name:'Name';
@@ -130,8 +130,9 @@ FunctionInvocationExpression: InvocationExpression, 'IHasContainingLexicalScope'
 MethodInvocationExpression: InvocationExpression, 'IHasContainingLexicalScope' = &Context:Expression MethodNameSyntax:InvocableName Arguments:Argument* ReferencedSymbol:'Promise<MethodSymbol?>';
 
 // ---------- Variable Expressions
-NameExpression: AssignableExpression, 'IHasContainingLexicalScope' = Name:'Name'? ReferencedSymbol:'Promise<NamedBindingSymbol?>';
-SelfExpression: Expression = IsImplicit:'bool' ReferencedSymbol:'Promise<SelfParameterSymbol?>';
+NameOrSelfExpression: Expression = ReferencedSymbol:'IPromise<BindingSymbol?>';
+NameExpression: AssignableExpression, NameOrSelfExpression, 'IHasContainingLexicalScope' = Name:'Name'? ReferencedSymbol:'Promise<NamedBindingSymbol?>';
+SelfExpression: NameOrSelfExpression = IsImplicit:'bool' ReferencedSymbol:'Promise<SelfParameterSymbol?>';
 // TODO in the CST, we don't know that this is a field access, it is just a qualified access (not even member because namespaces don't have members)
 FieldAccessExpression: AssignableExpression = &Context:Expression AccessOperator:'AccessOperator' Field:NameExpression ReferencedSymbol:'IPromise<FieldSymbol?>';
 BorrowExpression: Expression = &Referent:Expression ReferencedSymbol:'Promise<BindingSymbol?>';
