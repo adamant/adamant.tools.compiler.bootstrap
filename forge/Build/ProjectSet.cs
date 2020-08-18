@@ -103,7 +103,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             foreach (var referenceTask in referenceTasks)
             {
                 var package = await referenceTask.Value.ConfigureAwait(false);
-                references.Add(referenceTask.Key, package!);
+                if (!(package is null))
+                    references.Add(referenceTask.Key, package);
             }
 
             lock (consoleLock)

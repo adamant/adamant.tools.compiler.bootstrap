@@ -546,6 +546,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     var contextType = InferType(ref exp.Context, !isSelfField);
                     var member = exp.Field;
                     var contextSymbol = LookupSymbolForType(contextType);
+                    if (contextSymbol is null)
+                    {
+                        member.ReferencedSymbol.Fulfill(null);
+                        member.DataType = DataType.Unknown;
+                        exp.Semantics = exp.Semantics ?? ExpressionSemantics.Copy;
+                        return exp.DataType = DataType.Unknown;
+                    }
                     // TODO Deal with no context symbol
                     var memberSymbols = symbolTreeBuilder.Children(contextSymbol!).OfType<FieldSymbol>()
                                                   .Where(s => s.Name == member.Name).ToFixedList();
