@@ -134,7 +134,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             Diagnostics diagnostics)
         {
             var mainFunctions = declarations.OfType<FunctionIL>()
-                .Where(f => f.Symbol.Name == "main" && f.Symbol.IsGlobal)
+                .Where(f => f.Symbol.Name == "main")
                 .ToList();
 
             // TODO warn on and remove main functions that don't have correct parameters or types
