@@ -1,5 +1,5 @@
 using System;
-using System.Globalization;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -8,6 +8,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
+using Nunycode;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 {
@@ -27,9 +28,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
     public class NameMangler
     {
         private const string Separator = "__";
-
-        // try https://github.com/atifaziz/Nunycode
-        private readonly IdnMapping mapping = new IdnMapping();
 
         // Note, we don't have to worry about whether the identifier starts with
         // a number because it will end up prefixed anyway.
@@ -78,34 +76,38 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             return Mangle(type.Name);
         }
 
+        [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "OO")]
         public string Mangle(ObjectType type)
         {
             // builder with room for the characters we are likely to add
             var builder = new StringBuilder(EstimateNamespaceSize(type.ContainingNamespace) + EstimateSize(type.Name) + 5);
             MangleNamespace(type.ContainingNamespace, builder);
             Mangle(type.Name, builder);
-            return mapping.GetAscii(builder.ToString());
+            return Punycode.ToAscii(builder.ToString());
         }
 
+        [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "OO")]
         public string Mangle(TypeName name)
         {
             var builder = new StringBuilder(EstimateSize(name));
             Mangle(name, builder);
-            return mapping.GetAscii(builder.ToString());
+            return Punycode.ToAscii(builder.ToString());
         }
 
+        [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "OO")]
         public string Mangle(Symbol symbol)
         {
             var builder = new StringBuilder(EstimateSize(symbol.ContainingSymbol));
             Mangle(symbol, builder);
-            return mapping.GetAscii(builder.ToString());
+            return Punycode.ToAscii(builder.ToString());
         }
 
+        [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "OO")]
         public string MangleMethod(MethodSymbol symbol)
         {
             var builder = new StringBuilder(EstimateSize(symbol.ContainingSymbol));
             MangleMethod(symbol, builder);
-            return mapping.GetAscii(builder.ToString());
+            return Punycode.ToAscii(builder.ToString());
         }
 
         private static int EstimateNamespaceSize(NamespaceName namespaceName)

@@ -130,7 +130,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             var types = code.TypeDeclarations;
             types.AppendLine($"typedef struct {selfType} {selfType};");
             types.AppendLine($"typedef struct {vtableType} {vtableType};");
-            types.AppendLine($"typedef struct {typeName} {typeName};");
+            // Declare the full type because when it is used as a field, its
+            // size will need to be known. However, order within struct
+            // declarations is not defined.
+            types.AppendLine($"typedef struct {typeName}");
+            types.BeginBlock();
+            types.AppendLine($"{vtableType} const* restrict _vtable;");
+            types.AppendLine($"{selfType}* restrict _self;");
+            types.EndBlockWith($"}} {typeName};");
 
             var structs = code.StructDeclarations;
             structs.AppendLine($"struct {selfType}");
@@ -163,12 +170,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 globals.AppendLine($".{fieldName} = {functionName},");
             }
             globals.EndBlockWithSemicolon();
-
-            structs.AppendLine($"struct {typeName}");
-            structs.BeginBlock();
-            structs.AppendLine($"{vtableType} const* restrict _vtable;");
-            structs.AppendLine($"{selfType}* restrict _self;");
-            structs.EndBlockWithSemicolon();
         }
     }
 }
