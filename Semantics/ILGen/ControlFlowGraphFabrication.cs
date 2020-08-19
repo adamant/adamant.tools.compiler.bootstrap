@@ -68,7 +68,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 default:
                     throw ExhaustiveMatch.Failed(invocable);
                 case IConcreteMethodDeclaration method:
-                    // TODO what about the self parameter of methods?
+                    selfParameter = method.SelfParameter.Symbol;
                     returnType = method.Symbol.ReturnDataType.Known();
                     break;
                 case IConstructorDeclaration constructor:

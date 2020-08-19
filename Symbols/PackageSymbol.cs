@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
 
         public override string ToString()
         {
-            return $"{Name}::";
+            return $"<{Name}>::";
         }
     }
 }

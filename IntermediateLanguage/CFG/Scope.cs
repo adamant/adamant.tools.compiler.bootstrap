@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG
 
         public override int GetHashCode()
         {
-            return number.GetHashCode();
+            return HashCode.Combine(number);
         }
 
         public bool Equals(Scope other)
@@ -42,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG
 
         public override bool Equals(object? obj)
         {
-            return obj is Scope other && this.number == other.number;
+            return obj is Scope other && number == other.number;
         }
     }
 }

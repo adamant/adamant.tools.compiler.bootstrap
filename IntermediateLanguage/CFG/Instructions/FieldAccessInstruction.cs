@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions
 
         public override string ToInstructionString()
         {
-            return $"{ResultPlace} = {Operand}.{Field}";
+            return $"{ResultPlace} = LOAD[{Field.DataType}] {Operand}, {Field.ContainingSymbol}::{Field.Name}";
         }
     }
 }

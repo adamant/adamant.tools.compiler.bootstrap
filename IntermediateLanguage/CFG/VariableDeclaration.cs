@@ -69,7 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG
         public string ToStatementString()
         {
             var binding = IsMutableBinding ? "var" : "let";
-            var name = Symbol is null ? "" : $"({Symbol})";
+            var name = Symbol is null ? "" : $"({Symbol.Name})";
             return $"{binding} {Variable}{name}: {Type};";
         }
 
