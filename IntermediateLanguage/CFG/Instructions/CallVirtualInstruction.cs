@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions
         {
             var result = ResultPlace != null ? $"{ResultPlace} = " : "";
             var arguments = string.Join(", ", Arguments);
-            return $"{result}CALL.VIRT ({Self}).{Method}({arguments})";
+            return $"{result}CALL.VIRT({Self}).({arguments}) {Method}";
         }
     }
 }

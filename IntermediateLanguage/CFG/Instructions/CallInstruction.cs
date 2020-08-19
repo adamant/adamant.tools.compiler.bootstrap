@@ -72,7 +72,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions
                 selfArgument =  $"({selfArgument}).";
             var arguments = string.Join(", ", Arguments);
             var callType = IsMethodCall ? "METHOD" : "FN";
-            return $"{result}CALL.{callType} {selfArgument}{Function}({arguments})";
+            return $"{result}CALL.{callType}{selfArgument}({arguments}) {Function}";
         }
     }
 }

@@ -595,7 +595,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                         default:
                             throw ExhaustiveMatch.Failed(expression);
                         case UnaryOperator.Not:
-                        case UnaryOperator.Plus:
+                        case UnaryOperator.Plus: // TODO don't even allow unary plus in IL or AST, it is a noop
                             throw new NotImplementedException($"ConvertToOperand({expression.GetType().Name}, Place) Not Implemented for {exp.Operator}.");
                         case UnaryOperator.Minus:
                             currentBlock!.Add(new NegateInstruction(resultPlace, (NumericType)type, operand, exp.Span, CurrentScope));

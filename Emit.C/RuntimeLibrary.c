@@ -17,6 +17,7 @@ EXTERN_OPTIONAL_TYPE(_bool)
 
 // Extern Integer Type Operations Macro
 #define EXTERN_INTEGER_OPERATIONS(type) \
+extern inline type type##__neg(type x); \
 extern inline type type##__add(type x, type y); \
 extern inline type type##__sub(type x, type y); \
 extern inline type type##__mul(type x, type y); \
