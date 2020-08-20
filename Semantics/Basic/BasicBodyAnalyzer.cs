@@ -193,7 +193,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case (FixedSizeIntegerType targetType, IntegerConstantType expressionType):
                 {
                     var requireSigned = expressionType.Value < 0;
-                    var bits = expressionType.Value.GetByteCount() * 8;
+                    var bits = expressionType.Value.GetByteCount(!targetType.IsSigned) * 8;
                     if (targetType.Bits >= bits && (!requireSigned || targetType.IsSigned))
                         expression = new ImplicitNumericConversionExpression(expression, targetType);
                 }
