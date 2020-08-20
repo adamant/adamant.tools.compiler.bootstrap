@@ -42,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
             return HashCode.Combine(Name, SelfDataType, ParameterDataTypes, ReturnDataType);
         }
 
-        public override string ToString()
+        public override string ToILString()
         {
             return $"{ContainingSymbol}::{Name}({string.Join(", ", ParameterDataTypes)}) -> {ReturnDataType}";
         }

@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         typeof(ValueType),
         typeof(EmptyType),
         typeof(UnknownType))]
-    [DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
+    [DebuggerDisplay("{" + nameof(ToILString) + "(),nq}")]
     public abstract class DataType : IEquatable<DataType>
     {
         #region Standard Types
@@ -70,7 +70,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
 
         // TODO equality
 
-        public abstract override string ToString();
+        [Obsolete("Use ToSourceCodeString() or ToILString() instead")]
+#pragma warning disable CS0809 // Obsolete member overrides non-obsolete member
+        public sealed override string ToString()
+#pragma warning restore CS0809 // Obsolete member overrides non-obsolete member
+        {
+            return ToILString();
+        }
+
+        /// <summary>
+        /// How this type would be written in source code
+        /// </summary>
+        public abstract string ToSourceCodeString();
+
+        /// <summary>
+        /// How this type would be written in IL
+        /// </summary>
+        public abstract string ToILString();
 
         [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates",
             Justification = "Return self idiom")]

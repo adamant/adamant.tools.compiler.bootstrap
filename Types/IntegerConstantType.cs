@@ -38,7 +38,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
             return HashCode.Combine(Value);
         }
 
-        public override string ToString()
+        public override string ToSourceCodeString()
+        {
+            throw new InvalidOperationException("Integer constant type has no source code representation");
+        }
+
+        public override string ToILString()
         {
             return $"const[{Value}]";
         }

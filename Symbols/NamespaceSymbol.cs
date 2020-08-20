@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
             return HashCode.Combine(ContainingSymbol, Name);
         }
 
-        public override string ToString()
+        public override string ToILString()
         {
             return $"{ContainingSymbol}.{Name}";
         }

@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public override string ToString()
         {
-            var capability = Capability.ToSourceString();
+            var capability = Capability.ToSourceCodeString();
             if (capability.Length == 0) return ReferentType.ToString();
 
             return $"{capability} {ReferentType}";

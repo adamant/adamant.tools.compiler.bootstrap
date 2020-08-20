@@ -61,11 +61,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
             return constructedType;
         }
 
-        public override string ToString()
+        public override string ToSourceCodeString()
         {
             var builder = new StringBuilder();
-            builder.Append(ReferenceCapability.ToSourceString());
+            builder.Append(ReferenceCapability.ToSourceCodeString());
             if (builder.Length > 0) builder.Append(' ');
+            builder.Append(ContainingNamespace);
+            if (ContainingNamespace != NamespaceName.Global) builder.Append('.');
+            builder.Append(Name);
+            return builder.ToString();
+        }
+
+        public override string ToILString()
+        {
+            var builder = new StringBuilder();
+            builder.Append(ReferenceCapability.ToILString());
+            builder.Append(' ');
             builder.Append(ContainingNamespace);
             if (ContainingNamespace != NamespaceName.Global) builder.Append('.');
             builder.Append(Name);

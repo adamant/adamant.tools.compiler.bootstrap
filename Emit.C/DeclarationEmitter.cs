@@ -106,9 +106,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             var returnType = typeConverter.Convert(constructor.Symbol.ContainingSymbol.DeclaresDataType.Known());
 
             // Write out the function declaration for C so we can call functions defined after others
+            code.FunctionDeclarations.AppendLine($"// {constructor.Symbol}");
             code.FunctionDeclarations.AppendLine($"{returnType} {name}({parameters});");
 
             code.Definitions.DeclarationSeparatorLine();
+            code.Definitions.AppendLine($"// {constructor.Symbol}");
             code.Definitions.AppendLine($"{returnType} {name}({parameters})");
             code.Definitions.BeginBlock();
             controlFlowEmitter.Emit(constructor, code);
@@ -144,6 +146,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             structs.BeginBlock();
             foreach (var field in @class.Members.OfType<FieldIL>())
             {
+                var binding = field.Symbol.IsMutableBinding ? "var" : "let";
+                structs.AppendLine($"// {binding} {field.Symbol.Name}: {field.DataType}");
                 var fieldType = typeConverter.Convert(field.DataType.Known());
                 var fieldName = nameMangler.MangleName(field);
                 structs.AppendLine($"{fieldType} {fieldName};");

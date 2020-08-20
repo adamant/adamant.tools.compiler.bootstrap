@@ -1,3 +1,4 @@
+using System;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Types
@@ -22,7 +23,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
             return Bool;
         }
 
-        public override string ToString()
+        public override string ToSourceCodeString()
+        {
+            throw new InvalidOperationException("Bool constant type has no source code representation");
+        }
+
+        public override string ToILString()
         {
             return $"const[{(Value ? "true" : "false")}]";
         }

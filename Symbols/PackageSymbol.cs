@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
             return HashCode.Combine(Name);
         }
 
-        public override string ToString()
+        public override string ToILString()
         {
             return $"<{Name}>::";
         }

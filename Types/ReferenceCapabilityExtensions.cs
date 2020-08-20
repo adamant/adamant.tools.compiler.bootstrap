@@ -150,18 +150,35 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
                     return referenceCapability;
             }
         }
-        public static string ToSourceString(this ReferenceCapability referenceCapability)
+        public static string ToSourceCodeString(this ReferenceCapability referenceCapability)
         {
             return referenceCapability switch
             {
-                ReferenceCapability.OwnedMutable => "owned mut",
-                ReferenceCapability.IsolatedMutable => "iso mut",
-                ReferenceCapability.HeldMutable => "held mut",
-                ReferenceCapability.Borrowed => "mut",
-                ReferenceCapability.Owned => "owned",
                 ReferenceCapability.Isolated => "iso",
+                ReferenceCapability.IsolatedMutable => "iso mut",
+                ReferenceCapability.Owned => "owned",
+                ReferenceCapability.OwnedMutable => "owned mut",
                 ReferenceCapability.Held => "held",
+                ReferenceCapability.HeldMutable => "held mut",
                 ReferenceCapability.Shared => "",
+                ReferenceCapability.Borrowed => "mut",
+                ReferenceCapability.Identity => "id",
+                _ => throw ExhaustiveMatch.Failed(referenceCapability)
+            };
+        }
+
+        public static string ToILString(this ReferenceCapability referenceCapability)
+        {
+            return referenceCapability switch
+            {
+                ReferenceCapability.Isolated => "iso",
+                ReferenceCapability.IsolatedMutable => "iso mut",
+                ReferenceCapability.Owned => "owned",
+                ReferenceCapability.OwnedMutable => "owned mut",
+                ReferenceCapability.Held => "held",
+                ReferenceCapability.HeldMutable => "held mut",
+                ReferenceCapability.Shared => "shared",
+                ReferenceCapability.Borrowed => "mut",
                 ReferenceCapability.Identity => "id",
                 _ => throw ExhaustiveMatch.Failed(referenceCapability)
             };

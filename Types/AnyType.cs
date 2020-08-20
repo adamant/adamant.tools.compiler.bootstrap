@@ -21,12 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
 
         public override bool IsKnown => true;
 
-        public override string ToString()
-        {
-            var capability = ReferenceCapability.ToSourceString();
-            if (capability.Length == 0) return "Any";
-            return $"{capability} Any";
-        }
+
 
         public override bool Equals(DataType? other)
         {
@@ -44,6 +39,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         protected internal override Self To_ReturnsSelf(ReferenceCapability referenceCapability)
         {
             return new AnyType(referenceCapability);
+        }
+
+        public override string ToILString()
+        {
+            var capability = ReferenceCapability.ToILString();
+            return $"{capability} Any";
+        }
+
+        public override string ToSourceCodeString()
+        {
+            var capability = ReferenceCapability.ToSourceCodeString();
+            return capability.Length == 0 ? "Any" : $"{capability} Any";
         }
     }
 }

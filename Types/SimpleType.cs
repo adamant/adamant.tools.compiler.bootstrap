@@ -18,9 +18,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
             Name = name;
         }
 
-        public override string ToString()
+        public override string ToSourceCodeString()
         {
             return Name.ToString();
+        }
+
+        public override string ToILString()
+        {
+            return ToSourceCodeString();
         }
 
         public override bool Equals(DataType? other)

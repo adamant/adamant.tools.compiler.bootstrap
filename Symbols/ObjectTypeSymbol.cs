@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
             return HashCode.Combine(ContainingSymbol, Name, DeclaresDataType);
         }
 
-        public override string ToString()
+        public override string ToILString()
         {
             // TODO include generics
             return $"{ContainingSymbol}.{Name}";

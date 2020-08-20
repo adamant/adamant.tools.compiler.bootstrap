@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
         typeof(TypeSymbol),
         typeof(InvocableSymbol),
         typeof(BindingSymbol))]
-    [DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
+    [DebuggerDisplay("{" + nameof(ToILString) + "(),nq}")]
     public abstract class Symbol : IEquatable<Symbol>
     {
         public virtual PackageSymbol? Package { get; }
@@ -49,6 +49,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
         }
         #endregion
 
-        public abstract override string ToString();
+        [Obsolete("Use ToILString() instead")]
+#pragma warning disable CS0809 // Obsolete member overrides non-obsolete member
+        public sealed override string ToString()
+#pragma warning restore CS0809 // Obsolete member overrides non-obsolete member
+        {
+            return ToILString();
+        }
+
+        public abstract string ToILString();
     }
 }

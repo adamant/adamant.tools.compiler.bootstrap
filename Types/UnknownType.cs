@@ -23,7 +23,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         /// </summary>
         public override TypeSemantics Semantics => TypeSemantics.Never;
 
-        public override string ToString()
+        public override string ToSourceCodeString()
+        {
+            throw new InvalidOperationException("Unknown type has no source code representation");
+        }
+
+        public override string ToILString()
         {
             return "⧼unknown⧽";
         }

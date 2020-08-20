@@ -60,11 +60,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Types
         [InlineData(OwnedMutable, "owned mut Any")]
         [InlineData(Borrowed, "mut Any")]
         [InlineData(Shared, "Any")]
-        public void ToString_includes_reference_capability(ReferenceCapability capability, string expected)
+        public void ToSourceCodeString_includes_reference_capability(ReferenceCapability capability, string expected)
         {
             var type = new AnyType(capability);
 
-            Assert.Equal(expected, type.ToString());
+            Assert.Equal(expected, type.ToSourceCodeString());
+        }
+
+        [Theory]
+        [InlineData(Isolated, "iso Any")]
+        [InlineData(OwnedMutable, "owned mut Any")]
+        [InlineData(Borrowed, "mut Any")]
+        [InlineData(Shared, "shared Any")]
+        public void ToILString_includes_reference_capability(ReferenceCapability capability, string expected)
+        {
+            var type = new AnyType(capability);
+
+            Assert.Equal(expected, type.ToILString());
         }
 
         [Theory]

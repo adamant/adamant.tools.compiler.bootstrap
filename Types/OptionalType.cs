@@ -28,9 +28,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
             IsKnown = referent.IsKnown;
         }
 
-        public override string ToString()
+        public override string ToSourceCodeString()
         {
-            return $"({Referent})?";
+            return $"({Referent.ToSourceCodeString()})?";
+        }
+
+        public override string ToILString()
+        {
+            return $"({Referent.ToILString()})?";
         }
 
         public override bool Equals(DataType? other)
