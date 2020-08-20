@@ -171,6 +171,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                         var temp = TempValue.For(graph, exp);
                         temp?.ShareFrom(source);
                         graph.Add(temp);
+                        // Drop the temp we share from, it is no longer used
+                        graph.Drop(source);
                         return temp;
                     }
                 }
