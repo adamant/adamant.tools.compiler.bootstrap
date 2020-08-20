@@ -21,7 +21,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(IDeclarationSyntax),
         typeof(IParameterSyntax),
         typeof(IReachabilityAnnotationSyntax),
-        typeof(IInvocableNameSyntax),
         typeof(IArgumentSyntax),
         typeof(ITypeSyntax),
         typeof(IStatementSyntax),
@@ -288,11 +287,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         FixedList<INameOrSelfExpressionSyntax> CanReach { get; }
     }
 
-    public partial interface IInvocableNameSyntax : ISyntax
-    {
-        Name Name { get; }
-    }
-
     public partial interface IArgumentSyntax : ISyntax
     {
         ref IExpressionSyntax Expression { get; }
@@ -391,7 +385,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     [Closed(
         typeof(INameExpressionSyntax),
-        typeof(IFieldAccessExpressionSyntax))]
+        typeof(IQualifiedNameExpressionSyntax))]
     public partial interface IAssignableExpressionSyntax : IExpressionSyntax
     {
     }
@@ -403,7 +397,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface INewObjectExpressionSyntax : IExpressionSyntax
     {
         ITypeNameSyntax Type { get; }
-        IInvocableNameSyntax? ConstructorName { get; }
+        Name? ConstructorName { get; }
+        TextSpan? ConstructorNameSpan { get; }
         FixedList<IArgumentSyntax> Arguments { get; }
         Promise<ConstructorSymbol?> ReferencedSymbol { get; }
     }
@@ -536,26 +531,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     }
 
     [Closed(
-        typeof(IFunctionInvocationExpressionSyntax),
-        typeof(IMethodInvocationExpressionSyntax))]
+        typeof(IUnqualifiedInvocationExpressionSyntax),
+        typeof(IQualifiedInvocationExpressionSyntax))]
     public partial interface IInvocationExpressionSyntax : IExpressionSyntax
     {
-        Name Name { get; }
+        Name InvokedName { get; }
+        TextSpan InvokedNameSpan { get; }
         FixedList<IArgumentSyntax> Arguments { get; }
         IPromise<InvocableSymbol?> ReferencedSymbol { get; }
     }
 
-    public partial interface IFunctionInvocationExpressionSyntax : IInvocationExpressionSyntax, IHasContainingLexicalScope
+    public partial interface IUnqualifiedInvocationExpressionSyntax : IInvocationExpressionSyntax, IHasContainingLexicalScope
     {
         NamespaceName Namespace { get; }
-        IInvocableNameSyntax FunctionNameSyntax { get; }
         new Promise<FunctionSymbol?> ReferencedSymbol { get; }
     }
 
-    public partial interface IMethodInvocationExpressionSyntax : IInvocationExpressionSyntax, IHasContainingLexicalScope
+    public partial interface IQualifiedInvocationExpressionSyntax : IInvocationExpressionSyntax, IHasContainingLexicalScope
     {
         ref IExpressionSyntax Context { get; }
-        IInvocableNameSyntax MethodNameSyntax { get; }
         new Promise<MethodSymbol?> ReferencedSymbol { get; }
     }
 
@@ -579,7 +573,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         new Promise<SelfParameterSymbol?> ReferencedSymbol { get; }
     }
 
-    public partial interface IFieldAccessExpressionSyntax : IAssignableExpressionSyntax
+    public partial interface IQualifiedNameExpressionSyntax : IAssignableExpressionSyntax
     {
         ref IExpressionSyntax Context { get; }
         AccessOperator AccessOperator { get; }

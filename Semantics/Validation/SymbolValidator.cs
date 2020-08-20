@@ -73,10 +73,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                 case INewObjectExpressionSyntax syn:
                     CheckReferencedSymbol(syn, syn.ReferencedSymbol);
                     break;
-                case IFunctionInvocationExpressionSyntax syn:
+                case IUnqualifiedInvocationExpressionSyntax syn:
                     CheckReferencedSymbol(syn, syn.ReferencedSymbol);
                     break;
-                case IMethodInvocationExpressionSyntax syn:
+                case IQualifiedInvocationExpressionSyntax syn:
                     CheckReferencedSymbol(syn, syn.ReferencedSymbol);
                     break;
             }

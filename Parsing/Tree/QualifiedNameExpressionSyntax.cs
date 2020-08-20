@@ -7,7 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    internal class FieldAccessExpressionSyntax : ExpressionSyntax, IFieldAccessExpressionSyntax
+    internal class QualifiedNameExpressionSyntax : ExpressionSyntax, IQualifiedNameExpressionSyntax
     {
         private IExpressionSyntax context;
         public ref IExpressionSyntax Context => ref context;
@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public INameExpressionSyntax Field { get; }
         public IPromise<FieldSymbol?> ReferencedSymbol => Field.ReferencedSymbol.Select(s => (FieldSymbol?)s);
 
-        public FieldAccessExpressionSyntax(
+        public QualifiedNameExpressionSyntax(
             TextSpan span,
             IExpressionSyntax context,
             AccessOperator accessOperator,

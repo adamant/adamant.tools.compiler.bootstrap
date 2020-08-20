@@ -70,7 +70,6 @@ ReachableFromAnnotation: ReachabilityAnnotation = ReachableFrom:NameOrSelfExpres
 CanReachAnnotation: ReachabilityAnnotation = CanReach:NameOrSelfExpression*;
 
 // ---------- Function Parts
-InvocableName = Name:'Name';
 Argument = &Expression;
 Body: BodyOrBlock = Statements:BodyStatement*;
 
@@ -91,7 +90,7 @@ ExpressionStatement: BodyStatement = &Expression;
 Expression;
 AssignableExpression: Expression;
 BlockExpression: Expression, BlockOrResult, BodyOrBlock = Statements:Statement*;
-NewObjectExpression: Expression = Type:TypeName ConstructorName:InvocableName? Arguments:Argument* ReferencedSymbol:'Promise<ConstructorSymbol?>';
+NewObjectExpression: Expression = Type:TypeName ConstructorName:'Name'? ConstructorNameSpan:'TextSpan'? Arguments:Argument* ReferencedSymbol:'Promise<ConstructorSymbol?>';
 UnsafeExpression: Expression = &Expression;
 
 // ---------- Literal Expressions
@@ -123,18 +122,17 @@ ImplicitNumericConversionExpression: ImplicitConversionExpression = Expression C
 ImplicitOptionalConversionExpression: ImplicitConversionExpression = Expression ConvertToType:'OptionalType';
 
 // ---------- Invocation Expressions
-InvocationExpression: Expression = Name:'Name' Arguments:Argument* ReferencedSymbol:'IPromise<InvocableSymbol?>';
-FunctionInvocationExpression: InvocationExpression, 'IHasContainingLexicalScope' = Namespace:'NamespaceName' FunctionNameSyntax:InvocableName Arguments:Argument* ReferencedSymbol:'Promise<FunctionSymbol?>';
+InvocationExpression: Expression = InvokedName:'Name' InvokedNameSpan:'TextSpan' Arguments:Argument* ReferencedSymbol:'IPromise<InvocableSymbol?>';
+UnqualifiedInvocationExpression: InvocationExpression, 'IHasContainingLexicalScope' = Namespace:'NamespaceName' Arguments:Argument* ReferencedSymbol:'Promise<FunctionSymbol?>';
 // TODO in the CST, we don't know that this is a method invocation, it is just a qualified invocation (not even member because namespaces don't have members)
 // TODO remove IHasContainingLexicalScope when not needed because of conversion to FunctionInvocationExpression
-MethodInvocationExpression: InvocationExpression, 'IHasContainingLexicalScope' = &Context:Expression MethodNameSyntax:InvocableName Arguments:Argument* ReferencedSymbol:'Promise<MethodSymbol?>';
+QualifiedInvocationExpression: InvocationExpression, 'IHasContainingLexicalScope' = &Context:Expression Arguments:Argument* ReferencedSymbol:'Promise<MethodSymbol?>';
 
 // ---------- Variable Expressions
 NameOrSelfExpression: Expression = ReferencedSymbol:'IPromise<BindingSymbol?>';
 NameExpression: AssignableExpression, NameOrSelfExpression, 'IHasContainingLexicalScope' = Name:'Name'? ReferencedSymbol:'Promise<NamedBindingSymbol?>';
 SelfExpression: NameOrSelfExpression = IsImplicit:'bool' ReferencedSymbol:'Promise<SelfParameterSymbol?>';
-// TODO in the CST, we don't know that this is a field access, it is just a qualified access (not even member because namespaces don't have members)
-FieldAccessExpression: AssignableExpression = &Context:Expression AccessOperator:'AccessOperator' Field:NameExpression ReferencedSymbol:'IPromise<FieldSymbol?>';
+QualifiedNameExpression: AssignableExpression = &Context:Expression AccessOperator:'AccessOperator' Field:NameExpression ReferencedSymbol:'IPromise<FieldSymbol?>';
 BorrowExpression: Expression = &Referent:Expression ReferencedSymbol:'Promise<BindingSymbol?>';
 MoveExpression: Expression = &Referent:Expression ReferencedSymbol:'Promise<BindingSymbol?>';
 ShareExpression: Expression = &Referent:Expression ReferencedSymbol:'Promise<BindingSymbol?>';

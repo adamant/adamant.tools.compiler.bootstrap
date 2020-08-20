@@ -4,7 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
-    public partial interface IFunctionInvocationExpressionSyntax
+    public partial interface IUnqualifiedInvocationExpressionSyntax
     {
         IEnumerable<IPromise<FunctionSymbol>> LookupInContainingScope();
     }

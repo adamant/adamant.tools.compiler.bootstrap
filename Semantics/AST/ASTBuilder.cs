@@ -227,9 +227,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
                 IBoolLiteralExpressionSyntax syn => BuildBoolLiteralExpression(syn),
                 IBorrowExpressionSyntax syn => BuildBorrowExpression(syn),
                 IBreakExpressionSyntax syn => BuildBreakExpression(syn),
-                IFieldAccessExpressionSyntax syn => BuildFieldAccessExpression(syn),
+                IQualifiedNameExpressionSyntax syn => BuildFieldAccessExpression(syn),
                 IForeachExpressionSyntax syn => BuildForeachExpression(syn),
-                IFunctionInvocationExpressionSyntax syn => BuildFunctionInvocationExpression(syn),
+                IUnqualifiedInvocationExpressionSyntax syn => BuildFunctionInvocationExpression(syn),
                 IIfExpressionSyntax syn => BuildIfExpression(syn),
                 IImplicitImmutabilityConversionExpressionSyntax syn => BuildImplicitImmutabilityConversionExpression(syn),
                 IImplicitNoneConversionExpressionSyntax syn => BuildImplicitNoneConversionExpression(syn),
@@ -239,7 +239,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
                 INoneLiteralExpressionSyntax syn => BuildNoneLiteralExpression(syn),
                 IStringLiteralExpressionSyntax syn => BuildStringLiteralExpression(syn),
                 ILoopExpressionSyntax syn => BuildLoopExpression(syn),
-                IMethodInvocationExpressionSyntax syn => BuildMethodInvocationExpression(syn),
+                IQualifiedInvocationExpressionSyntax syn => BuildMethodInvocationExpression(syn),
                 IMoveExpressionSyntax syn => BuildMoveExpression(syn),
                 INameExpressionSyntax syn => BuildNameExpression(syn),
                 INewObjectExpressionSyntax syn => BuildNewObjectExpression(syn),
@@ -268,7 +268,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
         {
             return expression switch
             {
-                IFieldAccessExpressionSyntax syn => BuildFieldAccessExpression(syn),
+                IQualifiedNameExpressionSyntax syn => BuildFieldAccessExpression(syn),
                 INameExpressionSyntax syn => BuildNameExpression(syn),
                 _ => throw ExhaustiveMatch.Failed(expression),
             };
@@ -317,7 +317,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
             return new BreakExpression(syn.Span, type, semantics, value);
         }
 
-        private static IFieldAccessExpression BuildFieldAccessExpression(IFieldAccessExpressionSyntax syn)
+        private static IFieldAccessExpression BuildFieldAccessExpression(IQualifiedNameExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
             var semantics = syn.Semantics.Assigned();
@@ -337,7 +337,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
             return new ForeachExpression(syn.Span, type, semantics, symbol, inExpression, block);
         }
 
-        private static IFunctionInvocationExpression BuildFunctionInvocationExpression(IFunctionInvocationExpressionSyntax syn)
+        private static IFunctionInvocationExpression BuildFunctionInvocationExpression(IUnqualifiedInvocationExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
             var semantics = syn.Semantics.Assigned();
@@ -436,7 +436,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
             return new LoopExpression(syn.Span, type, semantics, block);
         }
 
-        private static IMethodInvocationExpression BuildMethodInvocationExpression(IMethodInvocationExpressionSyntax syn)
+        private static IMethodInvocationExpression BuildMethodInvocationExpression(IQualifiedInvocationExpressionSyntax syn)
         {
             var type = syn.DataType ?? throw new InvalidOperationException();
             var semantics = syn.Semantics.Assigned();

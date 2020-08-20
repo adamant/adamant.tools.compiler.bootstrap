@@ -507,9 +507,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     // TODO assign correct type to the expression
                     exp.Semantics = ExpressionSemantics.Void;
                     return exp.DataType = DataType.Void;
-                case IMethodInvocationExpressionSyntax exp:
+                case IQualifiedInvocationExpressionSyntax exp:
                     return InferMethodInvocationType(exp, ref expression);
-                case IFunctionInvocationExpressionSyntax exp:
+                case IUnqualifiedInvocationExpressionSyntax exp:
                     return InferFunctionInvocationType(exp);
                 case IUnsafeExpressionSyntax exp:
                 {
@@ -539,7 +539,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     // TODO assign a type to the expression
                     exp.Semantics = ExpressionSemantics.Void;
                     return exp.DataType = DataType.Void;
-                case IFieldAccessExpressionSyntax exp:
+                case IQualifiedNameExpressionSyntax exp:
                 {
                     // Don't wrap the self expression in a share expression for field access
                     var isSelfField = exp.Context is ISelfExpressionSyntax;
@@ -629,7 +629,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case ISelfExpressionSyntax exp:
                     referencedSymbol = exp.ReferencedSymbol.Result;
                     break;
-                case IFieldAccessExpressionSyntax exp:
+                case IQualifiedNameExpressionSyntax exp:
                     exp.Field.Semantics = ExpressionSemantics.Share;
                     exp.Semantics = ExpressionSemantics.Share;
                     referencedSymbol = exp.ReferencedSymbol.Result;
@@ -708,7 +708,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             {
                 default:
                     throw ExhaustiveMatch.Failed(expression);
-                case IFieldAccessExpressionSyntax exp:
+                case IQualifiedNameExpressionSyntax exp:
                     // Don't wrap the self expression in a share expression for field access
                     var isSelfField = exp.Context is ISelfExpressionSyntax;
                     var contextType = InferType(ref exp.Context, !isSelfField);
@@ -727,7 +727,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         }
 
         private DataType InferMethodInvocationType(
-            IMethodInvocationExpressionSyntax methodInvocation,
+            IQualifiedInvocationExpressionSyntax qualifiedInvocation,
             ref IExpressionSyntax expression)
         {
             // This could actually be any of the following since the parser can't distinguish them:
@@ -735,27 +735,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             // * Namespaced function invocation
             // * Method invocation
             // First we need to distinguish those.
-            var contextName = MethodContextAsName(methodInvocation.Context);
+            var contextName = MethodContextAsName(qualifiedInvocation.Context);
             if (contextName != null)
             {
-                var contextSymbols = methodInvocation.ContainingLexicalScope.Lookup(contextName.Segments[0]).Select(p => p.Result);
+                var contextSymbols = qualifiedInvocation.ContainingLexicalScope.Lookup(contextName.Segments[0]).Select(p => p.Result);
                 foreach (var name in contextName.Segments.Skip(1))
                     contextSymbols = contextSymbols.SelectMany(c => symbolTrees.Children(c).Where(s => s.Name == name));
 
                 var functionSymbols = contextSymbols
                                       .SelectMany(c => symbolTrees
                                                        .Children(c).OfType<FunctionSymbol>()
-                                                       .Where(s => s.Name == methodInvocation.Name))
+                                                       .Where(s => s.Name == qualifiedInvocation.InvokedName))
                                       .ToFixedSet();
                 if (functionSymbols.Any())
                 {
                     // It is a namespaced or associated function invocation, modify the tree
                     var functionInvocation = new FunctionInvocationExpressionSyntax(
-                        methodInvocation.Span,
-                        methodInvocation.MethodNameSyntax,
+                        qualifiedInvocation.Span,
                         contextName,
-                        methodInvocation.Name,
-                        methodInvocation.Arguments,
+                        qualifiedInvocation.InvokedName,
+                        qualifiedInvocation.InvokedNameSpan,
+                        qualifiedInvocation.Arguments,
                         functionSymbols);
 
                     expression = functionInvocation;
@@ -763,55 +763,55 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
             }
 
-            var argumentTypes = methodInvocation.Arguments.Select(argument => InferType(ref argument.Expression)).ToFixedList();
-            var contextType = InferType(ref methodInvocation.Context, false);
+            var argumentTypes = qualifiedInvocation.Arguments.Select(argument => InferType(ref argument.Expression)).ToFixedList();
+            var contextType = InferType(ref qualifiedInvocation.Context, false);
             // If it is unknown, we already reported an error
             if (contextType == DataType.Unknown)
             {
-                methodInvocation.Semantics = ExpressionSemantics.Never;
-                return methodInvocation.DataType = DataType.Unknown;
+                qualifiedInvocation.Semantics = ExpressionSemantics.Never;
+                return qualifiedInvocation.DataType = DataType.Unknown;
             };
 
             var contextSymbol = LookupSymbolForType(contextType);
             var methodSymbols = symbolTrees.Children(contextSymbol!).OfType<MethodSymbol>()
-                                                 .Where(s => s.Name == methodInvocation.Name).ToFixedList();
+                                                 .Where(s => s.Name == qualifiedInvocation.InvokedName).ToFixedList();
             methodSymbols = ResolveMethodOverload(contextType, methodSymbols, argumentTypes);
 
             switch (methodSymbols.Count)
             {
                 case 0:
-                    diagnostics.Add(NameBindingError.CouldNotBindMethod(file, methodInvocation.Span));
-                    methodInvocation.ReferencedSymbol.Fulfill(null);
-                    methodInvocation.DataType = DataType.Unknown;
+                    diagnostics.Add(NameBindingError.CouldNotBindMethod(file, qualifiedInvocation.Span));
+                    qualifiedInvocation.ReferencedSymbol.Fulfill(null);
+                    qualifiedInvocation.DataType = DataType.Unknown;
                     break;
                 case 1:
                     var methodSymbol = methodSymbols.Single();
-                    methodInvocation.ReferencedSymbol.Fulfill(methodSymbol);
+                    qualifiedInvocation.ReferencedSymbol.Fulfill(methodSymbol);
 
                     var selfParamType = methodSymbol.SelfDataType;
-                    InsertImplicitActionIfNeeded(ref methodInvocation.Context, selfParamType, implicitBorrowAllowed: true);
+                    InsertImplicitActionIfNeeded(ref qualifiedInvocation.Context, selfParamType, implicitBorrowAllowed: true);
 
-                    InsertImplicitConversionIfNeeded(ref methodInvocation.Context, selfParamType);
-                    CheckArgumentTypeCompatibility(selfParamType, methodInvocation.Context);
+                    InsertImplicitConversionIfNeeded(ref qualifiedInvocation.Context, selfParamType);
+                    CheckArgumentTypeCompatibility(selfParamType, qualifiedInvocation.Context);
 
-                    foreach (var (arg, type) in methodInvocation.Arguments
+                    foreach (var (arg, type) in qualifiedInvocation.Arguments
                                                                 .Zip(methodSymbol.ParameterDataTypes))
                     {
                         InsertImplicitConversionIfNeeded(ref arg.Expression, type);
                         CheckArgumentTypeCompatibility(type, arg.Expression);
                     }
 
-                    methodInvocation.DataType = methodSymbol.ReturnDataType;
-                    AssignInvocationSemantics(methodInvocation, methodSymbol.ReturnDataType);
+                    qualifiedInvocation.DataType = methodSymbol.ReturnDataType;
+                    AssignInvocationSemantics(qualifiedInvocation, methodSymbol.ReturnDataType);
                     break;
                 default:
-                    diagnostics.Add(NameBindingError.AmbiguousMethodCall(file, methodInvocation.Span));
-                    methodInvocation.ReferencedSymbol.Fulfill(null);
-                    methodInvocation.DataType = DataType.Unknown;
+                    diagnostics.Add(NameBindingError.AmbiguousMethodCall(file, qualifiedInvocation.Span));
+                    qualifiedInvocation.ReferencedSymbol.Fulfill(null);
+                    qualifiedInvocation.DataType = DataType.Unknown;
                     break;
             }
 
-            return methodInvocation.DataType;
+            return qualifiedInvocation.DataType;
         }
 
         /// <summary>
@@ -822,7 +822,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         {
             return expression switch
             {
-                IFieldAccessExpressionSyntax memberAccess =>
+                IQualifiedNameExpressionSyntax memberAccess =>
                 // if implicit self
                 memberAccess.Context is null
                     ? null
@@ -833,39 +833,39 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         }
 
         private DataType InferFunctionInvocationType(
-            IFunctionInvocationExpressionSyntax functionInvocationExpression)
+            IUnqualifiedInvocationExpressionSyntax unqualifiedInvocationExpression)
         {
-            var argumentTypes = functionInvocationExpression.Arguments.Select(argument => InferType(ref argument.Expression)).ToFixedList();
-            var functionSymbols = functionInvocationExpression.LookupInContainingScope().Select(s => s.Result).ToFixedList();
+            var argumentTypes = unqualifiedInvocationExpression.Arguments.Select(argument => InferType(ref argument.Expression)).ToFixedList();
+            var functionSymbols = unqualifiedInvocationExpression.LookupInContainingScope().Select(s => s.Result).ToFixedList();
             functionSymbols = ResolveOverload(functionSymbols, argumentTypes);
             switch (functionSymbols.Count)
             {
                 case 0:
-                    diagnostics.Add(NameBindingError.CouldNotBindFunction(file, functionInvocationExpression.Span));
-                    functionInvocationExpression.ReferencedSymbol.Fulfill(null);
-                    functionInvocationExpression.DataType = DataType.Unknown;
-                    functionInvocationExpression.Semantics = ExpressionSemantics.Never;
+                    diagnostics.Add(NameBindingError.CouldNotBindFunction(file, unqualifiedInvocationExpression.Span));
+                    unqualifiedInvocationExpression.ReferencedSymbol.Fulfill(null);
+                    unqualifiedInvocationExpression.DataType = DataType.Unknown;
+                    unqualifiedInvocationExpression.Semantics = ExpressionSemantics.Never;
                     break;
                 case 1:
                     var functionSymbol = functionSymbols.Single();
-                    functionInvocationExpression.ReferencedSymbol.Fulfill(functionSymbol);
-                    foreach (var (arg, parameterDataType) in functionInvocationExpression.Arguments.Zip(functionSymbol.ParameterDataTypes))
+                    unqualifiedInvocationExpression.ReferencedSymbol.Fulfill(functionSymbol);
+                    foreach (var (arg, parameterDataType) in unqualifiedInvocationExpression.Arguments.Zip(functionSymbol.ParameterDataTypes))
                     {
                         InsertImplicitConversionIfNeeded(ref arg.Expression, parameterDataType);
                         CheckArgumentTypeCompatibility(parameterDataType, arg.Expression);
                     }
 
-                    functionInvocationExpression.DataType = functionSymbol.ReturnDataType;
-                    AssignInvocationSemantics(functionInvocationExpression, functionSymbol.ReturnDataType);
+                    unqualifiedInvocationExpression.DataType = functionSymbol.ReturnDataType;
+                    AssignInvocationSemantics(unqualifiedInvocationExpression, functionSymbol.ReturnDataType);
                     break;
                 default:
-                    diagnostics.Add(NameBindingError.AmbiguousFunctionCall(file, functionInvocationExpression.Span));
-                    functionInvocationExpression.ReferencedSymbol.Fulfill(null);
-                    functionInvocationExpression.DataType = DataType.Unknown;
-                    functionInvocationExpression.Semantics = ExpressionSemantics.Never;
+                    diagnostics.Add(NameBindingError.AmbiguousFunctionCall(file, unqualifiedInvocationExpression.Span));
+                    unqualifiedInvocationExpression.ReferencedSymbol.Fulfill(null);
+                    unqualifiedInvocationExpression.DataType = DataType.Unknown;
+                    unqualifiedInvocationExpression.Semantics = ExpressionSemantics.Never;
                     break;
             }
-            return functionInvocationExpression.DataType;
+            return unqualifiedInvocationExpression.DataType;
         }
 
         private static void AssignInvocationSemantics(

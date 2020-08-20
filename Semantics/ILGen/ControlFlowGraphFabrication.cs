@@ -480,12 +480,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IReturnExpression _:
                 case IBreakExpression _:
                 case INextExpression _:
-                case ISelfExpression _:
                 case IIfExpression _:
                 case IUnsafeExpression _:
                 case IBlockExpression _:
                 case INoneLiteralExpression _:
                     throw new NotImplementedException($"ConvertIntoPlace({expression.GetType().Name}, Place) Not Implemented.");
+                case ISelfExpression exp:
+                {
+                    // This occurs when the source code contains a simple assignment like `x = self`
+                    var symbol = exp.ReferencedSymbol;
+                    var variable = graph.VariableFor(symbol).Reference(exp.Span);
+                    currentBlock!.Add(new AssignmentInstruction(resultPlace, variable, exp.Span, CurrentScope));
+                }
+                break;
                 case IImplicitOptionalConversionExpression exp:
                 {
                     var operand = ConvertToOperand(exp.Expression);
@@ -529,6 +536,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                         case BinaryOperator.DotDotLessThan:
                         case BinaryOperator.LessThanDotDotLessThan:
                             throw new NotImplementedException("Range operator control flow not implemented");
+                        #region Logical Operators
                         case BinaryOperator.And:
                             // TODO handle calls to overloaded operators
                             // TODO handle short circuiting if needed
@@ -541,6 +549,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                             currentBlock!.Add(new BooleanLogicInstruction(resultPlace, Or,
                                 leftOperand, rightOperand, CurrentScope));
                             break;
+                        #endregion
+                        #region Binary Math Operators
                         case BinaryOperator.Plus:
                             currentBlock!.Add(new NumericInstruction(resultPlace, Add,
                                 (NumericType)resultType, leftOperand, rightOperand, CurrentScope));
@@ -557,6 +567,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                             currentBlock!.Add(new NumericInstruction(resultPlace, Divide,
                                 (NumericType)resultType, leftOperand, rightOperand, CurrentScope));
                             break;
+                        #endregion
                         #region Comparisons
                         case BinaryOperator.EqualsEquals:
                             currentBlock!.Add(new CompareInstruction(resultPlace, Equal,
@@ -613,7 +624,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IFunctionInvocationExpression exp:
                 {
                     var functionName = exp.ReferencedSymbol;
-                    var args = exp.Arguments.Select(e => ConvertToOperand(e)).ToFixedList();
+                    var args = exp.Arguments.Select(ConvertToOperand).ToFixedList();
                     currentBlock!.Add(CallInstruction.ForFunction(resultPlace, functionName, args, exp.Span, CurrentScope));
                 }
                 break;
@@ -679,6 +690,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     var symbol = exp.ReferencedSymbol;
                     return graph.VariableFor(symbol).Reference(exp.Span);
                 }
+                case IBorrowExpression exp:
+                    return ConvertToOperand(exp.Referent);
+                case IShareExpression exp:
+                    return ConvertToOperand(exp.Referent);
+                case IMoveExpression exp:
+                    return ConvertToOperand(exp.Referent);
                 case IAssignmentExpression _:
                 case IBinaryOperatorExpression _:
                 case IUnaryOperatorExpression _:
@@ -698,9 +715,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IBreakExpression _:
                 case INextExpression _:
                 case IReturnExpression _:
-                case IMoveExpression _:
-                case IBorrowExpression _:
-                case IShareExpression _:
                 case IIfExpression _:
                 case IFunctionInvocationExpression _:
                 case IForeachExpression _:

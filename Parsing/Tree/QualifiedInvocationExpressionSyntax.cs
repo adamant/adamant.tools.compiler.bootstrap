@@ -11,7 +11,7 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    internal class MethodInvocationExpressionSyntax : InvocationExpressionSyntax, IMethodInvocationExpressionSyntax
+    internal class QualifiedInvocationExpressionSyntax : InvocationExpressionSyntax, IQualifiedInvocationExpressionSyntax
     {
         private LexicalScope? containingLexicalScope;
         public LexicalScope ContainingLexicalScope
@@ -31,19 +31,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         private IExpressionSyntax context;
         public ref IExpressionSyntax Context => ref context;
-        public IInvocableNameSyntax MethodNameSyntax { get; }
         public new Promise<MethodSymbol?> ReferencedSymbol { get; }
 
-        public MethodInvocationExpressionSyntax(
+        public QualifiedInvocationExpressionSyntax(
             TextSpan span,
             IExpressionSyntax context,
-            Name name,
-            IInvocableNameSyntax methodNameSyntax,
+            Name invokedName,
+            TextSpan invokedNameSpan,
             FixedList<IArgumentSyntax> arguments)
-            : base(span, name, arguments, new Promise<MethodSymbol?>())
+            : base(span, invokedName, invokedNameSpan, arguments, new Promise<MethodSymbol?>())
         {
             this.context = context;
-            MethodNameSyntax = methodNameSyntax;
             ReferencedSymbol = (Promise<MethodSymbol?>)base.ReferencedSymbol;
         }
 
@@ -51,7 +49,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public override string ToString()
         {
-            return $"{Context.ToGroupedString(ExpressionPrecedence)}.{Name}({string.Join(", ", Arguments)})";
+            return $"{Context.ToGroupedString(ExpressionPrecedence)}.{InvokedName}({string.Join(", ", Arguments)})";
         }
     }
 }

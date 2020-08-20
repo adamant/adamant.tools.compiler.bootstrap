@@ -102,8 +102,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                     foreach(var child in n.CanReach)
                         yield return child;
                     yield break;
-                case IInvocableNameSyntax n:
-                    yield break;
                 case IArgumentSyntax n:
                     yield return n.Expression;
                     yield break;
@@ -137,8 +135,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                     yield break;
                 case INewObjectExpressionSyntax n:
                     yield return n.Type;
-                    if(!(n.ConstructorName is null))
-                        yield return n.ConstructorName;
                     foreach(var child in n.Arguments)
                         yield return child;
                     yield break;
@@ -205,14 +201,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                 case IImplicitOptionalConversionExpressionSyntax n:
                     yield return n.Expression;
                     yield break;
-                case IFunctionInvocationExpressionSyntax n:
-                    yield return n.FunctionNameSyntax;
+                case IUnqualifiedInvocationExpressionSyntax n:
                     foreach(var child in n.Arguments)
                         yield return child;
                     yield break;
-                case IMethodInvocationExpressionSyntax n:
+                case IQualifiedInvocationExpressionSyntax n:
                     yield return n.Context;
-                    yield return n.MethodNameSyntax;
                     foreach(var child in n.Arguments)
                         yield return child;
                     yield break;
@@ -220,7 +214,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                     yield break;
                 case ISelfExpressionSyntax n:
                     yield break;
-                case IFieldAccessExpressionSyntax n:
+                case IQualifiedNameExpressionSyntax n:
                     yield return n.Context;
                     yield return n.Field;
                     yield break;

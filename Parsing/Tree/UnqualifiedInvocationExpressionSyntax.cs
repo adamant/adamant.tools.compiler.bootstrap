@@ -13,7 +13,7 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    internal class FunctionInvocationExpressionSyntax : InvocationExpressionSyntax, IFunctionInvocationExpressionSyntax
+    internal class UnqualifiedInvocationExpressionSyntax : InvocationExpressionSyntax, IUnqualifiedInvocationExpressionSyntax
     {
         private LexicalScope? containingLexicalScope;
         public LexicalScope ContainingLexicalScope
@@ -32,18 +32,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         }
 
         public NamespaceName Namespace { get; }
-        public IInvocableNameSyntax FunctionNameSyntax { get; }
         public new Promise<FunctionSymbol?> ReferencedSymbol { get; }
 
-        public FunctionInvocationExpressionSyntax(
+        public UnqualifiedInvocationExpressionSyntax(
             TextSpan span,
-            Name name,
-            IInvocableNameSyntax functionNameSyntax,
+            Name invokedName,
+            TextSpan invokedNameSpan,
             FixedList<IArgumentSyntax> arguments)
-            : base(span, name, arguments, new Promise<FunctionSymbol?>())
+            : base(span, invokedName, invokedNameSpan, arguments, new Promise<FunctionSymbol?>())
         {
             Namespace = NamespaceName.Global;
-            FunctionNameSyntax = functionNameSyntax;
             ReferencedSymbol = (Promise<FunctionSymbol?>)base.ReferencedSymbol;
         }
 
@@ -53,15 +51,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
                 throw new InvalidOperationException($"Can't lookup function name without {nameof(ContainingLexicalScope)}");
 
             // If name is unknown, no symbols
-            if (Name is null) return Enumerable.Empty<IPromise<FunctionSymbol>>();
+            if (InvokedName is null) return Enumerable.Empty<IPromise<FunctionSymbol>>();
 
-            return containingLexicalScope.Lookup(Name).Select(p => p.As<FunctionSymbol>()).NotNull();
+            return containingLexicalScope.Lookup(InvokedName).Select(p => p.As<FunctionSymbol>()).NotNull();
         }
 
         protected override OperatorPrecedence ExpressionPrecedence => OperatorPrecedence.Primary;
         public override string ToString()
         {
-            return $"{Name}({string.Join(", ", Arguments)})";
+            return $"{InvokedName}({string.Join(", ", Arguments)})";
         }
     }
 }

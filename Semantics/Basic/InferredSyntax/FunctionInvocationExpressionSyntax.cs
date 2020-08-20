@@ -15,7 +15,7 @@ using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax
 {
-    internal class FunctionInvocationExpressionSyntax : IFunctionInvocationExpressionSyntax
+    internal class FunctionInvocationExpressionSyntax : IUnqualifiedInvocationExpressionSyntax
     {
         private readonly FixedSet<FunctionSymbol> possibleReferents;
         public LexicalScope ContainingLexicalScope
@@ -26,9 +26,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax
             set => throw new NotSupportedException($"{nameof(ContainingLexicalScope)} not supported on inferred {nameof(FunctionInvocationExpressionSyntax)}");
         }
         public TextSpan Span { get; }
-        public IInvocableNameSyntax FunctionNameSyntax { get; }
         public NamespaceName Namespace { get; }
-        public Name Name { get; }
+        public Name InvokedName { get; }
+        public TextSpan InvokedNameSpan { get; }
         public FixedList<IArgumentSyntax> Arguments { get; }
         public Promise<FunctionSymbol?> ReferencedSymbol { get; } = new Promise<FunctionSymbol?>();
         IPromise<InvocableSymbol?> IInvocationExpressionSyntax.ReferencedSymbol => ReferencedSymbol;
@@ -63,17 +63,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax
 
         public FunctionInvocationExpressionSyntax(
             TextSpan span,
-            IInvocableNameSyntax functionNameSyntax,
             NamespaceName ns,
-            Name name,
+            Name invokedName,
+            TextSpan invokedNameSpan,
             FixedList<IArgumentSyntax> arguments,
             FixedSet<FunctionSymbol> possibleReferents)
         {
             this.possibleReferents = possibleReferents;
+            InvokedName = invokedName;
+            InvokedNameSpan = invokedNameSpan;
             Span = span;
-            FunctionNameSyntax = functionNameSyntax;
             Namespace = ns;
-            Name = name;
             Arguments = arguments;
         }
 
@@ -85,8 +85,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax
         public override string ToString()
         {
             return Namespace == NamespaceName.Global
-                ? $"{Name}({string.Join(", ", Arguments)})"
-                : $"{Namespace}.{Name}({string.Join(", ", Arguments)})";
+                ? $"{InvokedName}({string.Join(", ", Arguments)})"
+                : $"{Namespace}.{InvokedName}({string.Join(", ", Arguments)})";
         }
 
         public string ToGroupedString(OperatorPrecedence surroundingPrecedence)

@@ -147,7 +147,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                             if (!(Tokens.Current is IOpenParenToken))
                             {
                                 var memberAccessSpan = TextSpan.Covering(expression.Span, nameSyntax.Span);
-                                expression = new FieldAccessExpressionSyntax(memberAccessSpan, expression, accessOperator, nameSyntax.ToExpression());
+                                expression = new QualifiedNameExpressionSyntax(memberAccessSpan, expression, accessOperator, nameSyntax.ToExpression());
                             }
                             else
                             {
@@ -155,7 +155,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                                 var arguments = ParseArguments();
                                 var closeParenSpan = Tokens.Expect<ICloseParenToken>();
                                 var invocationSpan = TextSpan.Covering(expression.Span, closeParenSpan);
-                                expression = new MethodInvocationExpressionSyntax(invocationSpan, expression, nameSyntax.Name, nameSyntax.ToInvocable(), arguments);
+                                expression = new QualifiedInvocationExpressionSyntax(invocationSpan, expression, nameSyntax.Name, nameSyntax.Span, arguments);
                             }
                             continue;
                         }
@@ -250,7 +250,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var arguments = ParseArguments();
                     var closeParen = Tokens.Expect<ICloseParenToken>();
                     var span = TextSpan.Covering(newKeyword, closeParen);
-                    return new NewObjectExpressionSyntax(span, type, null, arguments);
+                    return new NewObjectExpressionSyntax(span, type, null, null, arguments);
                 }
                 case IReturnKeywordToken _:
                 {
@@ -296,7 +296,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var arguments = ParseArguments();
                     var closeParenSpan = Tokens.Expect<ICloseParenToken>();
                     var span = TextSpan.Covering(nameSyntax.Span, closeParenSpan);
-                    return new FunctionInvocationExpressionSyntax(span, nameSyntax.Name, nameSyntax.ToInvocable(), arguments);
+                    return new UnqualifiedInvocationExpressionSyntax(span, nameSyntax.Name, nameSyntax.Span, arguments);
                 }
                 case IForeachKeywordToken _:
                     return ParseForeach();
@@ -321,15 +321,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     return ParseUnsafeExpression();
                 case IIfKeywordToken _:
                     return ParseIf();
-                case IDotToken _:
+                case IDotToken dot:
                 {
-                    // implicit self etc.
-                    var dot = Tokens.Required<IDotToken>();
-                    var self = new SelfExpressionSyntax(dot.AtStart(), true);
-                    var member = ParseName();
-                    var span = TextSpan.Covering(dot, member.Span);
-                    // TODO we need to check for method call
-                    return new FieldAccessExpressionSyntax(span, self, AccessOperator.Standard, member.ToExpression());
+                    // implicit self, don't consume the '.' it will be parsed next
+                    return new SelfExpressionSyntax(dot.Span.AtStart(), true);
                 }
                 case IMutableKeywordToken _:
                 {
