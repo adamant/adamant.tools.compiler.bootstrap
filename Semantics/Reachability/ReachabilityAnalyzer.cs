@@ -197,7 +197,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     // Field access behaves like calling a get method
                     // Note: right now only objects (not values) have fields
                     var context = Analyze(exp.Context, graph, scope)!;
-                    UseArgument(context, exp.Context.Span, graph);
+                    UseArgument(context, exp.Context.Span);
                     if (isReferenceType)
                     {
                         var temp = graph.AddFieldAccess(exp)!;
@@ -216,7 +216,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                                        .ToFixedList();
                     var function = exp.ReferencedSymbol;
                     var parameterDataTypes = function.ParameterDataTypes;
-                    UseArguments(arguments, exp.Arguments, parameterDataTypes, graph);
+                    UseArguments(arguments, exp.Arguments, parameterDataTypes);
                     if (!(referenceType is null))
                         return CaptureArguments(exp, arguments, graph);
 
@@ -231,8 +231,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     var method = exp.ReferencedSymbol;
                     var parameterDataTypes = method.ParameterDataTypes;
                     if (!(selfArgument is null))
-                        UseArgument(selfArgument, exp.Context.Span, graph);
-                    UseArguments(arguments, exp.Arguments, parameterDataTypes, graph);
+                        UseArgument(selfArgument, exp.Context.Span);
+                    UseArguments(arguments, exp.Arguments, parameterDataTypes);
                     if (!(referenceType is null))
                         return CaptureArguments(exp, arguments.Prepend(selfArgument), graph);
 
@@ -270,7 +270,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
 
                     var constructor = exp.ReferencedSymbol;
                     var parameterDataTypes = constructor.ParameterDataTypes;
-                    UseArguments(arguments, exp.Arguments, parameterDataTypes, graph);
+                    UseArguments(arguments, exp.Arguments, parameterDataTypes);
                     if (referenceType is null) return null;
                     var obj = graph.AddObject(exp)!;
                     CaptureArguments(arguments, obj);
@@ -338,8 +338,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
         private void UseArguments(
             FixedList<TempValue?> arguments,
             FixedList<IExpression> argumentSyntaxes,
-            IEnumerable<DataType> parameterDataTypes,
-            ReachabilityGraph graph)
+            IEnumerable<DataType> parameterDataTypes)
         {
             foreach (var ((argument, argumentSyntax), parameterDataType) in arguments.Zip(argumentSyntaxes).Zip(parameterDataTypes))
             {
@@ -348,11 +347,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     // TODO this used to give the parameter name, would be nice to do so again
                     throw new InvalidOperationException($"Expected parameter of type {parameterDataType} to be a reference type");
 
-                UseArgument(argument, argumentSyntax.Span, graph);
+                UseArgument(argument, argumentSyntax.Span);
             }
         }
 
-        private void UseArgument(TempValue argument, TextSpan span, ReachabilityGraph graph)
+        private void UseArgument(TempValue argument, TextSpan span)
         {
             foreach (var reference in argument.References)
             {
@@ -392,7 +391,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 }
 
                 // Mark as used regardless to enable correct analysis of later expressions
-                reference.Use(graph);
+                reference.Use();
             }
         }
 

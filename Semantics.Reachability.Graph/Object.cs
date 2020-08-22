@@ -12,22 +12,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     {
         public bool IsContext { get; }
 
-        internal Object(ReachabilityGraph graph, bool isContext, IParameter parameter, Reference? originOfMutability)
-            : base(graph, parameter, originOfMutability)
+        internal Object(IReferenceGraph graph, bool isContext, IAbstractSyntax syntax, Reference? originOfMutability)
+            : base(graph, syntax, originOfMutability)
         {
             IsContext = isContext;
-        }
-
-        internal Object(ReachabilityGraph graph, bool isContext, IExpression originSyntax, Reference? originOfMutability)
-            : base(graph, originSyntax, originOfMutability)
-        {
-            IsContext = isContext;
-        }
-
-        internal Object(ReachabilityGraph graph, IFieldDeclaration field, Reference? originOfMutability)
-            : base(graph, field, originOfMutability)
-        {
-            IsContext = false;
         }
     }
 }

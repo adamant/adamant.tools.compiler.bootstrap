@@ -20,8 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         IReference Borrow();
         IReference Share();
         IReference Identify();
-
-        void Use(ReachabilityGraph graph);
-        internal void Release(IReachabilityGraph graph);
+        void Use();
+        internal void Release(IReferenceGraph graph);
     }
 }

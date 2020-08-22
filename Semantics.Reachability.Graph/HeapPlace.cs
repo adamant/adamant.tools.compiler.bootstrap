@@ -27,11 +27,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return currentAccess;
         }
 
-        protected HeapPlace(
-            ReachabilityGraph graph,
-            IAbstractSyntax originSyntax,
-            IReference? originOfMutability)
-            : base(graph)
+        private protected HeapPlace(
+             IReferenceGraph graph,
+             IAbstractSyntax originSyntax,
+             IReference? originOfMutability)
+             : base(graph)
         {
             OriginSyntax = originSyntax;
             OriginOfMutability = originOfMutability;

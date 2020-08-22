@@ -16,6 +16,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         /// </summary>
         public static string ToDotFormat(this ReachabilityGraph graph)
         {
+            return graph.ReferenceGraph.ToDotFormat();
+        }
+
+        internal static string ToDotFormat(this IReferenceGraph graph)
+        {
             var dot = new StringBuilder();
             var nodes = new Dictionary<MemoryPlace, string>();
             dot.AppendLine("digraph reachability {");
@@ -27,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return dot.ToString();
         }
 
-        private static void AppendStack(ReachabilityGraph graph, StringBuilder dot, Dictionary<MemoryPlace, string> nodes)
+        private static void AppendStack(IReferenceGraph graph, StringBuilder dot, Dictionary<MemoryPlace, string> nodes)
         {
             var hasCallerVariables = graph.CallerVariables.Any();
             var hasVariables = graph.Variables.Any();
@@ -78,7 +83,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             dot.AppendLine("            <TR><TD CELLPADDING=\"0\" BGCOLOR=\"black\"></TD></TR>");
         }
 
-        private static void AppendObjects(ReachabilityGraph graph, StringBuilder dot, Dictionary<MemoryPlace, string> nodes)
+        private static void AppendObjects(IReferenceGraph graph, StringBuilder dot, Dictionary<MemoryPlace, string> nodes)
         {
             if (!graph.Objects.Any()) return;
 
@@ -142,7 +147,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             dot.AppendLine($"    {name} [label={label}{color}{style}];");
         }
 
-        private static void AppendReferences(ReachabilityGraph graph, StringBuilder dot, Dictionary<MemoryPlace, string> nodes)
+        private static void AppendReferences(IReferenceGraph graph, StringBuilder dot, Dictionary<MemoryPlace, string> nodes)
         {
             var places = graph.CallerVariables
                               .Concat<MemoryPlace>(graph.Variables)

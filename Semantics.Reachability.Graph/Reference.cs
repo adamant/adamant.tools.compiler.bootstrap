@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
-using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
@@ -41,92 +40,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             Borrowers = borrowers.AsReadOnly();
         }
 
-        internal static Reference ToNewParameterObject(ReachabilityGraph graph, IBindingParameter parameter)
+        internal static Reference ToNewObject(
+            IReferenceGraph graph,
+            Ownership ownership,
+            Access declaredAccess,
+            IAbstractSyntax syntax,
+            bool isContext,
+            bool isOriginOfMutability)
         {
-            var referenceType = parameter.Symbol.DataType.Known().UnderlyingReferenceType()
-                                ?? throw new ArgumentException("Must be a parameter with a reference type", nameof(parameter));
-
-            var referenceCapability = referenceType.ReferenceCapability;
-            var ownership = referenceCapability.ToOwnership();
-            var access = referenceCapability.ToAccess();
-            var reference = new Reference(ownership, access);
-            var originOfMutability = access == Access.Mutable ? reference : null;
-            reference.Referent = new Object(graph, false, parameter, originOfMutability);
-            return reference;
-        }
-
-        internal static Reference ToNewParameterContextObject(ReachabilityGraph graph, IBindingParameter parameter)
-        {
-            var referenceType = parameter.Symbol.DataType.Known().UnderlyingReferenceType()
-                ?? throw new ArgumentException("Must be a parameter with a reference type",
-                                                nameof(parameter));
-
-            var referenceCapability = referenceType.ReferenceCapability;
-            var ownership = referenceCapability.ToOwnership();
-            var access = referenceCapability.ToAccess();
-            var reference = new Reference(ownership, access);
-            var originOfMutability = access == Access.Mutable ? reference : null;
-            reference.Referent = new Object(graph, true, parameter, originOfMutability);
-            return reference;
-        }
-
-        internal static Reference ToNewContextObject(ReachabilityGraph graph, IExpression expression)
-        {
-            var referenceType = expression.DataType.Known().UnderlyingReferenceType()
-                                ?? throw new ArgumentException("Must be a parameter with a reference type",
-                                    nameof(expression));
-
-            var referenceCapability = referenceType.ReferenceCapability;
-            var ownership = referenceCapability.ToOwnership();
-            var access = referenceCapability.ToAccess();
-            var reference = new Reference(ownership, access);
-            var originOfMutability = access == Access.Mutable ? reference : null;
-            reference.Referent = new Object(graph, true, expression, originOfMutability);
-            return reference;
-        }
-
-        internal static Reference ToNewObject(ReachabilityGraph graph, INewObjectExpression expression)
-        {
-            return ToExpressionObject(graph, expression);
-        }
-
-        internal static Reference ToNewInvocationReturnedObject(ReachabilityGraph graph, IInvocationExpression expression)
-        {
-            return ToExpressionObject(graph, expression);
-        }
-
-        internal static Reference ToFieldAccess(ReachabilityGraph graph, IFieldAccessExpression expression)
-        {
-            return ToExpressionObject(graph, expression);
-        }
-
-        private static Reference ToExpressionObject(ReachabilityGraph graph, IExpression expression)
-        {
-            var referenceType = expression.DataType.Known().UnderlyingReferenceType()
-                                ?? throw new ArgumentException("Must be a parameter with a reference type",
-                                    nameof(expression));
-
-            var referenceCapability = referenceType.ReferenceCapability;
-            var ownership = referenceCapability.ToOwnership();
-            var access = referenceCapability.ToAccess();
-            var reference = new Reference(ownership, access);
-            var originOfMutability = access == Access.Mutable ? reference : null;
-            reference.Referent = new Object(graph, false, expression, originOfMutability);
-            return reference;
-        }
-
-        public static Reference ToNewFieldObject(ReachabilityGraph graph, IFieldDeclaration field)
-        {
-            var referenceType = field.Symbol.DataType.Known().UnderlyingReferenceType()
-                                ?? throw new ArgumentException("Must be a parameter with a reference type",
-                                    nameof(field));
-
-            var referenceCapability = referenceType.ReferenceCapability;
-            var ownership = referenceCapability.ToOwnership();
-            var access = referenceCapability.ToAccess();
-            var reference = new Reference(ownership, access);
-            var originOfMutability = access == Access.Mutable ? reference : null;
-            reference.Referent = new Object(graph, field, originOfMutability);
+            var reference = new Reference(ownership, declaredAccess);
+            var originOfMutability = isOriginOfMutability ? reference : null;
+            reference.Referent = new Object(graph, isContext, syntax, originOfMutability);
             return reference;
         }
 
@@ -239,7 +163,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         /// dereferenced, it doesn't have to be marked used, just checked to
         /// be usable at that moment.
         /// </summary>
-        public void Use(ReachabilityGraph graph)
+        public void Use()
         {
             switch (Phase)
             {
@@ -247,7 +171,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                     throw ExhaustiveMatch.Failed(Phase);
                 case Phase.Unused:
                     Phase = Phase.Used;
-                    graph.Dirty();
+                    Referent.Graph.Dirty();
                     break;
                 case Phase.Used:
                     // already used, do nothing
@@ -260,7 +184,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         /// <summary>
         /// Release this reference so that it no longer holds the referenced object
         /// </summary>
-        void IReference.Release(IReachabilityGraph graph)
+        void IReference.Release(IReferenceGraph graph)
         {
             Phase = Phase.Released;
             graph.Dirty();

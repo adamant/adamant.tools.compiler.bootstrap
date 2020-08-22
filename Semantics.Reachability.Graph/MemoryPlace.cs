@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         /// <summary>
         /// The graph this node is in
         /// </summary>
-        internal IReachabilityGraph Graph { get; }
+        internal IReferenceGraph Graph { get; }
 
         private readonly List<IReference> references = new List<IReference>();
         public IReadOnlyList<IReference> References { get; }
@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         public bool IsAllocated { get; private set; } = true;
 
-        private protected MemoryPlace(IReachabilityGraph graph)
+        private protected MemoryPlace(IReferenceGraph graph)
         {
             Graph = graph;
             References = references.AsReadOnly();
@@ -137,12 +137,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         protected internal void AddReference(IReference reference)
         {
+            if (reference.Referent.Graph != Graph)
+                throw new ArgumentException("Must be a reference to part of the same graph", nameof(reference));
+
             references.Add(reference);
+            Graph.Dirty();
         }
 
-        protected void AddReferences(IEnumerable<IReference> reference)
+        protected void AddReferences(IReadOnlyCollection<IReference> references)
         {
-            references.AddRange(reference);
+            if (references.Any(r => r.Referent.Graph != Graph))
+                throw new ArgumentException("Must be references to parts of the same graph", nameof(references));
+
+            this.references.AddRange(references);
+            Graph.Dirty();
         }
 
         internal void MarkReferencedObjects()

@@ -13,47 +13,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     /// A graph of the possible references between places in a function. Also
     /// answers questions about the current mutability of objects etc.
     /// </summary>
-    public class ReachabilityGraph : IReachabilityGraph
+    public class ReachabilityGraph
     {
-        private bool isDirty = false;
-        private bool recomputingCurrentAccess = false;
-        private readonly Dictionary<BindingSymbol, CallerVariable> callerVariables = new Dictionary<BindingSymbol, CallerVariable>();
-        private readonly Dictionary<BindingSymbol, Variable> variables = new Dictionary<BindingSymbol, Variable>();
-        private readonly Dictionary<IAbstractSyntax, Object> objects = new Dictionary<IAbstractSyntax, Object>();
-        private readonly HashSet<TempValue> tempValues = new HashSet<TempValue>();
-
-        internal IReadOnlyCollection<CallerVariable> CallerVariables => callerVariables.Values;
-        internal IReadOnlyCollection<Variable> Variables => variables.Values;
-        internal IReadOnlyCollection<Object> Objects => objects.Values;
-        internal IReadOnlyCollection<TempValue> TempValues => tempValues;
-
-        void IReachabilityGraph.Dirty()
-        {
-            Dirty();
-        }
-
-        internal void Dirty()
-        {
-            isDirty = true;
-        }
-
-        void IReachabilityGraph.EnsureCurrentAccessIsUpToDate()
-        {
-            if (recomputingCurrentAccess)
-                throw new Exception("Current access is being updated");
-            if (!isDirty) return;
-
-            try
-            {
-                recomputingCurrentAccess = true;
-                RecomputeCurrentObjectAccess();
-                isDirty = false;
-            }
-            finally
-            {
-                recomputingCurrentAccess = false;
-            }
-        }
+        internal IReferenceGraph ReferenceGraph { get; } = new ReferenceGraph();
 
         #region Add/Remove Methods
         /// <returns>The added local variable for the parameter</returns>
@@ -64,8 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             if (referenceType is null)
                 return null;
 
-            CallerVariable? callerVariable = null;
-            var localVariable = new Variable(this, parameter.Symbol);
+            var localVariable = ReferenceGraph.AddVariable(parameter.Symbol);
 
             var capability = referenceType.ReferenceCapability;
             switch (capability)
@@ -76,7 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 case ReferenceCapability.Isolated:
                 {
                     // Isolated parameters are fully independent of the caller
-                    var reference = Reference.ToNewParameterObject(this, parameter);
+                    var reference = ReferenceToNewParameterObject(parameter);
                     localVariable.AddReference(reference);
                 }
                 break;
@@ -85,54 +46,55 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 case ReferenceCapability.Held:
                 case ReferenceCapability.HeldMutable:
                 {
-                    var reference = Reference.ToNewParameterObject(this, parameter);
+                    var reference = ReferenceToNewParameterObject(parameter);
                     localVariable.AddReference(reference);
                     var referencedObject = reference.Referent;
 
+                    // TODO this context object is needed
                     // Object to represent the bounding of the lifetime
-                    callerVariable = CallerVariable.CreateForParameterWithObject(this, parameter);
-                    referencedObject.ShareFrom(callerVariable);
+                    //var callerVariable = AddCallerVariableForParameterWithObject(parameter);
+                    //referencedObject.ShareFrom(callerVariable);
                 }
                 break;
                 case ReferenceCapability.Borrowed:
                 {
-                    callerVariable = CallerVariable.CreateForParameterWithObject(this, parameter);
+                    var callerVariable = AddCallerVariableForParameterWithObject(parameter);
                     localVariable.BorrowFrom(callerVariable);
                 }
                 break;
                 case ReferenceCapability.Shared:
                 {
-                    callerVariable = CallerVariable.CreateForParameterWithObject(this, parameter);
+                    var callerVariable = AddCallerVariableForParameterWithObject(parameter);
                     localVariable.ShareFrom(callerVariable);
                 }
                 break;
                 case ReferenceCapability.Identity:
                 {
-                    callerVariable = CallerVariable.CreateForParameterWithObject(this, parameter);
+                    var callerVariable = AddCallerVariableForParameterWithObject(parameter);
                     localVariable.IdentityFrom(callerVariable);
                 }
                 break;
             }
 
-
-            if (!(callerVariable is null))
-            {
-                callerVariables.Add(callerVariable.Symbol, callerVariable);
-                AddReferences(callerVariable);
-            }
-
-            Add(localVariable);
-
             return localVariable;
+        }
+
+        private CallerVariable AddCallerVariableForParameterWithObject(IBindingParameter parameter)
+        {
+            var reference = ReferenceToNewParameterContextObject(parameter);
+            var callerVariable = ReferenceGraph.AddCallerVariable(parameter.Symbol);
+            callerVariable.AddReference(reference);
+            return callerVariable;
         }
 
         public Variable? AddField(IFieldDeclaration fieldDeclaration)
         {
+            // Non-reference types don't participate in reachability (yet)
             var referenceType = fieldDeclaration.Symbol.DataType.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
 
-            var variable = Variable.ForField(this, fieldDeclaration);
-            Add(variable);
+            var variable = ReferenceGraph.AddVariable(fieldDeclaration.Symbol);
+            variable.AddReference(ReferenceToNewFieldObject(fieldDeclaration));
             return variable;
         }
 
@@ -141,144 +103,126 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             var referenceType = variableDeclaration.Symbol.DataType.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
 
-            var variable = Variable.Declared(this, variableDeclaration);
-            Add(variable);
-            return variable;
+            return ReferenceGraph.AddVariable(variableDeclaration.Symbol);
         }
 
         public TempValue? AddObject(INewObjectExpression exp)
         {
-            var temp = TempValue.ForNewObject(this, exp);
-            Add(temp);
+            var referenceType = exp.DataType.Known().UnderlyingReferenceType();
+            if (referenceType is null) return null;
+
+            var reference = ReferenceToNewObject(exp);
+            var temp = ReferenceGraph.AddTempValue(exp, referenceType);
+
+            temp.AddReference(reference);
             return temp;
         }
 
         public TempValue? AddLiteral(IStringLiteralExpression exp)
         {
-            var temp = TempValue.ForNewContextObject(this, exp);
-            Add(temp);
+            var referenceType = exp.DataType.Known().UnderlyingReferenceType();
+            if (referenceType is null) return null;
+
+            var reference = ReferenceToNewContextObject(exp);
+            var temp = ReferenceGraph.AddTempValue(exp, referenceType);
+            temp.AddReference(reference);
+
             return temp;
         }
 
         public TempValue? AddFunctionCall(IInvocationExpression exp)
         {
-            var temp = TempValue.ForNewInvocationReturnedObject(this, exp);
-            Add(temp);
+            var referenceType = exp.DataType.Known().UnderlyingReferenceType();
+            if (referenceType is null) return null;
+
+            var reference = ReferenceToNewInvocationReturnedObject(exp);
+            var temp = ReferenceGraph.AddTempValue(exp, referenceType);
+            temp.AddReference(reference);
             return temp;
         }
 
         public TempValue? AddFieldAccess(IFieldAccessExpression fieldAccess)
         {
-            var temp = TempValue.ForFieldAccess(this, fieldAccess);
-            Add(temp);
+            var referenceType = fieldAccess.DataType.Known().UnderlyingReferenceType();
+            if (referenceType is null) return null;
+
+            var reference = ReferenceToFieldAccess(fieldAccess);
+            var temp = ReferenceGraph.AddTempValue(fieldAccess, referenceType);
+            temp.AddReference(reference);
             return temp;
         }
 
         public TempValue? AddReturnValue(IExpression expression, DataType type)
         {
-            var temp = TempValue.For(this, expression, type);
-            Add(temp);
-            return temp;
+            var referenceType = type.UnderlyingReferenceType();
+            if (referenceType is null) return null;
+
+            return ReferenceGraph.AddTempValue(expression, referenceType);
         }
 
         public TempValue? AddTempValue(IExpression expression)
         {
-            var temp = TempValue.For(this, expression);
-            Add(temp);
-            return temp;
+            DataType type = expression.DataType.Known();
+            var referenceType = type.UnderlyingReferenceType();
+            if (referenceType is null) return null;
+
+            return ReferenceGraph.AddTempValue(expression, referenceType);
         }
 
-        private void Add(Object obj)
-        {
-            if (objects.TryAdd(obj.OriginSyntax, obj))
-            {
-                AddReferences(obj);
-                this.Dirty();
-            }
-        }
+        //private void Add(Object obj)
+        //{
+        //    if (objects.TryAdd(obj.OriginSyntax, obj))
+        //    {
+        //        AddReferences(obj);
+        //        this.Dirty();
+        //    }
+        //}
 
-        public void Add(TempValue? temp)
-        {
-            if (temp is null) return; // for convenience
-            if (tempValues.Add(temp))
-            {
-                AddReferences(temp);
-                Dirty();
-            }
-        }
+        //public void Add(TempValue? temp)
+        //{
+        //    if (temp is null) return; // for convenience
+        //    if (tempValues.Add(temp))
+        //    {
+        //        AddReferences(temp);
+        //        Dirty();
+        //    }
+        //}
 
-        private void Add(Variable? variable)
-        {
-            if (variable is null) return; // for convenience
-            variables.Add(variable.Symbol, variable);
-            AddReferences(variable);
-            Dirty();
-        }
+        //private void Add(Variable? variable)
+        //{
+        //    if (variable is null) return; // for convenience
+        //    variables.Add(variable.Symbol, variable);
+        //    AddReferences(variable);
+        //    Dirty();
+        //}
 
-        private void AddReferences(MemoryPlace place)
-        {
-            foreach (var reference in place.References)
-                Add(reference.Referent);
-        }
+        //private void AddReferences(MemoryPlace place)
+        //{
+        //    foreach (var reference in place.References)
+        //        Add(reference.Referent);
+        //}
 
         public void EndVariableScope(BindingSymbol variable)
         {
-            if (!variables.Remove(variable, out var place))
-                throw new Exception($"Variable '{variable.Name}' does not exist in the graph.");
-
-            place.Freed();
-            Dirty();
+            ReferenceGraph.EndVariableScope(variable);
         }
 
         public void Drop(TempValue? temp)
         {
-            if (temp is null) return;
-            if (!tempValues.Remove(temp))
-                throw new Exception($"Temp value '{temp}' does not exist in the graph.");
-
-            temp.Freed();
-            Dirty();
+            ReferenceGraph.Drop(temp);
         }
 
         public void ExitFunction(TempValue? returnValue)
         {
-            foreach (var tempValue in TempValues.Except(returnValue).ToList()) Drop(tempValue);
-            foreach (var variable in Variables.ToList()) EndVariableScope(variable.Symbol);
+            foreach (var tempValue in ReferenceGraph.TempValues.Except(returnValue).ToList())
+                ReferenceGraph.Drop(tempValue);
+            foreach (var variable in ReferenceGraph.Variables.ToList())
+                ReferenceGraph.EndVariableScope(variable.Symbol);
         }
 
         public void Drop(IEnumerable<TempValue?> temps)
         {
             foreach (var tempValue in temps) Drop(tempValue);
-        }
-
-        void IReachabilityGraph.Delete(Object obj)
-        {
-            Delete(obj);
-        }
-
-        internal void Delete(Object obj)
-        {
-            if (obj.Graph != this) throw new Exception($"Object '{obj}' is from a different graph.");
-
-            if (objects.ContainsKey(obj.OriginSyntax))
-                obj.Freed();
-        }
-
-        void IReachabilityGraph.LostReference(Object obj)
-        {
-            LostReference(obj);
-        }
-
-        /// <summary>
-        /// A reference to a given object was lost, it may not be in the graph anymore
-        /// </summary>
-        internal void LostReference(Object obj)
-        {
-            if (obj.Graph != this) throw new Exception($"Object '{obj}' is from a different graph.");
-
-            if (!(obj.GetCurrentAccess() is null)) return;
-
-            Delete(obj);
         }
         #endregion
 
@@ -289,35 +233,95 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         /// can be removed from the graph even if there is no variable.</remarks>
         public void Assign(Variable? variable, TempValue? value)
         {
-            if (value == null) return;
-            variable?.Assign(value);
-            Drop(value);
+            ReferenceGraph.Assign(variable, value);
         }
 
         public Variable GetVariableFor(BindingSymbol variableSymbol)
         {
-            // Variable needs to have already been declared
-            return variables[variableSymbol];
+            return ReferenceGraph.GetVariableFor(variableSymbol);
         }
         public Variable? TryGetVariableFor(BindingSymbol variableSymbol)
         {
-            return variables.TryGetValue(variableSymbol, out var variable)
-                ? variable : null;
+            return ReferenceGraph.TryGetVariableFor(variableSymbol);
         }
 
-        private void RecomputeCurrentObjectAccess()
+        private Reference ReferenceToNewParameterObject(IBindingParameter parameter)
         {
-            // Reset mutability to unknown (null)
-            foreach (var place in Objects)
-                place.ResetAccess();
+            var referenceType = parameter.Symbol.DataType.Known().UnderlyingReferenceType()
+                                ?? throw new ArgumentException("Must be a parameter with a reference type", nameof(parameter));
 
-            var rootPlaces = callerVariables.Values.SafeCast<StackPlace>()
-                                            .Concat(variables.Values)
-                                            .Concat(tempValues)
-                                            .ToFixedList();
+            var referenceCapability = referenceType.ReferenceCapability;
+            var ownership = referenceCapability.ToOwnership();
+            var access = referenceCapability.ToAccess();
+            var isOriginOfMutability = access == Access.Mutable;
+            return ReferenceGraph.AddNewObject(ownership, access, parameter, false, isOriginOfMutability);
+        }
 
-            foreach (var place in rootPlaces)
-                place.MarkReferencedObjects();
+        private Reference ReferenceToNewParameterContextObject(IBindingParameter parameter)
+        {
+            var referenceType = parameter.Symbol.DataType.Known().UnderlyingReferenceType()
+                                ?? throw new ArgumentException("Must be a parameter with a reference type",
+                                    nameof(parameter));
+
+            var referenceCapability = referenceType.ReferenceCapability;
+            var ownership = referenceCapability.ToOwnership();
+            var access = referenceCapability.ToAccess();
+            var isOriginOfMutability = access == Access.Mutable;
+            return ReferenceGraph.AddNewObject(ownership, access, parameter, true, isOriginOfMutability);
+        }
+
+        private Reference ReferenceToNewContextObject(IExpression expression)
+        {
+            var referenceType = expression.DataType.Known().UnderlyingReferenceType()
+                                ?? throw new ArgumentException("Must be a parameter with a reference type",
+                                    nameof(expression));
+
+            var referenceCapability = referenceType.ReferenceCapability;
+            var ownership = referenceCapability.ToOwnership();
+            var access = referenceCapability.ToAccess();
+            var isOriginOfMutability = access == Access.Mutable;
+            return ReferenceGraph.AddNewObject(ownership, access, expression, true, isOriginOfMutability);
+        }
+
+        private Reference ReferenceToNewObject(INewObjectExpression expression)
+        {
+            return ReferenceToExpressionObject(expression);
+        }
+
+        private Reference ReferenceToNewInvocationReturnedObject(IInvocationExpression expression)
+        {
+            return ReferenceToExpressionObject(expression);
+        }
+
+        private Reference ReferenceToFieldAccess(IFieldAccessExpression expression)
+        {
+            return ReferenceToExpressionObject(expression);
+        }
+
+        private Reference ReferenceToExpressionObject(IExpression expression)
+        {
+            var referenceType = expression.DataType.Known().UnderlyingReferenceType()
+                                ?? throw new ArgumentException("Must be a parameter with a reference type",
+                                    nameof(expression));
+
+            var referenceCapability = referenceType.ReferenceCapability;
+            var ownership = referenceCapability.ToOwnership();
+            var access = referenceCapability.ToAccess();
+            var isOriginOfMutability = access == Access.Mutable;
+            return ReferenceGraph.AddNewObject(ownership, access, expression, false, isOriginOfMutability);
+        }
+
+        private Reference ReferenceToNewFieldObject(IFieldDeclaration field)
+        {
+            var referenceType = field.Symbol.DataType.Known().UnderlyingReferenceType()
+                                ?? throw new ArgumentException("Must be a parameter with a reference type",
+                                    nameof(field));
+
+            var referenceCapability = referenceType.ReferenceCapability;
+            var ownership = referenceCapability.ToOwnership();
+            var access = referenceCapability.ToAccess();
+            var isOriginOfMutability = access == Access.Mutable;
+            return ReferenceGraph.AddNewObject(ownership, access, field, false, isOriginOfMutability);
         }
     }
 }

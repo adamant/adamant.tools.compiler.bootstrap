@@ -25,8 +25,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Reachability.Gra
             var localVariable = graph.AddParameter(mockParameter.Object);
 
             Assert.Null(localVariable);
-            Assert.Empty(graph.CallerVariables);
-            Assert.Empty(graph.Variables);
+            Assert.Empty(graph.ReferenceGraph.CallerVariables);
+            Assert.Empty(graph.ReferenceGraph.Variables);
         }
 
         // TODO Unit test all the other AddParameter cases
@@ -45,8 +45,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Reachability.Gra
             var temp = graph.AddObject(mockExpression.Object);
 
             Assert.Null(temp);
-            Assert.Empty(graph.Objects);
-            Assert.Empty(graph.TempValues);
+            Assert.Empty(graph.ReferenceGraph.Objects);
+            Assert.Empty(graph.ReferenceGraph.TempValues);
         }
 
         [Fact]
@@ -61,13 +61,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Reachability.Gra
             var temp = graph.AddObject(mockExpression.Object);
 
             Assert.NotNull(temp);
-            Assert.Collection(graph.Objects, o =>
+            Assert.Collection(graph.ReferenceGraph.Objects, o =>
             {
                 Assert.Equal(mockExpression.Object, o.OriginSyntax);
                 Assert.Single(temp!.PossibleReferents, o);
                 // TODO what else to test
             });
-            Assert.Contains(temp, graph.TempValues);
+            Assert.Contains(temp, graph.ReferenceGraph.TempValues);
         }
 
         [Fact]
@@ -87,7 +87,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Reachability.Gra
 
             graph.Assign(variable, temp);
 
-            Assert.DoesNotContain(temp, graph.TempValues);
+            Assert.DoesNotContain(temp, graph.ReferenceGraph.TempValues);
         }
     }
 }

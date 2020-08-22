@@ -1,5 +1,4 @@
 using System;
-using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 
@@ -14,20 +13,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     {
         public BindingSymbol Symbol { get; }
 
-        internal CallerVariable(ReachabilityGraph graph, BindingSymbol symbol)
+        internal CallerVariable(IReferenceGraph graph, BindingSymbol symbol)
             : base(graph)
         {
             _ = symbol.DataType.UnderlyingReferenceType()
                 ?? throw new ArgumentException("Must be a reference type", nameof(symbol));
             Symbol = symbol;
-        }
-
-        internal static CallerVariable CreateForParameterWithObject(ReachabilityGraph graph, IBindingParameter parameter)
-        {
-            var reference = Reference.ToNewParameterContextObject(graph, parameter);
-            var callerVariable = new CallerVariable(graph, parameter.Symbol);
-            callerVariable.AddReference(reference);
-            return callerVariable;
         }
 
         public override string ToString()
