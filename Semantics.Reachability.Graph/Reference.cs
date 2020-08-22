@@ -7,7 +7,7 @@ using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 {
-    public class Reference
+    internal class Reference : IReference
     {
         public Object Referent { get; private set; }
         public Ownership Ownership { get; }
@@ -22,7 +22,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         public bool IsUsed => Phase == Phase.Used;
         public bool IsReleased => Phase == Phase.Released;
         private readonly List<Reference> borrowers = new List<Reference>();
-        public IReadOnlyList<Reference> Borrowers { get; }
+        internal IReadOnlyList<Reference> Borrowers { get; }
+        IEnumerable<IReference> IReference.Borrowers => Borrowers;
 
         private Reference(Object referent, Ownership ownership, Access declaredAccess)
         {
@@ -159,13 +160,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return Borrowers.Any(b => b.IsUsedForBorrowInternal(null));
         }
 
-        public bool IsUsedForBorrowExceptBy(Reference reference)
+        public bool IsUsedForBorrowExceptBy(IReference reference)
         {
             PruneBorrowers();
             return Borrowers.Any(b => b.IsUsedForBorrowInternal(reference));
         }
 
-        private bool IsUsedForBorrowInternal(Reference? exceptBy)
+        private bool IsUsedForBorrowInternal(IReference? exceptBy)
         {
             return (Phase == Phase.Used && this != exceptBy)
                    || (Phase == Phase.Unused && Borrowers.Any(b => b.IsUsedForBorrowInternal(exceptBy)));
@@ -194,20 +195,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             borrowers.AddRange(newBorrowers);
         }
 
-        public bool IsOriginFor(Reference reference)
+        public bool IsOriginFor(IReference reference)
         {
             PruneBorrowers();
             return IsOriginForInternal(reference);
         }
 
-        private bool IsOriginForInternal(Reference reference)
+        private bool IsOriginForInternal(IReference reference)
         {
             return reference == this
                 || Borrowers.Any(b => b.Equals(reference))
                 || Borrowers.Any(b => b.IsOriginForInternal(reference));
         }
 
-        public Reference Borrow()
+        public IReference Borrow()
         {
             if (DeclaredAccess != Access.Mutable)
                 throw new InvalidOperationException("Can't borrow from non-mutable reference");
@@ -217,7 +218,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return borrower;
         }
 
-        public Reference Share()
+        public IReference Share()
         {
             if (DeclaredAccess == Access.Identify)
                 throw new InvalidOperationException("Can't share from identity reference");
@@ -225,7 +226,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return share;
         }
 
-        public Reference Identify()
+        public IReference Identify()
         {
             var identity = new Reference(Referent, Ownership.None, Access.Identify);
             return identity;
@@ -259,7 +260,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         /// <summary>
         /// Release this reference so that it no longer holds the referenced object
         /// </summary>
-        internal void Release(ReachabilityGraph graph)
+        void IReference.Release(IReachabilityGraph graph)
         {
             Phase = Phase.Released;
             graph.Dirty();

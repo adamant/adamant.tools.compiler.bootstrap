@@ -150,7 +150,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                               .Concat(graph.Objects)
                               .ToList();
 
-            var referenceNames = new Dictionary<Reference, string>();
+            var referenceNames = new Dictionary<IReference, string>();
 
             AppendBorrows(dot, places, referenceNames);
             AppendReferences(dot, nodes, places, referenceNames);
@@ -159,7 +159,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         private static void AppendBorrows(
             StringBuilder dot,
             IReadOnlyList<MemoryPlace> places,
-            Dictionary<Reference, string> referenceNames)
+            Dictionary<IReference, string> referenceNames)
         {
             var borrowedReferences = places.SelectMany(n => n.References)
                                            .Where(r => r.Borrowers.Any()).ToList();
@@ -184,8 +184,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         private static string AppendBorrowPoint(
             StringBuilder dot,
-            Reference reference,
-            Dictionary<Reference, string> referenceNames)
+            IReference reference,
+            Dictionary<IReference, string> referenceNames)
         {
             if (referenceNames.TryGetValue(reference, out var name)) return name;
 
@@ -200,7 +200,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             StringBuilder dot,
             Dictionary<MemoryPlace, string> nodes,
             List<MemoryPlace> places,
-            Dictionary<Reference, string> referenceNames)
+            Dictionary<IReference, string> referenceNames)
         {
             bool firstEdge = true;
             foreach (var sourceNode in places)
@@ -219,9 +219,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         private static void AppendReference(
             StringBuilder dot,
             MemoryPlace sourceNode,
-            Reference reference,
+            IReference reference,
             Dictionary<MemoryPlace, string> nodes,
-            Dictionary<Reference, string> referenceNames)
+            Dictionary<IReference, string> referenceNames)
         {
             if (referenceNames.TryGetValue(reference, out var borrowPointName))
             {
@@ -257,7 +257,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             }
         }
 
-        private static void AppendOwnership(StringBuilder dot, Reference reference)
+        private static void AppendOwnership(StringBuilder dot, IReference reference)
         {
             switch (reference.Ownership)
             {
@@ -275,7 +275,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             }
         }
 
-        private static void AppendDeclaredAccess(StringBuilder dot, Reference reference)
+        private static void AppendDeclaredAccess(StringBuilder dot, IReference reference)
         {
             var color = ColorForPhase(reference);
 
@@ -295,7 +295,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             }
         }
 
-        private static string ColorForPhase(Reference reference)
+        private static string ColorForPhase(IReference reference)
         {
             string color = reference.Phase switch
             {
@@ -308,7 +308,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return color;
         }
 
-        private static void AppendEffectiveAccess(StringBuilder dot, Reference reference)
+        private static void AppendEffectiveAccess(StringBuilder dot, IReference reference)
         {
             switch (reference.EffectiveAccess())
             {

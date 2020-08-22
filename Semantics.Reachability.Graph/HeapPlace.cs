@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         /// This is the root reference that provides mutability from which
         /// all the others must directly or indirectly borrow.
         /// </summary>
-        public Reference? OriginOfMutability { get; }
+        public IReference? OriginOfMutability { get; }
 
         /// <summary>
         /// Whether this object is currently mutable. Null indicates access is
@@ -30,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         protected HeapPlace(
             ReachabilityGraph graph,
             IAbstractSyntax originSyntax,
-            Reference? originOfMutability)
+            IReference? originOfMutability)
             : base(graph)
         {
             OriginSyntax = originSyntax;

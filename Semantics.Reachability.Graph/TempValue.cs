@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         private readonly IExpression expression;
         public ReferenceType ReferenceType { get; }
 
-        private TempValue(ReachabilityGraph graph, IExpression expression, ReferenceType referenceType)
+        private TempValue(IReachabilityGraph graph, IExpression expression, ReferenceType referenceType)
             : base(graph)
         {
             this.expression = expression;

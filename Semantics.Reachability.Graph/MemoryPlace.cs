@@ -16,21 +16,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         /// <summary>
         /// The graph this node is in
         /// </summary>
-        internal ReachabilityGraph Graph { get; }
+        internal IReachabilityGraph Graph { get; }
 
-        private readonly List<Reference> references = new List<Reference>();
-        public IReadOnlyList<Reference> References { get; }
+        private readonly List<IReference> references = new List<IReference>();
+        public IReadOnlyList<IReference> References { get; }
         public IEnumerable<HeapPlace> PossibleReferents => references.Select(r => r.Referent).Distinct();
 
         public bool IsAllocated { get; private set; } = true;
 
-        protected MemoryPlace(ReachabilityGraph graph)
+        private protected MemoryPlace(IReachabilityGraph graph)
         {
             Graph = graph;
             References = references.AsReadOnly();
         }
 
-        internal FixedList<Reference> StealReferences()
+        internal FixedList<IReference> StealReferences()
         {
             var stolenReferences = references.ToFixedList();
             references.Clear();
@@ -135,12 +135,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             references.Clear();
         }
 
-        protected internal void AddReference(Reference reference)
+        protected internal void AddReference(IReference reference)
         {
             references.Add(reference);
         }
 
-        protected void AddReferences(IEnumerable<Reference> reference)
+        protected void AddReferences(IEnumerable<IReference> reference)
         {
             references.AddRange(reference);
         }

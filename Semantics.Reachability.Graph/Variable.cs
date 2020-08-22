@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         /// </summary>
         public ReferenceType Type { get; }
 
-        internal Variable(ReachabilityGraph graph, BindingSymbol symbol)
+        internal Variable(IReachabilityGraph graph, BindingSymbol symbol)
             : base(graph)
         {
             Symbol = symbol;

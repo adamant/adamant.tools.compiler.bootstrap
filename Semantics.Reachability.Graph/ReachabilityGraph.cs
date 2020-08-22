@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     /// A graph of the possible references between places in a function. Also
     /// answers questions about the current mutability of objects etc.
     /// </summary>
-    public class ReachabilityGraph
+    public class ReachabilityGraph : IReachabilityGraph
     {
         private bool isDirty = false;
         private bool recomputingCurrentAccess = false;
@@ -27,12 +27,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         internal IReadOnlyCollection<Object> Objects => objects.Values;
         internal IReadOnlyCollection<TempValue> TempValues => tempValues;
 
+        void IReachabilityGraph.Dirty()
+        {
+            Dirty();
+        }
+
         internal void Dirty()
         {
             isDirty = true;
         }
 
-        internal void EnsureCurrentAccessIsUpToDate()
+        void IReachabilityGraph.EnsureCurrentAccessIsUpToDate()
         {
             if (recomputingCurrentAccess)
                 throw new Exception("Current access is being updated");
@@ -188,7 +193,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             if (objects.TryAdd(obj.OriginSyntax, obj))
             {
                 AddReferences(obj);
-                Dirty();
+                this.Dirty();
             }
         }
 
@@ -246,12 +251,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             foreach (var tempValue in temps) Drop(tempValue);
         }
 
+        void IReachabilityGraph.Delete(Object obj)
+        {
+            Delete(obj);
+        }
+
         internal void Delete(Object obj)
         {
             if (obj.Graph != this) throw new Exception($"Object '{obj}' is from a different graph.");
 
             if (objects.ContainsKey(obj.OriginSyntax))
                 obj.Freed();
+        }
+
+        void IReachabilityGraph.LostReference(Object obj)
+        {
+            LostReference(obj);
         }
 
         /// <summary>

@@ -4,6 +4,7 @@ using Xunit;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Reachability.Graph
 {
+    [Trait("Category", "Semantics")]
     public class CallerVariableTests : SymbolTestFixture
     {
         [Fact]
