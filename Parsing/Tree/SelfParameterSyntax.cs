@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class SelfParameterSyntax : ParameterSyntax, ISelfParameterSyntax
     {
-        public bool IsMutableBinding => MutableSelf;
+        public bool IsMutableBinding => false;
         public bool MutableSelf { get; }
         public Promise<SelfParameterSymbol> Symbol { get; } = new Promise<SelfParameterSymbol>();
         IPromise<BindingSymbol> IBindingSyntax.Symbol => Symbol;

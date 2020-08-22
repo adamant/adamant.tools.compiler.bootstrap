@@ -35,6 +35,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Symbols\Symbols.csproj" />
     <ProjectReference Include="..\Tests.Asserts\Tests.Asserts.csproj" />
+    <ProjectReference Include="..\Tests.Unit\Tests.Unit.csproj" />
   </ItemGroup>
 
 </Project>

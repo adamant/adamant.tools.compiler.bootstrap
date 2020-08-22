@@ -7,9 +7,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
     {
         public new InvocableSymbol ContainingSymbol { get; }
 
-        public SelfParameterSymbol(InvocableSymbol containingSymbol, bool isMutableBinding, DataType dataType)
-            : base(containingSymbol, null, isMutableBinding, dataType)
+        public SelfParameterSymbol(InvocableSymbol containingSymbol, DataType dataType)
+            : base(containingSymbol, null, false, dataType)
         {
+            if (containingSymbol is FunctionSymbol)
+                throw new ArgumentException("Function can't have self parameter", nameof(containingSymbol));
+
             ContainingSymbol = containingSymbol;
         }
 
@@ -31,8 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
 
         public override string ToILString()
         {
-            var mutable = IsMutableBinding ? "mut " : "";
-            return $"{ContainingSymbol} {{{mutable}{Name}: {DataType}}}";
+            return $"{ContainingSymbol} {{self: {DataType}}}";
         }
     }
 }

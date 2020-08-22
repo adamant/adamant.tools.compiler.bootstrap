@@ -36,8 +36,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
 
         public override string ToILString()
         {
-            var mutable = IsMutableBinding ? "mut " : "";
-            return $"{ContainingSymbol}::{mutable}{Name}: {DataType}";
+            var mutable = IsMutableBinding ? "var" : "let";
+            return $"{ContainingSymbol}::{mutable} {Name}: {DataType}";
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 {
     public static class ReachabilityGraphGraphvizExtensions
     {
-        private const string Grey = "grey45";
+        private const string Grey = "grey55";
         private const string Black = "black";
 
         /// <summary>

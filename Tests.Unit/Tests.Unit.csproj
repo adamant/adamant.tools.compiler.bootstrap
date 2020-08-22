@@ -42,6 +42,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
+    <ProjectReference Include="..\Names\Names.csproj" />
+    <ProjectReference Include="..\Symbols\Symbols.csproj" />
     <ProjectReference Include="..\Tests.Asserts\Tests.Asserts.csproj" />
   </ItemGroup>
 

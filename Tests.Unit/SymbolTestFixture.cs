@@ -5,7 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
+namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit
 {
     public abstract class SymbolTestFixture
     {
@@ -96,10 +96,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
                 @params ?? mother.ParameterDataTypes,
                 @return ?? mother.ReturnDataType);
         }
-        protected ObjectType DataType(string? name = null)
+
+        protected ObjectType DataType(
+            string? name = null,
+            NamespaceName? containingNamespace = null,
+            bool? declaredMutable = null,
+            ReferenceCapability? referenceCapability = null)
         {
             var finalName = Name(name) ?? DefaultName("DataType");
-            return new ObjectType(NamespaceName.Global, finalName.Text, false, ReferenceCapability.Isolated);
+            return new ObjectType(
+                containingNamespace ?? NamespaceName.Global,
+                finalName.Text,
+                declaredMutable ?? false,
+                referenceCapability ?? ReferenceCapability.Isolated);
         }
 
         protected ObjectTypeSymbol Type(
@@ -140,6 +149,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
                 declaration ?? mother.DeclarationNumber,
                 mut ?? mother.IsMutableBinding,
                 type ?? mother.DataType);
+        }
+
+        protected SelfParameterSymbol SelfParam(
+            InvocableSymbol? containing = null,
+            DataType? type = null)
+        {
+            return new SelfParameterSymbol(
+                containing ?? Method(),
+                type ?? DataType());
         }
     }
 }

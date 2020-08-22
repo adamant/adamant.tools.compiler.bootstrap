@@ -36,6 +36,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Semantics.Reachability.Graph\Semantics.Reachability.Graph.csproj" />
     <ProjectReference Include="..\Tests.Asserts\Tests.Asserts.csproj" />
+    <ProjectReference Include="..\Tests.Unit\Tests.Unit.csproj" />
   </ItemGroup>
 
 </Project>

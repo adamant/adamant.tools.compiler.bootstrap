@@ -243,7 +243,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
             ISelfParameterSyntax param,
             DataType type)
         {
-            var symbol = new SelfParameterSymbol(containingSymbol, param.IsMutableBinding, type);
+            var symbol = new SelfParameterSymbol(containingSymbol, type);
             param.Symbol.Fulfill(symbol);
             symbolTree.Add(symbol);
         }

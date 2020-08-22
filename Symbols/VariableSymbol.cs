@@ -43,9 +43,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
 
         public override string ToILString()
         {
-            var mutable = IsMutableBinding ? "mut " : "";
+            var mutable = IsMutableBinding ? "var" : "let";
             var declarationNumber = DeclarationNumber is null ? "" : "#" + DeclarationNumber;
-            return $"{ContainingSymbol} {{{mutable}{Name}{declarationNumber}: {DataType}}}";
+            return $"{ContainingSymbol} {{{mutable} {Name}{declarationNumber}: {DataType}}}";
         }
     }
 }

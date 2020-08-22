@@ -58,7 +58,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         public override string ToString()
         {
-            return $"{Symbol.Name}: {Symbol.DataType}";
+            var mut = Symbol.IsMutableBinding ? "var " : "";
+            var name = Symbol is SelfParameterSymbol ? "self" : Symbol.Name?.ToString();
+            return $"{mut}{name}: {Symbol.DataType}";
         }
     }
 }

@@ -67,7 +67,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
             var constructedType = Symbol.Result.DeclaresDataType;
             var constructorSymbol = new ConstructorSymbol(Symbol.Result, null, FixedList<DataType>.Empty);
-            var selfParameterSymbol = new SelfParameterSymbol(constructorSymbol, false, constructedType);
+            var selfParameterSymbol = new SelfParameterSymbol(constructorSymbol, constructedType);
 
             symbolTree.Add(constructorSymbol);
             symbolTree.Add(selfParameterSymbol);

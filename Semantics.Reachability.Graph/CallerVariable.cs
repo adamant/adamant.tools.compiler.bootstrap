@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     {
         public BindingSymbol Symbol { get; }
 
-        private CallerVariable(ReachabilityGraph graph, BindingSymbol symbol)
+        internal CallerVariable(ReachabilityGraph graph, BindingSymbol symbol)
             : base(graph)
         {
             _ = symbol.DataType.UnderlyingReferenceType()
@@ -32,7 +32,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         public override string ToString()
         {
-            return $"⟦{Symbol.Name}⟧: {Symbol.DataType}";
+            var name = Symbol is SelfParameterSymbol ? "self" : Symbol.Name?.ToString();
+            return $"⟦{name}⟧: {Symbol.DataType}";
         }
     }
 }
