@@ -27,6 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         internal void Assign(TempValue temp)
         {
+            ReleaseReferences();
             AddReferences(temp.StealReferences());
         }
 

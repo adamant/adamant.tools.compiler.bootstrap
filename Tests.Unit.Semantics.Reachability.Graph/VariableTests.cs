@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using Moq;
@@ -32,23 +33,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Reachability.Gra
             Assert.Equal("var foo: iso MyType", actual);
         }
 
-        //[Fact]
-        //public void Assign_replaces_references()
-        //{
-        //    var mockGraph = new Mock<IReferenceGraph>();
-        //    var sym = Variable("foo", mut: true, type: DataType("MyType"));
-        //    var v = new Variable(mockGraph.Object, sym);
-        //    var mockReference = new Mock<IReference>();
+        [Fact]
+        public void Assign_replaces_references()
+        {
+            var graph = new ReferenceGraph();
+            var v = graph.AddVariable(Variable("foo"));
+            var mockSyntax = new Mock<IAbstractSyntax>();
+            var ref1 = graph.AddNewObject(Ownership.Owns, Access.Mutable, mockSyntax.Object, false, false);
+            v.AddReference(ref1);
+            var mockExpression = new Mock<IExpression>();
+            var ref2 = graph.AddNewObject(Ownership.Owns, Access.Mutable, mockExpression.Object, false, false);
+            var temp = graph.AddTempValue(mockExpression.Object, DataType());
+            temp.AddReference(ref2);
 
-        //    v.AddReference(mockReference.Object);
+            v.Assign(temp);
 
-        //    var mockExp2 = new Mock<IExpression>();
-        //    var newTemp = new TempValue(mockGraph.Object, mockExp2.Object, null!);
-        //    var newReferences = newTemp.References;
-
-        //    v.Assign(newTemp);
-
-        //    Assert.Equal(newReferences, v.References);
-        //}
+            Assert.Equal(new[] { ref2 }, v.References);
+        }
     }
 }
