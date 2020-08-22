@@ -15,8 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             ReferenceType = referenceType;
         }
 
-        // TODO encapsulate this in the graph class
-        public static TempValue? ForNewContextObject(ReachabilityGraph graph, IExpression expression)
+        internal static TempValue? ForNewContextObject(ReachabilityGraph graph, IExpression expression)
         {
             var referenceType = expression.DataType.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
@@ -38,7 +37,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return temp;
         }
 
-        // TODO encapsulate this in the graph class
         internal static TempValue? ForNewInvocationReturnedObject(ReachabilityGraph graph, IInvocationExpression expression)
         {
             var referenceType = expression.DataType.Known().UnderlyingReferenceType();
@@ -63,8 +61,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return temp;
         }
 
-        // TODO encapsulate this in the graph class
-        public static TempValue? For(ReachabilityGraph graph, IExpression expression, DataType? type = null)
+        internal static TempValue? For(ReachabilityGraph graph, IExpression expression, DataType? type = null)
         {
             type ??= expression.DataType.Known();
             var referenceType = type.UnderlyingReferenceType();

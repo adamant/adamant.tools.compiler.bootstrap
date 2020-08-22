@@ -40,8 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             Borrowers = borrowers.AsReadOnly();
         }
 
-        // TODO encapsulate these in the graph class
-        public static Reference ToNewParameterObject(ReachabilityGraph graph, IBindingParameter parameter)
+        internal static Reference ToNewParameterObject(ReachabilityGraph graph, IBindingParameter parameter)
         {
             var referenceType = parameter.Symbol.DataType.Known().UnderlyingReferenceType()
                                 ?? throw new ArgumentException("Must be a parameter with a reference type", nameof(parameter));
@@ -55,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return reference;
         }
 
-        public static Reference ToNewParameterContextObject(ReachabilityGraph graph, IBindingParameter parameter)
+        internal static Reference ToNewParameterContextObject(ReachabilityGraph graph, IBindingParameter parameter)
         {
             var referenceType = parameter.Symbol.DataType.Known().UnderlyingReferenceType()
                 ?? throw new ArgumentException("Must be a parameter with a reference type",
@@ -70,7 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return reference;
         }
 
-        public static Reference ToNewContextObject(ReachabilityGraph graph, IExpression expression)
+        internal static Reference ToNewContextObject(ReachabilityGraph graph, IExpression expression)
         {
             var referenceType = expression.DataType.Known().UnderlyingReferenceType()
                                 ?? throw new ArgumentException("Must be a parameter with a reference type",
@@ -85,12 +84,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return reference;
         }
 
-        public static Reference ToNewObject(ReachabilityGraph graph, INewObjectExpression expression)
+        internal static Reference ToNewObject(ReachabilityGraph graph, INewObjectExpression expression)
         {
             return ToExpressionObject(graph, expression);
         }
 
-        public static Reference ToNewInvocationReturnedObject(ReachabilityGraph graph, IInvocationExpression expression)
+        internal static Reference ToNewInvocationReturnedObject(ReachabilityGraph graph, IInvocationExpression expression)
         {
             return ToExpressionObject(graph, expression);
         }

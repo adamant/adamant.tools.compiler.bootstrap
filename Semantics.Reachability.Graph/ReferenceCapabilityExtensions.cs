@@ -1,14 +1,14 @@
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
-using static Adamant.Tools.Compiler.Bootstrap.Types.ReferenceCapability;
 using static Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph.Access;
 using static Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph.Ownership;
+using static Adamant.Tools.Compiler.Bootstrap.Types.ReferenceCapability;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 {
     internal static class ReferenceCapabilityExtensions
     {
-        public static Access ToAccess(this ReferenceCapability capability)
+        internal static Access ToAccess(this ReferenceCapability capability)
         {
             switch (capability)
             {
@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             }
         }
 
-        public static Ownership ToOwnership(this ReferenceCapability capability)
+        internal static Ownership ToOwnership(this ReferenceCapability capability)
         {
             switch (capability)
             {

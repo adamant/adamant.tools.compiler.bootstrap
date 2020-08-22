@@ -131,12 +131,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return variable;
         }
 
-        public Variable? AddVariable(BindingSymbol bindingSymbol)
+        public Variable? AddVariable(IVariableDeclarationStatement variableDeclaration)
         {
-            var referenceType = bindingSymbol.DataType.Known().UnderlyingReferenceType();
+            var referenceType = variableDeclaration.Symbol.DataType.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
 
-            var variable = Variable.Declared(this, bindingSymbol);
+            var variable = Variable.Declared(this, variableDeclaration);
             Add(variable);
             return variable;
         }
@@ -144,6 +144,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         public TempValue? AddObject(INewObjectExpression exp)
         {
             var temp = TempValue.ForNewObject(this, exp);
+            Add(temp);
+            return temp;
+        }
+
+        public TempValue? AddLiteral(IStringLiteralExpression exp)
+        {
+            var temp = TempValue.ForNewContextObject(this, exp);
             Add(temp);
             return temp;
         }
@@ -165,6 +172,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         public TempValue? AddReturnValue(IExpression expression, DataType type)
         {
             var temp = TempValue.For(this, expression, type);
+            Add(temp);
+            return temp;
+        }
+
+        public TempValue? AddTempValue(IExpression expression)
+        {
+            var temp = TempValue.For(this, expression);
             Add(temp);
             return temp;
         }

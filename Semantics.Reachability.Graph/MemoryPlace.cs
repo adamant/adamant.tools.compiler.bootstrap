@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -15,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         /// <summary>
         /// The graph this node is in
         /// </summary>
-        public ReachabilityGraph Graph { get; }
+        internal ReachabilityGraph Graph { get; }
 
         private readonly List<Reference> references = new List<Reference>();
         public IReadOnlyList<Reference> References { get; }
@@ -37,15 +38,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return stolenReferences;
         }
 
-        // TODO verify that the place is part of the correct graph
         public void MoveFrom(StackPlace place)
         {
+            if (place.Graph != Graph)
+                throw new ArgumentException("Must be part of the same graph", nameof(place));
+
             references.AddRange(place.StealReferences());
             Graph.Dirty();
         }
 
         public void BorrowFrom(StackPlace place)
         {
+            if (place.Graph != Graph)
+                throw new ArgumentException("Must be part of the same graph", nameof(place));
+
             foreach (var reference in place.References)
                 references.Add(reference.Borrow());
             Graph.Dirty();
@@ -53,18 +59,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         public void ShareFrom(StackPlace place)
         {
+            if (place.Graph != Graph)
+                throw new ArgumentException("Must be part of the same graph", nameof(place));
+
             references.AddRange(place.References.Select(r => r.Share()).DistinctBy(r => r.Referent));
             Graph.Dirty();
         }
 
         public void IdentityFrom(StackPlace place)
         {
+            if (place.Graph != Graph)
+                throw new ArgumentException("Must be part of the same graph", nameof(place));
+
             references.AddRange(place.References.Select(r => r.Identify()).DistinctBy(r => r.Referent));
             Graph.Dirty();
         }
 
         public void AssignFrom(StackPlace place, ReferenceCapability referenceCapability)
         {
+            if (place.Graph != Graph)
+                throw new ArgumentException("Must be part of the same graph", nameof(place));
+
             switch (referenceCapability)
             {
                 default:

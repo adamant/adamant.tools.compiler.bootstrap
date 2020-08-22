@@ -38,12 +38,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return variable;
         }
 
-        internal static Variable? Declared(ReachabilityGraph graph, BindingSymbol syntax)
+        internal static Variable? Declared(ReachabilityGraph graph, IVariableDeclarationStatement variable)
         {
-            var referenceType = syntax.DataType.Known().UnderlyingReferenceType();
+            var referenceType = variable.Symbol.DataType.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
 
-            return new Variable(graph, syntax);
+            return new Variable(graph, variable.Symbol);
         }
 
         internal void Assign(TempValue temp)

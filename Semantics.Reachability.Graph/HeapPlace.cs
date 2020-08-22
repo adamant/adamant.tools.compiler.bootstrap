@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using ExhaustiveMatching;
@@ -38,6 +39,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         public void Capture(TempValue argument)
         {
+            if (argument.Graph != Graph)
+                throw new ArgumentException("Must be part of the same graph", nameof(argument));
+
             AddReferences(argument.StealReferences());
             Graph.Drop(argument);
         }

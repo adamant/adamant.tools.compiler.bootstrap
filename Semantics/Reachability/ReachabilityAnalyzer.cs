@@ -125,9 +125,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
 
                     // The referent should be a name or `self` so we don't need to evaluate it
                     var variable = graph.GetVariableFor(exp.ReferencedSymbol);
-                    var temp = TempValue.For(graph, exp);
+                    var temp = graph.AddTempValue(exp);
                     temp?.MoveFrom(variable);
-                    graph.Add(temp);
                     return temp;
                 }
                 case IBorrowExpression exp:
@@ -138,9 +137,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     var variable = graph.TryGetVariableFor(exp.ReferencedSymbol);
                     if (!(variable is null))
                     {
-                        var temp = TempValue.For(graph, exp);
+                        var temp = graph.AddTempValue(exp);
                         temp?.BorrowFrom(variable);
-                        graph.Add(temp);
                         return temp;
                     }
 
@@ -159,18 +157,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     var variable = graph.TryGetVariableFor(exp.ReferencedSymbol);
                     if (!(variable is null))
                     {
-                        var temp = TempValue.For(graph, exp);
+                        var temp = graph.AddTempValue(exp);
                         temp?.ShareFrom(variable);
-                        graph.Add(temp);
                         return temp;
                     }
                     else
                     {
                         // It must be a field or something
                         var source = Analyze(exp.Referent, graph, scope)!;
-                        var temp = TempValue.For(graph, exp);
+                        var temp = graph.AddTempValue(exp);
                         temp?.ShareFrom(source);
-                        graph.Add(temp);
                         // Drop the temp we share from, it is no longer used
                         graph.Drop(source);
                         return temp;
@@ -259,8 +255,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
 
                         // TODO make a deep copy of the graph so the existing graph is intact
                         // create a new temp with the correct reference capabilities to the value
-                        var returnValue = graph.AddReturnValue(exp, invocable.Symbol.ReturnDataType
-                                                                             .Known())!;
+                        var returnValue = graph.AddReturnValue(exp, invocable.Symbol.ReturnDataType.Known())!;
                         returnValue.AssignFrom(temp, returnValue.ReferenceType.ReferenceCapability);
                         // Exit the function, releasing all temps and variables except the returned value
                         graph.ExitFunction(returnValue);
@@ -286,8 +281,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     if (referenceType is null) return null;
 
                     // Create an untethered context object that doesn't need released
-                    var temp = TempValue.ForNewContextObject(graph, exp);
-                    graph.Add(temp);
+                    var temp = graph.AddLiteral(exp);
                     return temp;
                 }
                 case IImplicitNumericConversionExpression exp:
@@ -586,7 +580,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             ReachabilityGraph graph,
             VariableScope scope)
         {
-            var variable = graph.AddVariable(variableSyntax.Symbol);
+            var variable = graph.AddVariable(variableSyntax);
             if (!(variable is null))
                 scope.VariableDeclared(variable.Symbol);
             return variable;

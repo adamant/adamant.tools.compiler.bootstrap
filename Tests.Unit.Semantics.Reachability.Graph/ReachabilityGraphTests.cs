@@ -79,9 +79,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Reachability.Gra
             var fakeReferenceType = new ObjectType(NamespaceName.Global, "Fake", false, ReferenceCapability.Shared);
             mockExpression.Setup(e => e.DataType).Returns(fakeReferenceType);
             var temp = graph.AddObject(mockExpression.Object);
+            var mockVariable = new Mock<IVariableDeclarationStatement>();
             var funcSymbol = new FunctionSymbol(new PackageSymbol("my.package"), "func", FixedList<DataType>.Empty, DataType.Void);
             var fakeVariableSymbol = new VariableSymbol(funcSymbol, "var_name", null, false, fakeReferenceType);
-            var variable = graph.AddVariable(fakeVariableSymbol);
+            mockVariable.Setup(v => v.Symbol).Returns(fakeVariableSymbol);
+            var variable = graph.AddVariable(mockVariable.Object);
 
             graph.Assign(variable, temp);
 

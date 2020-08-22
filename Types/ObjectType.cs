@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         /// </summary>
         public ObjectType ToMutable()
         {
-            Requires.That("DeclaredMutable", DeclaredMutable, "must be declared as a mutable type to use mutably");
+            Requires.That(nameof(DeclaredMutable), DeclaredMutable, "must be declared as a mutable type to use mutably");
             return new ObjectType(ContainingNamespace, Name, DeclaredMutable, ReferenceCapability.ToMutable());
         }
 
