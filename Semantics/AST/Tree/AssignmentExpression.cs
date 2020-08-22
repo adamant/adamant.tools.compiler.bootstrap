@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Operators;
@@ -8,9 +9,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
 {
     internal class AssignmentExpression : Expression, IAssignmentExpression
     {
-        public IAssignableExpression LeftOperand { get; }
-        public AssignmentOperator Operator { get; }
-        public IExpression RightOperand { get; }
+        public IAssignableExpression LeftOperand { [DebuggerStepThrough] get; }
+        public AssignmentOperator Operator { [DebuggerStepThrough] get; }
+        public IExpression RightOperand { [DebuggerStepThrough] get; }
 
         public AssignmentExpression(
             TextSpan span,
