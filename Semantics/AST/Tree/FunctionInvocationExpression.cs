@@ -10,6 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
     internal class FunctionInvocationExpression : Expression, IFunctionInvocationExpression
     {
         public FunctionSymbol ReferencedSymbol { get; }
+        InvocableSymbol IInvocationExpression.ReferencedSymbol => ReferencedSymbol;
         public FixedList<IExpression> Arguments { get; }
 
         public FunctionInvocationExpression(

@@ -108,7 +108,7 @@ ImplicitNumericConversionExpression: ImplicitConversionExpression = Expression C
 ImplicitOptionalConversionExpression: ImplicitConversionExpression = Expression ConvertToType:'OptionalType';
 
 // ---------- Invocation Expressions
-InvocationExpression: Expression = Arguments:Expression*;
+InvocationExpression: Expression = ReferencedSymbol:'InvocableSymbol' Arguments:Expression*;
 FunctionInvocationExpression: InvocationExpression = ReferencedSymbol:'FunctionSymbol' Arguments:Expression*;
 MethodInvocationExpression: InvocationExpression = Context:Expression ReferencedSymbol:'MethodSymbol' Arguments:Expression*;
 

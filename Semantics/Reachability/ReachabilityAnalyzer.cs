@@ -6,6 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
@@ -196,49 +197,41 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
 
                     // Field access behaves like calling a get method
                     // Note: right now only objects (not values) have fields
-                    var context = Analyze(exp.Context, graph, scope)!;
-                    UseArgument(context, exp.Context.Span);
+                    var arguments = AnalyzeArgument(exp.Context, graph, scope, exp.ReferencedSymbol.ContainingSymbol.DeclaresDataType)
+                                    .Yield().ToFixedList();
+                    UseArguments(arguments);
                     if (isReferenceType)
                     {
                         var temp = graph.AddFieldAccess(exp)!;
-                        CaptureArguments(context.YieldValue(), temp);
+                        CaptureArguments(arguments, temp);
                         return temp;
                     }
 
                     // Temp dropped because it wasn't captured
-                    graph.Drop(context);
+                    graph.Drop(arguments.Select(a => a.Value));
                     return null;
                 }
                 case IFunctionInvocationExpression exp:
                 {
-                    var arguments = exp.Arguments
-                                       .Select(e => Analyze(e, graph, scope))
-                                       .ToFixedList();
-                    var function = exp.ReferencedSymbol;
-                    var parameterDataTypes = function.ParameterDataTypes;
-                    UseArguments(arguments, exp.Arguments, parameterDataTypes);
+                    var arguments = AnalyzeArguments(exp.ReferencedSymbol, exp.Arguments, graph, scope).ToFixedList();
+                    UseArguments(arguments);
                     if (!(referenceType is null))
                         return CaptureArguments(exp, arguments, graph);
 
                     // All the arguments are dropped because they aren't captured
-                    graph.Drop(arguments);
+                    graph.Drop(arguments.Select(a => a.Value));
                     return null;
                 }
                 case IMethodInvocationExpression exp:
                 {
-                    var selfArgument = Analyze(exp.Context, graph, scope);
-                    var arguments = exp.Arguments.Select(e => Analyze(e, graph, scope)).ToFixedList();
-                    var method = exp.ReferencedSymbol;
-                    var parameterDataTypes = method.ParameterDataTypes;
-                    if (!(selfArgument is null))
-                        UseArgument(selfArgument, exp.Context.Span);
-                    UseArguments(arguments, exp.Arguments, parameterDataTypes);
+                    var selfArgument = AnalyzeArgument(exp.Context, graph, scope, exp.ReferencedSymbol.SelfDataType);
+                    var arguments = AnalyzeArguments(exp.ReferencedSymbol, exp.Arguments, graph, scope).Prepend(selfArgument).ToFixedList();
+                    UseArguments(arguments);
                     if (!(referenceType is null))
-                        return CaptureArguments(exp, arguments.Prepend(selfArgument), graph);
+                        return CaptureArguments(exp, arguments, graph);
 
                     // All the arguments are dropped because they aren't captured
-                    graph.Drop(selfArgument);
-                    graph.Drop(arguments);
+                    graph.Drop(arguments.Select(a => a.Value));
                     return null;
                 }
                 case IUnsafeExpression exp:
@@ -266,11 +259,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 }
                 case INewObjectExpression exp:
                 {
-                    var arguments = exp.Arguments.Select(e => Analyze(e, graph, scope)).ToFixedList();
-
-                    var constructor = exp.ReferencedSymbol;
-                    var parameterDataTypes = constructor.ParameterDataTypes;
-                    UseArguments(arguments, exp.Arguments, parameterDataTypes);
+                    var arguments = AnalyzeArguments(exp.ReferencedSymbol, exp.Arguments, graph, scope).ToFixedList();
+                    UseArguments(arguments);
                     if (referenceType is null) return null;
                     var obj = graph.AddObject(exp)!;
                     CaptureArguments(arguments, obj);
@@ -335,25 +325,44 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             }
         }
 
-        private void UseArguments(
-            FixedList<TempValue?> arguments,
-            FixedList<IExpression> argumentSyntaxes,
-            IEnumerable<DataType> parameterDataTypes)
+        private IEnumerable<Argument> AnalyzeArguments(
+            InvocableSymbol symbol,
+            FixedList<IExpression> arguments,
+            ReachabilityGraph graph,
+            VariableScope scope)
         {
-            foreach (var ((argument, argumentSyntax), parameterDataType) in arguments.Zip(argumentSyntaxes).Zip(parameterDataTypes))
-            {
-                if (argument is null) continue;
-                if (!(parameterDataType is ReferenceType))
-                    // TODO this used to give the parameter name, would be nice to do so again
-                    throw new InvalidOperationException($"Expected parameter of type {parameterDataType} to be a reference type");
+            foreach (var (arg, dataType) in arguments.Zip(symbol.ParameterDataTypes))
+                yield return AnalyzeArgument(arg, graph, scope, dataType);
+        }
 
-                UseArgument(argument, argumentSyntax.Span);
+        private Argument AnalyzeArgument(
+            IExpression exp,
+            ReachabilityGraph graph,
+            VariableScope scope,
+            DataType dataType)
+        {
+            return new Argument(exp, dataType, Analyze(exp, graph, scope));
+        }
+
+        private void UseArguments(IEnumerable<Argument> arguments)
+        {
+            foreach (var arg in arguments)
+            {
+                if (arg.Value is null) continue;
+                if (!(arg.ParameterDataType is ReferenceType))
+                    // TODO this used to give the parameter name, would be nice to do so again
+                    throw new InvalidOperationException($"Expected parameter of type {arg.ParameterDataType} to be a reference type");
+
+                UseArgument(arg);
             }
         }
 
-        private void UseArgument(TempValue argument, TextSpan span)
+        private void UseArgument(Argument arg)
         {
-            foreach (var reference in argument.References)
+            if (arg.Value is null) return;
+
+            var span = arg.Expression.Span;
+            foreach (var reference in arg.Value.References)
             {
                 // Check if we are safe to use this reference
                 switch (reference.DeclaredAccess)
@@ -397,7 +406,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
 
         private static TempValue CaptureArguments(
             IInvocationExpression exp,
-            IEnumerable<TempValue?> arguments,
+            FixedList<Argument> arguments,
             ReachabilityGraph graph)
         {
             var referenceType = exp.DataType.Known().UnderlyingReferenceType();
@@ -409,14 +418,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             return temp;
         }
 
-        private static void CaptureArguments(IEnumerable<TempValue?> arguments, TempValue temp)
+        private static void CaptureArguments(FixedList<Argument> arguments, TempValue temp)
         {
             var referent = temp!.PossibleReferents.Single();
             foreach (var argument in arguments)
-                if (!(argument is null))
+                if (!(argument.Value is null))
                 {
                     // TODO base this on reachability expressions instead of capturing every argument
-                    referent.Capture(argument);
+                    referent.Capture(argument.Value);
                 }
         }
 

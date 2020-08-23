@@ -466,18 +466,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(IMethodInvocationExpression))]
     public partial interface IInvocationExpression : IExpression
     {
+        InvocableSymbol ReferencedSymbol { get; }
         FixedList<IExpression> Arguments { get; }
     }
 
     public partial interface IFunctionInvocationExpression : IInvocationExpression
     {
-        FunctionSymbol ReferencedSymbol { get; }
+        new FunctionSymbol ReferencedSymbol { get; }
     }
 
     public partial interface IMethodInvocationExpression : IInvocationExpression
     {
         IExpression Context { get; }
-        MethodSymbol ReferencedSymbol { get; }
+        new MethodSymbol ReferencedSymbol { get; }
     }
 
     public partial interface INameExpression : IAssignableExpression

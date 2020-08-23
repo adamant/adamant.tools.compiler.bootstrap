@@ -11,6 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
     {
         public IExpression Context { get; }
         public MethodSymbol ReferencedSymbol { get; }
+        InvocableSymbol IInvocationExpression.ReferencedSymbol => ReferencedSymbol;
         public FixedList<IExpression> Arguments { get; }
 
         public MethodInvocationExpression(
