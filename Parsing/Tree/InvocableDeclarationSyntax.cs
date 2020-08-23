@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     {
         public IAccessModifierToken? AccessModifier { get; }
         public FixedList<IConstructorParameterSyntax> Parameters { get; }
-        public FixedList<IReachabilityAnnotationSyntax> ReachabilityAnnotations { get; }
+        public IReachabilityAnnotationsSyntax ReachabilityAnnotations { get; }
         public new IPromise<InvocableSymbol> Symbol { get; }
 
         protected InvocableDeclarationSyntax(
@@ -23,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             TextSpan nameSpan,
             Name? name,
             IEnumerable<IConstructorParameterSyntax> parameters,
-            FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
+            IReachabilityAnnotationsSyntax reachabilityAnnotations,
             IPromise<InvocableSymbol> symbol)
             : base(span, file, name, nameSpan, symbol)
         {

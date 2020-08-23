@@ -31,7 +31,7 @@ LocalBinding: Binding = Symbol:'IPromise<NamedBindingSymbol>';
 // ---------- Declarations
 Declaration: 'ISyntax', 'IHasContainingLexicalScope' = File:'CodeFile' Name:'Name'? NameSpan:'TextSpan' Symbol:'IPromise<Symbol>';
 EntityDeclaration: Declaration = AccessModifier:'IAccessModifierToken'?;
-InvocableDeclaration: EntityDeclaration = Parameters:ConstructorParameter* ReachabilityAnnotations:ReachabilityAnnotation* Symbol:'IPromise<InvocableSymbol>';
+InvocableDeclaration: EntityDeclaration = Parameters:ConstructorParameter* ReachabilityAnnotations Symbol:'IPromise<InvocableSymbol>';
 ConcreteInvocableDeclaration: InvocableDeclaration = Body;
 
 // ---------- Non-Member Declarations
@@ -42,17 +42,17 @@ NamespaceDeclaration: NonMemberDeclaration = IsGlobalQualified:'bool' DeclaredNa
 // ---------- Non-Member Entity Declarations
 NonMemberEntityDeclaration: EntityDeclaration, NonMemberDeclaration = Name:'Name';
 ClassDeclaration: NonMemberEntityDeclaration = MutableModifier:'IMutableKeywordToken'? Name:'Name' Symbol:'AcyclicPromise<ObjectTypeSymbol>' Members:MemberDeclaration* DefaultConstructorSymbol:'ConstructorSymbol'?;
-FunctionDeclaration: NonMemberEntityDeclaration, ConcreteInvocableDeclaration = Name:'Name' Parameters:NamedParameter* ReturnType:Type? ReachabilityAnnotations:ReachabilityAnnotation* Body Symbol:'AcyclicPromise<FunctionSymbol>';
+FunctionDeclaration: NonMemberEntityDeclaration, ConcreteInvocableDeclaration = Name:'Name' Parameters:NamedParameter* ReturnType:Type? ReachabilityAnnotations Body Symbol:'AcyclicPromise<FunctionSymbol>';
 
 // ---------- Member Declarations
 // Note: by declaring the DeclaringClass property type with quotes, it avoids the system assuming it must represent a child syntax node
 MemberDeclaration: EntityDeclaration = DeclaringClass:'IClassDeclarationSyntax';
 MethodDeclaration: MemberDeclaration, InvocableDeclaration = Name:'Name' SelfParameter Parameters:NamedParameter* ReturnType:Type? Symbol:'AcyclicPromise<MethodSymbol>';
-AbstractMethodDeclaration: MethodDeclaration = SelfParameter Parameters:NamedParameter* ReturnType:Type? ReachabilityAnnotations:ReachabilityAnnotation*;
-ConcreteMethodDeclaration: MethodDeclaration, ConcreteInvocableDeclaration = SelfParameter Parameters:NamedParameter* ReturnType:Type? ReachabilityAnnotations:ReachabilityAnnotation* Body;
-ConstructorDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = ImplicitSelfParameter:SelfParameter Parameters:ConstructorParameter* ReachabilityAnnotations:ReachabilityAnnotation* Body Symbol:'AcyclicPromise<ConstructorSymbol>';
+AbstractMethodDeclaration: MethodDeclaration = SelfParameter Parameters:NamedParameter* ReturnType:Type? ReachabilityAnnotations;
+ConcreteMethodDeclaration: MethodDeclaration, ConcreteInvocableDeclaration = SelfParameter Parameters:NamedParameter* ReturnType:Type? ReachabilityAnnotations Body;
+ConstructorDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = ImplicitSelfParameter:SelfParameter Parameters:ConstructorParameter* ReachabilityAnnotations Body Symbol:'AcyclicPromise<ConstructorSymbol>';
 FieldDeclaration: MemberDeclaration, Binding = Name:'Name' Type Symbol:'AcyclicPromise<FieldSymbol>' &Initializer:Expression?;
-AssociatedFunctionDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = Name:'Name' Parameters:NamedParameter* ReturnType:Type? ReachabilityAnnotations:ReachabilityAnnotation* Body Symbol:'AcyclicPromise<FunctionSymbol>';
+AssociatedFunctionDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = Name:'Name' Parameters:NamedParameter* ReturnType:Type? ReachabilityAnnotations Body Symbol:'AcyclicPromise<FunctionSymbol>';
 
 // ---------- Parameters --------------
 Parameter = Name:'Name'? DataType:'IPromise<DataType>' Unused:'bool';
@@ -65,6 +65,7 @@ SelfParameter: Parameter, BindingParameter = MutableSelf:'bool' Symbol:'Promise<
 FieldParameter: Parameter, ConstructorParameter = ReferencedSymbol:'Promise<FieldSymbol?>' DefaultValue:Expression?;
 
 // ---------- Annotations
+ReachabilityAnnotations = ReachableFromAnnotation? CanReachAnnotation?
 ReachabilityAnnotation;
 ReachableFromAnnotation: ReachabilityAnnotation = ReachableFrom:NameOrSelfExpression*;
 CanReachAnnotation: ReachabilityAnnotation = CanReach:NameOrSelfExpression*;

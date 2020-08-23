@@ -42,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name name,
             FixedList<INamedParameterSyntax> parameters,
             ITypeSyntax? returnType,
-            FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
+            IReachabilityAnnotationsSyntax reachabilityAnnotations,
             IBodySyntax body)
             : base(span, file, accessModifier, nameSpan, name, parameters,
                 reachabilityAnnotations, new AcyclicPromise<FunctionSymbol>())

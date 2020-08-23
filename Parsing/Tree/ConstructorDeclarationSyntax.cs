@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name? name,
             ISelfParameterSyntax implicitSelfParameter,
             FixedList<IConstructorParameterSyntax> parameters,
-            FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
+            IReachabilityAnnotationsSyntax reachabilityAnnotations,
             IBodySyntax body)
             : base(span, file, accessModifier, nameSpan, name, parameters, reachabilityAnnotations,
                 new AcyclicPromise<ConstructorSymbol>())

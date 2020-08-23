@@ -20,6 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(IBindingSyntax),
         typeof(IDeclarationSyntax),
         typeof(IParameterSyntax),
+        typeof(IReachabilityAnnotationsSyntax),
         typeof(IReachabilityAnnotationSyntax),
         typeof(IArgumentSyntax),
         typeof(ITypeSyntax),
@@ -111,7 +112,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IInvocableDeclarationSyntax : IEntityDeclarationSyntax
     {
         FixedList<IConstructorParameterSyntax> Parameters { get; }
-        FixedList<IReachabilityAnnotationSyntax> ReachabilityAnnotations { get; }
+        IReachabilityAnnotationsSyntax ReachabilityAnnotations { get; }
         new IPromise<InvocableSymbol> Symbol { get; }
     }
 
@@ -197,7 +198,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IConcreteMethodDeclarationSyntax : IMethodDeclarationSyntax, IConcreteInvocableDeclarationSyntax
     {
         new FixedList<INamedParameterSyntax> Parameters { get; }
-        new FixedList<IReachabilityAnnotationSyntax> ReachabilityAnnotations { get; }
+        new IReachabilityAnnotationsSyntax ReachabilityAnnotations { get; }
     }
 
     public partial interface IConstructorDeclarationSyntax : IMemberDeclarationSyntax, IConcreteInvocableDeclarationSyntax
@@ -268,6 +269,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     {
         Promise<FieldSymbol?> ReferencedSymbol { get; }
         IExpressionSyntax? DefaultValue { get; }
+    }
+
+    public partial interface IReachabilityAnnotationsSyntax : ISyntax
+    {
+        IReachableFromAnnotationSyntax? ReachableFromAnnotation { get; }
+        ICanReachAnnotationSyntax? CanReachAnnotation { get; }
     }
 
     [Closed(

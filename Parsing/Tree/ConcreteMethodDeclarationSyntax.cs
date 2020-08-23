@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             ISelfParameterSyntax selfParameter,
             FixedList<INamedParameterSyntax> parameters,
             ITypeSyntax? returnType,
-            FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
+            IReachabilityAnnotationsSyntax reachabilityAnnotations,
             IBodySyntax body)
             : base(declaringClass, span, file, accessModifier, nameSpan, name, selfParameter,
                 parameters, returnType, reachabilityAnnotations)

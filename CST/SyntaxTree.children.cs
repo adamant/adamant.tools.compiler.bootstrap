@@ -38,8 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                         yield return child;
                     if(!(n.ReturnType is null))
                         yield return n.ReturnType;
-                    foreach(var child in n.ReachabilityAnnotations)
-                        yield return child;
+                    yield return n.ReachabilityAnnotations;
                     yield return n.Body;
                     yield break;
                 case IAbstractMethodDeclarationSyntax n:
@@ -48,8 +47,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                         yield return child;
                     if(!(n.ReturnType is null))
                         yield return n.ReturnType;
-                    foreach(var child in n.ReachabilityAnnotations)
-                        yield return child;
+                    yield return n.ReachabilityAnnotations;
                     yield break;
                 case IConcreteMethodDeclarationSyntax n:
                     yield return n.SelfParameter;
@@ -57,16 +55,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                         yield return child;
                     if(!(n.ReturnType is null))
                         yield return n.ReturnType;
-                    foreach(var child in n.ReachabilityAnnotations)
-                        yield return child;
+                    yield return n.ReachabilityAnnotations;
                     yield return n.Body;
                     yield break;
                 case IConstructorDeclarationSyntax n:
                     yield return n.ImplicitSelfParameter;
                     foreach(var child in n.Parameters)
                         yield return child;
-                    foreach(var child in n.ReachabilityAnnotations)
-                        yield return child;
+                    yield return n.ReachabilityAnnotations;
                     yield return n.Body;
                     yield break;
                 case IFieldDeclarationSyntax n:
@@ -79,8 +75,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                         yield return child;
                     if(!(n.ReturnType is null))
                         yield return n.ReturnType;
-                    foreach(var child in n.ReachabilityAnnotations)
-                        yield return child;
+                    yield return n.ReachabilityAnnotations;
                     yield return n.Body;
                     yield break;
                 case INamedParameterSyntax n:
@@ -93,6 +88,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                 case IFieldParameterSyntax n:
                     if(!(n.DefaultValue is null))
                         yield return n.DefaultValue;
+                    yield break;
+                case IReachabilityAnnotationsSyntax n:
+                    if(!(n.ReachableFromAnnotation is null))
+                        yield return n.ReachableFromAnnotation;
+                    if(!(n.CanReachAnnotation is null))
+                        yield return n.CanReachAnnotation;
                     yield break;
                 case IReachableFromAnnotationSyntax n:
                     foreach(var child in n.ReachableFrom)

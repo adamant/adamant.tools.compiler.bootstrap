@@ -158,12 +158,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new BodySyntax(span, statements.OfType<IBodyStatementSyntax>().ToFixedList());
         }
 
-        private (ITypeSyntax?, FixedList<IReachabilityAnnotationSyntax>) ParseReturn()
+        private (ITypeSyntax?, IReachabilityAnnotationsSyntax) ParseReturn()
         {
             if (Tokens.Accept<IRightArrowToken>())
                 return (ParseType(), ParseReachabilityAnnotations());
 
-            return (null, FixedList<IReachabilityAnnotationSyntax>.Empty);
+            return (null, new ReachabilityAnnotationsSyntax(Tokens.Current.Span.AtStart(), null, null));
         }
         #endregion
 
@@ -286,7 +286,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var parameters = bodyParser.ParseParameters(bodyParser.ParseConstructorParameter);
             var body = bodyParser.ParseFunctionBody();
             // For now, just say constructors have no annotations
-            var reachabilityAnnotations = FixedList<IReachabilityAnnotationSyntax>.Empty;
+            var reachabilityAnnotations = new ReachabilityAnnotationsSyntax(Tokens.Current.Span.AtStart(), null, null);
             var span = TextSpan.Covering(newKeywordSpan, body.Span);
             return new ConstructorDeclarationSyntax(declaringType, span, File, accessModifer,
                 TextSpan.Covering(newKeywordSpan, identifier?.Span), name, selfParameter, parameters, reachabilityAnnotations, body);

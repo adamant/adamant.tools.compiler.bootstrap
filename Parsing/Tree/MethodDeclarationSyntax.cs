@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             ISelfParameterSyntax selfParameter,
             FixedList<INamedParameterSyntax> parameters,
             ITypeSyntax? returnType,
-            FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations)
+            IReachabilityAnnotationsSyntax reachabilityAnnotations)
             : base(span, file, accessModifier, nameSpan, name,
                 parameters, reachabilityAnnotations, new AcyclicPromise<MethodSymbol>())
         {
