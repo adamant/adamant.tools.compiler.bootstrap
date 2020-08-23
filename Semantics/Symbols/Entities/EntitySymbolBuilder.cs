@@ -268,10 +268,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
                                 ?? Enumerable.Empty<IParameterNameSyntax>();
             var symbols = symbolTree.Children(invocable.Symbol.Result).OfType<BindingSymbol>().ToFixedSet();
             foreach (var syn in canReach.Concat(reachableFrom))
-                ResolveReachabilityAnnotation(syn, symbols);
+                ResolveReachabilityAnnotation(invocable.File, syn, symbols);
         }
 
-        private static void ResolveReachabilityAnnotation(
+        private void ResolveReachabilityAnnotation(
+            CodeFile file,
             IParameterNameSyntax syntax,
             FixedSet<BindingSymbol> symbols)
         {
@@ -283,14 +284,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
                 {
                     var referencedSymbol = symbols.OfType<VariableSymbol>().SingleOrDefault(s => s.Name == syn.Name);
                     syn.ReferencedSymbol.Fulfill(referencedSymbol);
-                    // TODO error for null
+                    if (referencedSymbol is null)
+                        diagnostics.Add(NameBindingError.CouldNotBindParameterName(file, syn.Span));
                 }
                 break;
                 case ISelfParameterNameSyntax syn:
                 {
                     var referencedSymbol = symbols.OfType<SelfParameterSymbol>().SingleOrDefault();
                     syn.ReferencedSymbol.Fulfill(referencedSymbol);
-                    // TODO error for null
+                    if (referencedSymbol is null)
+                        diagnostics.Add(NameBindingError.CouldNotBindParameterName(file, syn.Span));
                 }
                 break;
             }
