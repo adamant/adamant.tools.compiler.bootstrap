@@ -85,6 +85,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
             symbolTree.Add(symbol);
             BuildSelParameterSymbol(symbol, method.SelfParameter, selfParameterType);
             BuildParameterSymbols(symbol, method.Parameters, parameterTypes);
+            ResolveReachabilityAnnotations(method);
         }
 
         private void BuildConstructorSymbol(IConstructorDeclarationSyntax constructor)
@@ -99,6 +100,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
             symbolTree.Add(symbol);
             BuildSelParameterSymbol(symbol, constructor.ImplicitSelfParameter, selfParameterType);
             BuildParameterSymbols(symbol, constructor.Parameters, parameterTypes);
+            ResolveReachabilityAnnotations(constructor);
         }
 
         private void BuildAssociatedFunctionSymbol(IAssociatedFunctionDeclarationSyntax associatedFunction)
@@ -112,6 +114,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
             associatedFunction.Symbol.Fulfill(symbol);
             symbolTree.Add(symbol);
             BuildParameterSymbols(symbol, associatedFunction.Parameters, parameterTypes);
+            ResolveReachabilityAnnotations(associatedFunction);
         }
 
         private FieldSymbol BuildFieldSymbol(IFieldDeclarationSyntax field)
@@ -138,6 +141,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
             function.Symbol.Fulfill(symbol);
             symbolTree.Add(symbol);
             BuildParameterSymbols(symbol, function.Parameters, parameterTypes);
+            ResolveReachabilityAnnotations(function);
         }
 
         private void BuildClassSymbol(IClassDeclarationSyntax @class)
@@ -254,6 +258,40 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
             var returnType = returnTypeSyntax != null
                 ? resolver.Evaluate(returnTypeSyntax) : DataType.Void;
             return returnType;
+        }
+
+        private void ResolveReachabilityAnnotations(IInvocableDeclarationSyntax invocable)
+        {
+            var canReach = invocable.ReachabilityAnnotations.CanReachAnnotation?.CanReach
+                           ?? Enumerable.Empty<INameOrSelfExpressionSyntax>();
+            var reachableFrom = invocable.ReachabilityAnnotations.ReachableFromAnnotation?.ReachableFrom
+                                ?? Enumerable.Empty<INameOrSelfExpressionSyntax>();
+            var symbols = symbolTree.Children(invocable.Symbol.Result).OfType<BindingSymbol>().ToFixedSet();
+            foreach (var syn in canReach.Concat(reachableFrom))
+                ResolveReachabilityAnnotation(syn, symbols);
+        }
+
+        private static void ResolveReachabilityAnnotation(
+            INameOrSelfExpressionSyntax syntax,
+            FixedSet<BindingSymbol> symbols)
+        {
+            switch (syntax)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(syntax);
+                case INameExpressionSyntax syn:
+                {
+                    var referencedSymbol = symbols.OfType<NamedBindingSymbol>().SingleOrDefault(s => s.Name == syn.Name);
+                    syn.ReferencedSymbol.Fulfill(referencedSymbol);
+                }
+                break;
+                case ISelfExpressionSyntax syn:
+                {
+                    var referencedSymbol = symbols.OfType<SelfParameterSymbol>().SingleOrDefault();
+                    syn.ReferencedSymbol.Fulfill(referencedSymbol);
+                }
+                break;
+            }
         }
     }
 }
