@@ -26,22 +26,22 @@ LocalBinding: Binding = Symbol:'NamedBindingSymbol';
 Declaration = File:'CodeFile' Symbol:'Symbol' NameSpan:'TextSpan';
 /// A declaration that could contain executable code (i.e. invocable declaration or field declaration)
 ExecutableDeclaration: Declaration;
-InvocableDeclaration: Declaration = Symbol:'InvocableSymbol' Parameters:ConstructorParameter*;
+InvocableDeclaration: Declaration = Symbol:'InvocableSymbol' Parameters:ConstructorParameter* ReachabilityAnnotations;
 ConcreteInvocableDeclaration: InvocableDeclaration, ExecutableDeclaration = Body;
 
 // ---------- Non-Member Declarations
 NonMemberDeclaration: Declaration;
 ClassDeclaration: NonMemberDeclaration = Symbol:'ObjectTypeSymbol' Members:MemberDeclaration* DefaultConstructorSymbol:'ConstructorSymbol'?;
-FunctionDeclaration: NonMemberDeclaration, ConcreteInvocableDeclaration = Symbol:'FunctionSymbol' Parameters:NamedParameter* Body;
+FunctionDeclaration: NonMemberDeclaration, ConcreteInvocableDeclaration = Symbol:'FunctionSymbol' Parameters:NamedParameter* ReachabilityAnnotations Body;
 
 // ---------- Member Declarations
 MemberDeclaration: Declaration = DeclaringClass:'IClassDeclaration';
-MethodDeclaration: MemberDeclaration = Symbol:'MethodSymbol' SelfParameter Parameters:NamedParameter*;
-AbstractMethodDeclaration: MethodDeclaration = SelfParameter Parameters:NamedParameter*;
-ConcreteMethodDeclaration: MethodDeclaration, ConcreteInvocableDeclaration = Symbol:'MethodSymbol' SelfParameter Parameters:NamedParameter* Body;
-ConstructorDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = Symbol:'ConstructorSymbol' ImplicitSelfParameter:SelfParameter Parameters:ConstructorParameter* Body;
+MethodDeclaration: MemberDeclaration = Symbol:'MethodSymbol' SelfParameter Parameters:NamedParameter* ReachabilityAnnotations;
+AbstractMethodDeclaration: MethodDeclaration = SelfParameter Parameters:NamedParameter* ReachabilityAnnotations;
+ConcreteMethodDeclaration: MethodDeclaration, ConcreteInvocableDeclaration = Symbol:'MethodSymbol' SelfParameter Parameters:NamedParameter* ReachabilityAnnotations Body;
+ConstructorDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = Symbol:'ConstructorSymbol' ImplicitSelfParameter:SelfParameter Parameters:ConstructorParameter* ReachabilityAnnotations Body;
 FieldDeclaration: MemberDeclaration, ExecutableDeclaration, Binding = Symbol:'FieldSymbol';
-AssociatedFunctionDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = Symbol:'FunctionSymbol' Parameters:NamedParameter* Body;
+AssociatedFunctionDeclaration: MemberDeclaration, ConcreteInvocableDeclaration = Symbol:'FunctionSymbol' Parameters:NamedParameter* ReachabilityAnnotations Body;
 
 // ---------- Parameters --------------
 Parameter = Unused:'bool';
@@ -52,6 +52,15 @@ BindingParameter: Parameter, Binding;
 NamedParameter: Parameter, ConstructorParameter, BindingParameter, LocalBinding = Symbol:'VariableSymbol' DefaultValue:Expression?;
 SelfParameter: Parameter, BindingParameter = Symbol:'SelfParameterSymbol';
 FieldParameter: Parameter, ConstructorParameter = ReferencedSymbol:'FieldSymbol' DefaultValue:Expression?;
+
+// ---------- Annotations
+ReachabilityAnnotations = ReachableFromAnnotation? CanReachAnnotation?
+ReachabilityAnnotation = Parameters:ParameterName*;
+ReachableFromAnnotation: ReachabilityAnnotation = Parameters:ParameterName*;
+CanReachAnnotation: ReachabilityAnnotation = Parameters:ParameterName*;
+ParameterName = ReferencedSymbol:'BindingSymbol';
+NamedParameterName: ParameterName = ReferencedSymbol:'VariableSymbol';
+SelfParameterName: ParameterName = ReferencedSymbol:'SelfParameterSymbol';
 
 // ---------- Function Parts
 Body: BodyOrBlock = Statements:BodyStatement*;

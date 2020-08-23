@@ -22,6 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(IParameterSyntax),
         typeof(IReachabilityAnnotationsSyntax),
         typeof(IReachabilityAnnotationSyntax),
+        typeof(IParameterNameSyntax),
         typeof(IArgumentSyntax),
         typeof(ITypeSyntax),
         typeof(IStatementSyntax),
@@ -282,16 +283,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(ICanReachAnnotationSyntax))]
     public partial interface IReachabilityAnnotationSyntax : ISyntax
     {
+        FixedList<IParameterNameSyntax> Parameters { get; }
     }
 
     public partial interface IReachableFromAnnotationSyntax : IReachabilityAnnotationSyntax
     {
-        FixedList<INameOrSelfExpressionSyntax> ReachableFrom { get; }
     }
 
     public partial interface ICanReachAnnotationSyntax : IReachabilityAnnotationSyntax
     {
-        FixedList<INameOrSelfExpressionSyntax> CanReach { get; }
+    }
+
+    [Closed(
+        typeof(INamedParameterNameSyntax),
+        typeof(ISelfParameterNameSyntax))]
+    public partial interface IParameterNameSyntax : ISyntax
+    {
+        IPromise<BindingSymbol?> ReferencedSymbol { get; }
+    }
+
+    public partial interface INamedParameterNameSyntax : IParameterNameSyntax
+    {
+        Name? Name { get; }
+        new Promise<VariableSymbol?> ReferencedSymbol { get; }
+    }
+
+    public partial interface ISelfParameterNameSyntax : IParameterNameSyntax
+    {
+        new Promise<SelfParameterSymbol?> ReferencedSymbol { get; }
     }
 
     public partial interface IArgumentSyntax : ISyntax
@@ -382,7 +401,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(IReturnExpressionSyntax),
         typeof(IImplicitConversionExpressionSyntax),
         typeof(IInvocationExpressionSyntax),
-        typeof(INameOrSelfExpressionSyntax),
+        typeof(ISelfExpressionSyntax),
         typeof(IBorrowExpressionSyntax),
         typeof(IMoveExpressionSyntax),
         typeof(IShareExpressionSyntax))]
@@ -560,24 +579,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         new Promise<MethodSymbol?> ReferencedSymbol { get; }
     }
 
-    [Closed(
-        typeof(INameExpressionSyntax),
-        typeof(ISelfExpressionSyntax))]
-    public partial interface INameOrSelfExpressionSyntax : IExpressionSyntax
-    {
-        IPromise<BindingSymbol?> ReferencedSymbol { get; }
-    }
-
-    public partial interface INameExpressionSyntax : IAssignableExpressionSyntax, INameOrSelfExpressionSyntax, IHasContainingLexicalScope
+    public partial interface INameExpressionSyntax : IAssignableExpressionSyntax, IHasContainingLexicalScope
     {
         Name? Name { get; }
-        new Promise<NamedBindingSymbol?> ReferencedSymbol { get; }
+        Promise<NamedBindingSymbol?> ReferencedSymbol { get; }
     }
 
-    public partial interface ISelfExpressionSyntax : INameOrSelfExpressionSyntax
+    public partial interface ISelfExpressionSyntax : IExpressionSyntax
     {
         bool IsImplicit { get; }
-        new Promise<SelfParameterSymbol?> ReferencedSymbol { get; }
+        Promise<SelfParameterSymbol?> ReferencedSymbol { get; }
     }
 
     public partial interface IQualifiedNameExpressionSyntax : IAssignableExpressionSyntax

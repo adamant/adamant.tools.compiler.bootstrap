@@ -22,23 +22,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
                 case IFunctionDeclaration n:
                     foreach(var child in n.Parameters)
                         yield return child;
+                    yield return n.ReachabilityAnnotations;
                     yield return n.Body;
                     yield break;
                 case IAbstractMethodDeclaration n:
                     yield return n.SelfParameter;
                     foreach(var child in n.Parameters)
                         yield return child;
+                    yield return n.ReachabilityAnnotations;
                     yield break;
                 case IConcreteMethodDeclaration n:
                     yield return n.SelfParameter;
                     foreach(var child in n.Parameters)
                         yield return child;
+                    yield return n.ReachabilityAnnotations;
                     yield return n.Body;
                     yield break;
                 case IConstructorDeclaration n:
                     yield return n.ImplicitSelfParameter;
                     foreach(var child in n.Parameters)
                         yield return child;
+                    yield return n.ReachabilityAnnotations;
                     yield return n.Body;
                     yield break;
                 case IFieldDeclaration n:
@@ -46,6 +50,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
                 case IAssociatedFunctionDeclaration n:
                     foreach(var child in n.Parameters)
                         yield return child;
+                    yield return n.ReachabilityAnnotations;
                     yield return n.Body;
                     yield break;
                 case INamedParameter n:
@@ -57,6 +62,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
                 case IFieldParameter n:
                     if(!(n.DefaultValue is null))
                         yield return n.DefaultValue;
+                    yield break;
+                case IReachabilityAnnotations n:
+                    if(!(n.ReachableFromAnnotation is null))
+                        yield return n.ReachableFromAnnotation;
+                    if(!(n.CanReachAnnotation is null))
+                        yield return n.CanReachAnnotation;
+                    yield break;
+                case IReachableFromAnnotation n:
+                    foreach(var child in n.Parameters)
+                        yield return child;
+                    yield break;
+                case ICanReachAnnotation n:
+                    foreach(var child in n.Parameters)
+                        yield return child;
+                    yield break;
+                case INamedParameterName n:
+                    yield break;
+                case ISelfParameterName n:
                     yield break;
                 case IBody n:
                     foreach(var child in n.Statements)

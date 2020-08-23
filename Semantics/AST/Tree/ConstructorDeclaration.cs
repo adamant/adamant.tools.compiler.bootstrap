@@ -20,8 +20,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
             TextSpan nameSpan,
             ISelfParameter implicitSelfParameter,
             FixedList<IConstructorParameter> parameters,
+            IReachabilityAnnotations reachabilityAnnotations,
             IBody body)
-            : base(file, span, symbol, nameSpan, parameters)
+            : base(file, span, symbol, nameSpan, parameters, reachabilityAnnotations)
         {
             Symbol = symbol;
             ImplicitSelfParameter = implicitSelfParameter;

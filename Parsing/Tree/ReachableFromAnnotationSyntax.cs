@@ -6,17 +6,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class ReachableFromAnnotationSyntax : Syntax, IReachableFromAnnotationSyntax
     {
-        public FixedList<INameOrSelfExpressionSyntax> ReachableFrom { get; }
+        public FixedList<IParameterNameSyntax> Parameters { get; }
 
-        public ReachableFromAnnotationSyntax(TextSpan span, FixedList<INameOrSelfExpressionSyntax> reachableFrom)
+        public ReachableFromAnnotationSyntax(TextSpan span, FixedList<IParameterNameSyntax> parameters)
             : base(span)
         {
-            ReachableFrom = reachableFrom;
+            Parameters = parameters;
         }
 
         public override string ToString()
         {
-            return $"<~ {string.Join(", ", ReachableFrom)}";
+            return $"<~ {string.Join(", ", Parameters)}";
         }
     }
 }

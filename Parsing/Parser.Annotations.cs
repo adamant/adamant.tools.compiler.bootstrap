@@ -19,28 +19,41 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             if (!(Tokens.Current is ILeftWaveArrowToken)) return null;
             var leftArrow = Tokens.Required<ILeftWaveArrowToken>();
-            var names = ParseManySeparated<INameOrSelfExpressionSyntax, ICommaToken>(ParseNameOrSelfExpression);
-            var span = TextSpan.Covering(leftArrow, names[^1].Span);
-            return new ReachableFromAnnotationSyntax(span, names);
+            var parameters = ParseManySeparated<IParameterNameSyntax, ICommaToken>(ParseParameterName);
+            var span = TextSpan.Covering(leftArrow, parameters[^1].Span);
+            return new ReachableFromAnnotationSyntax(span, parameters);
         }
 
         private ICanReachAnnotationSyntax? AcceptCanReachAnnotation()
         {
             if (!(Tokens.Current is IRightWaveArrowToken)) return null;
             var rightArrow = Tokens.Required<IRightWaveArrowToken>();
-            var names = ParseManySeparated<INameOrSelfExpressionSyntax, ICommaToken>(ParseNameOrSelfExpression);
-            var span = TextSpan.Covering(rightArrow, names[^1].Span);
-            return new CanReachAnnotationSyntax(span, names);
+            var parameters = ParseManySeparated<IParameterNameSyntax, ICommaToken>(ParseParameterName);
+            var span = TextSpan.Covering(rightArrow, parameters[^1].Span);
+            return new CanReachAnnotationSyntax(span, parameters);
         }
 
-        private INameOrSelfExpressionSyntax ParseNameOrSelfExpression()
+        private IParameterNameSyntax ParseParameterName()
         {
-            return Tokens.Current switch
+
+            switch (Tokens.Current)
             {
-                ISelfKeywordToken _ => ParseSelfExpression(),
-                IIdentifierToken _ => ParseName().ToExpression(),
-                _ => ParseMissingIdentifier()
-            };
+                case ISelfKeywordToken _:
+                {
+                    var selfKeyword = Tokens.Required<ISelfKeywordToken>();
+                    return new SelfParameterNameSyntax(selfKeyword);
+                }
+                case IIdentifierToken _:
+                {
+                    var identifier = Tokens.RequiredToken<IIdentifierToken>();
+                    return new NamedParameterNameSyntax(identifier.Span, identifier.Value);
+                }
+                default:
+                {
+                    var identifierSpan = Tokens.Expect<IIdentifierToken>();
+                    return new NamedParameterNameSyntax(identifierSpan, null);
+                }
+            }
         }
     }
 }

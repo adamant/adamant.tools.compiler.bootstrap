@@ -5,6 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree;
+using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
@@ -69,8 +70,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
             var symbol = syn.Symbol.Result;
             var nameSpan = syn.NameSpan;
             var parameters = syn.Parameters.Select(BuildParameter).ToFixedList();
-            IBody body = BuildBody(syn.Body);
-            return new AssociatedFunctionDeclaration(syn.File, syn.Span, declaringClass, symbol, nameSpan, parameters, body);
+            var body = BuildBody(syn.Body);
+            var reachabilityAnnotations = BuildReachabilityAnnotations(syn.ReachabilityAnnotations);
+            return new AssociatedFunctionDeclaration(syn.File, syn.Span, declaringClass, symbol, nameSpan, parameters, reachabilityAnnotations, body);
         }
 
         private static IAbstractMethodDeclaration BuildAbstractMethod(
@@ -81,7 +83,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
             var nameSpan = syn.NameSpan;
             var selfParameter = BuildParameter(syn.SelfParameter);
             var parameters = syn.Parameters.Select(BuildParameter).ToFixedList();
-            return new AbstractMethodDeclaration(syn.File, syn.Span, declaringClass, symbol, nameSpan, selfParameter, parameters);
+            var reachabilityAnnotations = BuildReachabilityAnnotations(syn.ReachabilityAnnotations);
+            return new AbstractMethodDeclaration(syn.File, syn.Span, declaringClass, symbol, nameSpan, selfParameter, parameters, reachabilityAnnotations);
         }
 
         private static IConcreteMethodDeclaration BuildConcreteMethod(
@@ -92,8 +95,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
             var nameSpan = syn.NameSpan;
             var selfParameter = BuildParameter(syn.SelfParameter);
             var parameters = syn.Parameters.Select(BuildParameter).ToFixedList();
-            IBody body = BuildBody(syn.Body);
-            return new ConcreteMethodDeclaration(syn.File, syn.Span, declaringClass, symbol, nameSpan, selfParameter, parameters, body);
+            var reachabilityAnnotations = BuildReachabilityAnnotations(syn.ReachabilityAnnotations);
+            var body = BuildBody(syn.Body);
+            return new ConcreteMethodDeclaration(syn.File, syn.Span, declaringClass, symbol, nameSpan, selfParameter, parameters,
+                reachabilityAnnotations, body);
         }
 
         private static IConstructorDeclaration BuildConstructor(
@@ -104,8 +109,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
             var nameSpan = syn.NameSpan;
             var selfParameter = BuildParameter(syn.ImplicitSelfParameter);
             var parameters = syn.Parameters.Select(BuildParameter).ToFixedList();
-            IBody body = BuildBody(syn.Body);
-            return new ConstructorDeclaration(syn.File, syn.Span, declaringClass, symbol, nameSpan, selfParameter, parameters, body);
+            var reachabilityAnnotations = BuildReachabilityAnnotations(syn.ReachabilityAnnotations);
+            var body = BuildBody(syn.Body);
+            return new ConstructorDeclaration(syn.File, syn.Span, declaringClass, symbol, nameSpan, selfParameter, parameters, reachabilityAnnotations, body);
         }
 
         private static IFieldDeclaration BuildField(
@@ -122,8 +128,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
             var symbol = syn.Symbol.Result;
             var nameSpan = syn.NameSpan;
             var parameters = syn.Parameters.Select(BuildParameter).ToFixedList();
-            IBody body = BuildBody(syn.Body);
-            return new FunctionDeclaration(syn.File, syn.Span, symbol, nameSpan, parameters, body);
+            var reachabilityAnnotations = BuildReachabilityAnnotations(syn.ReachabilityAnnotations);
+            var body = BuildBody(syn.Body);
+            return new FunctionDeclaration(syn.File, syn.Span, symbol, nameSpan, parameters, reachabilityAnnotations, body);
         }
 
         private static IConstructorParameter BuildParameter(IConstructorParameterSyntax parameter)
@@ -155,6 +162,46 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST
             var referencedSymbol = syn.ReferencedSymbol.Result ?? throw new InvalidOperationException();
             var defaultValue = BuildExpression(syn.DefaultValue);
             return new FieldParameter(syn.Span, referencedSymbol, defaultValue);
+        }
+
+        private static IReachabilityAnnotations BuildReachabilityAnnotations(IReachabilityAnnotationsSyntax syn)
+        {
+            IReachableFromAnnotation? reachableFrom = null;
+            if (syn.ReachableFromAnnotation != null)
+            {
+                var span = syn.ReachableFromAnnotation.Span;
+                var parameters = syn.ReachableFromAnnotation.Parameters.Select(BuildParameterName).ToFixedList();
+                reachableFrom= new ReachableFromAnnotation(span, parameters);
+            }
+
+            ICanReachAnnotation? canReach = null;
+            if (syn.CanReachAnnotation != null)
+            {
+                var span = syn.CanReachAnnotation.Span;
+                var parameters = syn.CanReachAnnotation.Parameters.Select(BuildParameterName).ToFixedList();
+                canReach = new CanReachAnnotation(span, parameters);
+            }
+
+            return new ReachabilityAnnotations(syn.Span, reachableFrom, canReach);
+        }
+
+        private static IParameterName BuildParameterName(IParameterNameSyntax exp)
+        {
+            switch (exp)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(exp);
+                case INamedParameterNameSyntax syn:
+                {
+                    var referencedSymbol = syn.ReferencedSymbol.Result ?? throw new InvalidOperationException();
+                    return new NamedParameterName(syn.Span, referencedSymbol);
+                }
+                case ISelfParameterNameSyntax syn:
+                {
+                    var referencedSymbol = syn.ReferencedSymbol.Result ?? throw new InvalidOperationException();
+                    return new SelfParameterName(syn.Span, referencedSymbol);
+                }
+            }
         }
 
         private static IBody BuildBody(IBodySyntax syn)

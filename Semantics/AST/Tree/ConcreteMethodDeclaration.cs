@@ -22,8 +22,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
             TextSpan nameSpan,
             ISelfParameter selfParameter,
             FixedList<INamedParameter> parameters,
+            IReachabilityAnnotations reachabilityAnnotations,
             IBody body)
-            : base(file, span, symbol, nameSpan, parameters.ToFixedList<IConstructorParameter>())
+            : base(file, span, symbol, nameSpan,
+                parameters.ToFixedList<IConstructorParameter>(),
+                reachabilityAnnotations)
         {
             Symbol = symbol;
             Parameters = parameters;

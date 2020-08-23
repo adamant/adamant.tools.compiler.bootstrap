@@ -66,9 +66,13 @@ FieldParameter: Parameter, ConstructorParameter = ReferencedSymbol:'Promise<Fiel
 
 // ---------- Annotations
 ReachabilityAnnotations = ReachableFromAnnotation? CanReachAnnotation?
-ReachabilityAnnotation;
-ReachableFromAnnotation: ReachabilityAnnotation = ReachableFrom:NameOrSelfExpression*;
-CanReachAnnotation: ReachabilityAnnotation = CanReach:NameOrSelfExpression*;
+ReachabilityAnnotation = Parameters:ParameterName*;
+ReachableFromAnnotation: ReachabilityAnnotation = Parameters:ParameterName*;
+CanReachAnnotation: ReachabilityAnnotation = Parameters:ParameterName*;
+ParameterName = ReferencedSymbol:'IPromise<BindingSymbol?>';
+NamedParameterName: ParameterName = Name:'Name'? ReferencedSymbol:'Promise<VariableSymbol?>';
+SelfParameterName: ParameterName = ReferencedSymbol:'Promise<SelfParameterSymbol?>';
+
 
 // ---------- Function Parts
 Argument = &Expression;
@@ -130,9 +134,8 @@ UnqualifiedInvocationExpression: InvocationExpression, 'IHasContainingLexicalSco
 QualifiedInvocationExpression: InvocationExpression, 'IHasContainingLexicalScope' = &Context:Expression Arguments:Argument* ReferencedSymbol:'Promise<MethodSymbol?>';
 
 // ---------- Variable Expressions
-NameOrSelfExpression: Expression = ReferencedSymbol:'IPromise<BindingSymbol?>';
-NameExpression: AssignableExpression, NameOrSelfExpression, 'IHasContainingLexicalScope' = Name:'Name'? ReferencedSymbol:'Promise<NamedBindingSymbol?>';
-SelfExpression: NameOrSelfExpression = IsImplicit:'bool' ReferencedSymbol:'Promise<SelfParameterSymbol?>';
+NameExpression: AssignableExpression, 'IHasContainingLexicalScope' = Name:'Name'? ReferencedSymbol:'Promise<NamedBindingSymbol?>';
+SelfExpression: Expression = IsImplicit:'bool' ReferencedSymbol:'Promise<SelfParameterSymbol?>';
 QualifiedNameExpression: AssignableExpression = &Context:Expression AccessOperator:'AccessOperator' Field:NameExpression ReferencedSymbol:'IPromise<FieldSymbol?>';
 BorrowExpression: Expression = &Referent:Expression ReferencedSymbol:'Promise<BindingSymbol?>';
 MoveExpression: Expression = &Referent:Expression ReferencedSymbol:'Promise<BindingSymbol?>';

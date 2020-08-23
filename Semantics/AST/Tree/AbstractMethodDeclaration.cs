@@ -21,8 +21,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
             MethodSymbol symbol,
             TextSpan nameSpan,
             ISelfParameter selfParameter,
-            FixedList<INamedParameter> parameters)
-            : base(file, span, symbol, nameSpan, parameters.ToFixedList<IConstructorParameter>())
+            FixedList<INamedParameter> parameters,
+            IReachabilityAnnotations reachabilityAnnotations)
+            : base(file, span, symbol, nameSpan, parameters.ToFixedList<IConstructorParameter>(), reachabilityAnnotations)
         {
             Symbol = symbol;
             SelfParameter = selfParameter;

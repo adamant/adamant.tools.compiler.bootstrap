@@ -52,6 +52,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                 case IDeclarationSyntax syn:
                     CheckSymbol(syn, syn.Symbol);
                     break;
+                case IParameterNameSyntax syn:
+                    CheckReferencedSymbol(syn, syn.ReferencedSymbol);
+                    break;
                 case INameExpressionSyntax syn:
                     CheckReferencedSymbol(syn, syn.ReferencedSymbol);
                     break;

@@ -96,12 +96,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
                         yield return n.CanReachAnnotation;
                     yield break;
                 case IReachableFromAnnotationSyntax n:
-                    foreach(var child in n.ReachableFrom)
+                    foreach(var child in n.Parameters)
                         yield return child;
                     yield break;
                 case ICanReachAnnotationSyntax n:
-                    foreach(var child in n.CanReach)
+                    foreach(var child in n.Parameters)
                         yield return child;
+                    yield break;
+                case INamedParameterNameSyntax n:
+                    yield break;
+                case ISelfParameterNameSyntax n:
                     yield break;
                 case IArgumentSyntax n:
                     yield return n.Expression;

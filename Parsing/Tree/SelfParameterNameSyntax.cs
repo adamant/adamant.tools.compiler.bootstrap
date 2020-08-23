@@ -2,26 +2,22 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Promises;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
-using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    internal class SelfExpressionSyntax : ExpressionSyntax, ISelfExpressionSyntax
+    internal class SelfParameterNameSyntax : Syntax, ISelfParameterNameSyntax
     {
-        public bool IsImplicit { get; }
         public Promise<SelfParameterSymbol?> ReferencedSymbol { get; } = new Promise<SelfParameterSymbol?>();
+        IPromise<BindingSymbol?> IParameterNameSyntax.ReferencedSymbol => ReferencedSymbol;
 
-        public SelfExpressionSyntax(TextSpan span, bool isImplicit)
+        public SelfParameterNameSyntax(TextSpan span)
             : base(span)
         {
-            IsImplicit = isImplicit;
         }
-
-        protected override OperatorPrecedence ExpressionPrecedence => OperatorPrecedence.Primary;
 
         public override string ToString()
         {
-            return IsImplicit ? "⟦self⟧" : "self";
+            return "self";
         }
     }
 }

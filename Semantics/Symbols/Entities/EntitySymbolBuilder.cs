@@ -262,33 +262,35 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
 
         private void ResolveReachabilityAnnotations(IInvocableDeclarationSyntax invocable)
         {
-            var canReach = invocable.ReachabilityAnnotations.CanReachAnnotation?.CanReach
-                           ?? Enumerable.Empty<INameOrSelfExpressionSyntax>();
-            var reachableFrom = invocable.ReachabilityAnnotations.ReachableFromAnnotation?.ReachableFrom
-                                ?? Enumerable.Empty<INameOrSelfExpressionSyntax>();
+            var canReach = invocable.ReachabilityAnnotations.CanReachAnnotation?.Parameters
+                           ?? Enumerable.Empty<IParameterNameSyntax>();
+            var reachableFrom = invocable.ReachabilityAnnotations.ReachableFromAnnotation?.Parameters
+                                ?? Enumerable.Empty<IParameterNameSyntax>();
             var symbols = symbolTree.Children(invocable.Symbol.Result).OfType<BindingSymbol>().ToFixedSet();
             foreach (var syn in canReach.Concat(reachableFrom))
                 ResolveReachabilityAnnotation(syn, symbols);
         }
 
         private static void ResolveReachabilityAnnotation(
-            INameOrSelfExpressionSyntax syntax,
+            IParameterNameSyntax syntax,
             FixedSet<BindingSymbol> symbols)
         {
             switch (syntax)
             {
                 default:
                     throw ExhaustiveMatch.Failed(syntax);
-                case INameExpressionSyntax syn:
+                case INamedParameterNameSyntax syn:
                 {
-                    var referencedSymbol = symbols.OfType<NamedBindingSymbol>().SingleOrDefault(s => s.Name == syn.Name);
+                    var referencedSymbol = symbols.OfType<VariableSymbol>().SingleOrDefault(s => s.Name == syn.Name);
                     syn.ReferencedSymbol.Fulfill(referencedSymbol);
+                    // TODO error for null
                 }
                 break;
-                case ISelfExpressionSyntax syn:
+                case ISelfParameterNameSyntax syn:
                 {
                     var referencedSymbol = symbols.OfType<SelfParameterSymbol>().SingleOrDefault();
                     syn.ReferencedSymbol.Fulfill(referencedSymbol);
+                    // TODO error for null
                 }
                 break;
             }

@@ -16,6 +16,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(IBinding),
         typeof(IDeclaration),
         typeof(IParameter),
+        typeof(IReachabilityAnnotations),
+        typeof(IReachabilityAnnotation),
+        typeof(IParameterName),
         typeof(IStatement),
         typeof(IExpression))]
     public partial interface IAbstractSyntax
@@ -88,6 +91,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         new InvocableSymbol Symbol { get; }
         FixedList<IConstructorParameter> Parameters { get; }
+        IReachabilityAnnotations ReachabilityAnnotations { get; }
     }
 
     [Closed(
@@ -138,6 +142,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         new MethodSymbol Symbol { get; }
         ISelfParameter SelfParameter { get; }
         FixedList<INamedParameter> Parameters { get; }
+        IReachabilityAnnotations ReachabilityAnnotations { get; }
     }
 
     public partial interface IAbstractMethodDeclaration : IMethodDeclaration
@@ -148,6 +153,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         new MethodSymbol Symbol { get; }
         new FixedList<INamedParameter> Parameters { get; }
+        new IReachabilityAnnotations ReachabilityAnnotations { get; }
     }
 
     public partial interface IConstructorDeclaration : IMemberDeclaration, IConcreteInvocableDeclaration
@@ -207,6 +213,46 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         FieldSymbol ReferencedSymbol { get; }
         IExpression? DefaultValue { get; }
+    }
+
+    public partial interface IReachabilityAnnotations : IAbstractSyntax
+    {
+        IReachableFromAnnotation? ReachableFromAnnotation { get; }
+        ICanReachAnnotation? CanReachAnnotation { get; }
+    }
+
+    [Closed(
+        typeof(IReachableFromAnnotation),
+        typeof(ICanReachAnnotation))]
+    public partial interface IReachabilityAnnotation : IAbstractSyntax
+    {
+        FixedList<IParameterName> Parameters { get; }
+    }
+
+    public partial interface IReachableFromAnnotation : IReachabilityAnnotation
+    {
+    }
+
+    public partial interface ICanReachAnnotation : IReachabilityAnnotation
+    {
+    }
+
+    [Closed(
+        typeof(INamedParameterName),
+        typeof(ISelfParameterName))]
+    public partial interface IParameterName : IAbstractSyntax
+    {
+        BindingSymbol ReferencedSymbol { get; }
+    }
+
+    public partial interface INamedParameterName : IParameterName
+    {
+        new VariableSymbol ReferencedSymbol { get; }
+    }
+
+    public partial interface ISelfParameterName : IParameterName
+    {
+        new SelfParameterSymbol ReferencedSymbol { get; }
     }
 
     public partial interface IBody : IBodyOrBlock

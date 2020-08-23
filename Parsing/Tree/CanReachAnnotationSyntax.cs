@@ -6,17 +6,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class CanReachAnnotationSyntax : Syntax, ICanReachAnnotationSyntax
     {
-        public FixedList<INameOrSelfExpressionSyntax> CanReach { get; }
+        public FixedList<IParameterNameSyntax> Parameters { get; }
 
-        public CanReachAnnotationSyntax(TextSpan span, FixedList<INameOrSelfExpressionSyntax> canReach)
+        public CanReachAnnotationSyntax(TextSpan span, FixedList<IParameterNameSyntax> parameters)
             : base(span)
         {
-            CanReach = canReach;
+            Parameters = parameters;
         }
 
         public override string ToString()
         {
-            return $"~> {string.Join(", ", CanReach)}";
+            return $"~> {string.Join(", ", Parameters)}";
         }
     }
 }

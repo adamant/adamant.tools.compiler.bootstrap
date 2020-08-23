@@ -18,8 +18,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.AST.Tree
             FunctionSymbol symbol,
             TextSpan nameSpan,
             FixedList<INamedParameter> parameters,
+            IReachabilityAnnotations reachabilityAnnotations,
             IBody body)
-            : base(file, span, symbol, nameSpan, parameters.ToFixedList<IConstructorParameter>())
+            : base(file, span, symbol, nameSpan, parameters.ToFixedList<IConstructorParameter>(), reachabilityAnnotations)
         {
             Symbol = symbol;
             Parameters = parameters;
