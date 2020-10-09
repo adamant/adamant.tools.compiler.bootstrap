@@ -43,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public IEnumerable<IPromise<TypeSymbol>> LookupInContainingScope()
         {
             if (containingLexicalScope != null)
-                return containingLexicalScope.Lookup(Name).Select(p => p.As<TypeSymbol>()).NotNull();
+                return containingLexicalScope.Lookup(Name).Select(p => p.As<TypeSymbol>()).WhereNotNull();
 
             throw new InvalidOperationException($"Can't lookup type name without {nameof(ContainingLexicalScope)}");
         }

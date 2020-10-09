@@ -125,10 +125,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IEnumerable<T> NotNull<T>(this IEnumerable<T?> values)
+        public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> values)
             where T : class
         {
-            return values.Where(v => !(v is null)).Select(v => v!);
+            return values.Where(v => !(v is null))!;
+        }
+
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> values)
+            where T : struct
+        {
+            return values.Where(v => !(v is null)).Select(v => v!.Value);
         }
     }
 }

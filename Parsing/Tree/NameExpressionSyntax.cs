@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             // If name is unknown, no symbols
             if (Name is null) return Enumerable.Empty<IPromise<NamedBindingSymbol>>();
 
-            return containingLexicalScope.Lookup(Name).Select(p => p.As<NamedBindingSymbol>()).NotNull();
+            return containingLexicalScope.Lookup(Name).Select(p => p.As<NamedBindingSymbol>()).WhereNotNull();
         }
 
         protected override OperatorPrecedence ExpressionPrecedence => OperatorPrecedence.Primary;

@@ -53,7 +53,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             // If name is unknown, no symbols
             if (InvokedName is null) return Enumerable.Empty<IPromise<FunctionSymbol>>();
 
-            return containingLexicalScope.Lookup(InvokedName).Select(p => p.As<FunctionSymbol>()).NotNull();
+            return containingLexicalScope.Lookup(InvokedName).Select(p => p.As<FunctionSymbol>()).WhereNotNull();
         }
 
         protected override OperatorPrecedence ExpressionPrecedence => OperatorPrecedence.Primary;

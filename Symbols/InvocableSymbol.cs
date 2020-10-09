@@ -1,5 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Symbols.Reachability;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
 
@@ -15,14 +16,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
         public FixedList<DataType> ParameterDataTypes { get; }
         public int Arity => ParameterDataTypes.Count;
         public DataType ReturnDataType { get; }
+        public FixedSet<ReachabilityAnnotation> ReachabilityAnnotations { get; }
 
-        protected InvocableSymbol(Symbol containingSymbol, Name? name, FixedList<DataType> parameterDataTypes, DataType returnDataType)
+        protected InvocableSymbol(
+            Symbol containingSymbol,
+            Name? name,
+            FixedList<DataType> parameterDataTypes,
+            DataType returnDataType,
+            FixedSet<ReachabilityAnnotation> reachabilityAnnotations)
             : base(containingSymbol, name)
         {
             ContainingSymbol = containingSymbol;
             Name = name;
             ParameterDataTypes = parameterDataTypes;
             ReturnDataType = returnDataType;
+            ReachabilityAnnotations = reachabilityAnnotations;
         }
     }
 }

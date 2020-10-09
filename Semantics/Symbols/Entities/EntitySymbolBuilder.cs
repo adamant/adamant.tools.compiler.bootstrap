@@ -4,9 +4,11 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
+using Adamant.Tools.Compiler.Bootstrap.Symbols.Reachability;
 using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
@@ -80,7 +82,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
             var selfParameterType = ResolveSelfParameterType(method.SelfParameter, method.DeclaringClass);
             var parameterTypes = ResolveParameterTypes(resolver, method.Parameters, method.DeclaringClass);
             var returnType = ResolveReturnType(method.ReturnType, resolver);
-            var symbol = new MethodSymbol(declaringClassSymbol, method.Name, selfParameterType, parameterTypes, returnType);
+            var reachabilityAnnotations = BuildReachabilityAnnotations(method);
+            var symbol = new MethodSymbol(declaringClassSymbol, method.Name, selfParameterType, parameterTypes, returnType, reachabilityAnnotations);
             method.Symbol.Fulfill(symbol);
             symbolTree.Add(symbol);
             BuildSelParameterSymbol(symbol, method.SelfParameter, selfParameterType);
@@ -258,6 +261,62 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols.Entities
             var returnType = returnTypeSyntax != null
                 ? resolver.Evaluate(returnTypeSyntax) : DataType.Void;
             return returnType;
+        }
+
+        private static FixedSet<ReachabilityAnnotation>? BuildReachabilityAnnotations(IInvocableDeclarationSyntax invocable)
+        {
+            var annotation = BuildReachabilityAnnotation(invocable);
+            return annotation is null ? null : new FixedSet<ReachabilityAnnotation>(annotation.Yield());
+        }
+
+        private static ReachabilityAnnotation? BuildReachabilityAnnotation(IInvocableDeclarationSyntax invocable)
+        {
+            var parameters = invocable.Parameters.Select((p, i) => new { Param = p, Index = i })
+                                  .Where(x => x.Param is INamedParameterSyntax)
+                                  .ToDictionary(x => ((INamedParameterSyntax)x.Param).Name, x => ParameterReference.Create(x.Index));
+
+            ReachabilityAnnotation? annotation = null;
+
+            var canReach = ToReferences(invocable.ReachabilityAnnotations.CanReachAnnotation, parameters);
+            if (canReach.Count != 0)
+            {
+                var refs = new ReachableReferences(canReach);
+                annotation = new ReachabilityAnnotation(ReturnReference.Instance, refs);
+            }
+
+            var reachableFrom = ToReferences(invocable.ReachabilityAnnotations.ReachableFromAnnotation, parameters);
+            if (reachableFrom.Count != 0)
+            {
+                var chain = (ReachabilityChain?)annotation ?? new ReachableReferences(ReturnReference.Instance);
+                annotation = new ReachabilityAnnotation(reachableFrom, chain);
+            }
+
+            return annotation;
+        }
+
+        private static FixedSet<Reference> ToReferences(
+            IReachabilityAnnotationSyntax? annotation,
+            Dictionary<Name, ParameterReference> parameters)
+        {
+            return annotation?.Parameters.Select(p => ToSymbolReference(p, parameters))
+                             .WhereNotNull().ToFixedSet() ?? FixedSet<Reference>.Empty;
+        }
+
+        private static Reference? ToSymbolReference(
+            IParameterNameSyntax paramName,
+            IReadOnlyDictionary<Name, ParameterReference> parameters)
+        {
+            switch (paramName)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(paramName);
+                case INamedParameterNameSyntax syn:
+                    if (syn.Name != null && parameters.TryGetValue(syn.Name, out var reference))
+                        return reference;
+                    return null;
+                case ISelfParameterNameSyntax _:
+                    return SelfParameterReference.Instance;
+            }
         }
 
         private void ResolveReachabilityAnnotations(IInvocableDeclarationSyntax invocable)

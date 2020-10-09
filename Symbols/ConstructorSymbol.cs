@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Symbols.Reachability;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Symbols
@@ -14,8 +15,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
         public ConstructorSymbol(
             ObjectTypeSymbol containingSymbol,
             Name? name,
-            FixedList<DataType> parameterDataTypes)
-            : base(containingSymbol, name, parameterDataTypes, containingSymbol.DeclaresDataType.ToConstructorReturn())
+            FixedList<DataType> parameterDataTypes,
+            FixedSet<ReachabilityAnnotation>? reachabilityAnnotations = null)
+            : base(containingSymbol, name, parameterDataTypes,
+                containingSymbol.DeclaresDataType.ToConstructorReturn(),
+                reachabilityAnnotations ?? FixedSet<ReachabilityAnnotation>.Empty)
         {
             ContainingSymbol = containingSymbol;
             ReturnDataType = containingSymbol.DeclaresDataType.ToConstructorReturn();
@@ -23,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
 
         public static ConstructorSymbol CreateDefault(ObjectTypeSymbol containingSymbol)
         {
-            return new ConstructorSymbol(containingSymbol, null, FixedList<DataType>.Empty);
+            return new ConstructorSymbol(containingSymbol, null, FixedList<DataType>.Empty, FixedSet<ReachabilityAnnotation>.Empty);
         }
 
         public override bool Equals(Symbol? other)
